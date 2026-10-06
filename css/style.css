@@ -262,3 +262,17 @@ nav a:hover {
         gap: 15px;
     }
 }
+
+/* Image block */
+
+.image-section {
+    padding-bottom: 0;
+}
+
+.image-block img {
+    display: block;
+    max-width: 100%;
+    width: 480px;
+    height: auto;
+    border-radius: 8px;
+}

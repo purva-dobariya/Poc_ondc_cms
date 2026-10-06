@@ -1,6 +1,6 @@
 paths:
   static: ''
-  uploads: uploads
+  uploads: images
 timezone: Asia/Calcutta
 markdown:
   engine: commonmark
