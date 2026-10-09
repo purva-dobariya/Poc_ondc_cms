@@ -59,6 +59,44 @@ collections_config:
         label: Article link
         comment: Full address of the article, starting with https://
 
+      stories:
+        type: array
+        label: Network stories
+        comment: >-
+          Each item is one poster in "The Network in Action". Use "Add item" for
+          a new story, the item menu to duplicate or delete, and drag to reorder.
+          Three fit on one row; more wrap onto the next row (a swipeable rail on phones).
+        options:
+          structures: _structures.story_card
+      poster:
+        type: image
+        label: Poster image
+        comment: The LinkedIn post / quote graphic. Portrait 4:5 works best (e.g. 1080 x 1350).
+        options:
+          resize_style: cover
+          width: 1080
+          height: 1350
+      name:
+        type: text
+        label: Person's name
+        comment: Read out by screen readers only.
+      role:
+        type: text
+        label: Role and company
+        comment: e.g. Founder, SukeshKart. Read out by screen readers only.
+      quote:
+        type: textarea
+        label: Quote shown in the poster
+        comment: Same words as the poster image. Read out by screen readers only.
+      badge:
+        type: text
+        label: Label under the poster
+        comment: e.g. Seller Story
+      post_link:
+        type: url
+        label: Post link
+        comment: Address of the LinkedIn post, starting with https://
+
     _structures:
       news_card:
         style: select
@@ -79,6 +117,25 @@ collections_config:
               headline: ''
               dek: ''
               link: ''
+      story_card:
+        style: select
+        values:
+          - label: Network story
+            icon: format_quote
+            preview:
+              text:
+                - key: name
+              subtext:
+                - key: role
+              image:
+                - key: poster
+            value:
+              poster: ''
+              name: ''
+              role: ''
+              quote: ''
+              badge: Seller Story
+              post_link: ''
 
 # Toolbar for every data-editable="source" region (home.html has ~83 of them).
 # `format` limits which block types editors can switch to, so they stay on-design.

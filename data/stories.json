@@ -1,0 +1,28 @@
+{
+  "stories": [
+    {
+      "poster": "/images/home-story-1.jpeg",
+      "name": "Harshal Gada",
+      "role": "Director, Onlinebecho Solutions India Pvt Ltd",
+      "quote": "ONDC is a game changer ecommerce platform that has allowed us to increase our brands to a national level. The user base of the ONDC Network is increasing multifolds month on month.",
+      "badge": "Seller Story",
+      "post_link": "https://www.linkedin.com/feed/update/urn:li:activity:7442813849013157888"
+    },
+    {
+      "poster": "/images/home-story-2.jpeg",
+      "name": "Rahul Jaishwal",
+      "role": "Founder, APIDEAR",
+      "quote": "As a budding entrepreneur with little prior experience in the digital business ecosystem, ONDC Network and UdyamWell proved to be a true blessing in disguise… instilled in me the confidence to innovate and expand my product range.",
+      "badge": "Seller Story",
+      "post_link": "https://www.linkedin.com/feed/update/urn:li:activity:7443542399223693312"
+    },
+    {
+      "poster": "/images/home-story-3.jpeg",
+      "name": "Sanjeev Bhardwaj",
+      "role": "Founder, SukeshKart",
+      "quote": "Compared to traditional private marketplaces, ONDC Network offers a more economical and transparent model, creating a level playing field and expanding opportunities for MSMEs and manufacturers across India.",
+      "badge": "Seller Story",
+      "post_link": "https://www.linkedin.com/feed/update/urn:li:activity:7442083536192536577"
+    }
+  ]
+}
