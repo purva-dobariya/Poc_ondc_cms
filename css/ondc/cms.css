@@ -68,3 +68,6 @@ html.is-editing #site-header { position: relative; }
 
 /* count-up: the real (editable) number hides while a copy outside the region counts */
 .metric.is-counting .metric-num:not(.metric-num-ghost) { visibility: hidden; }
+
+/* editor-only note above the news rail (injected by js/ondc-home.js) */
+.news-edit-hint { margin: 0 0 20px; padding: 12px 16px; border: 1px dashed #00AEEF; border-radius: 10px; background: rgba(0,174,239,.08); font: 500 14px/1.5 system-ui, sans-serif; color: #0b2a3d; }

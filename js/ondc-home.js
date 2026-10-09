@@ -56,6 +56,13 @@
     $$('.ondc-hero, .home-ambient, .intro-skip, .metric-num-ghost').forEach(function (n) { n.remove(); });
     $$('.is-counting').forEach(function (n) { n.classList.remove('is-counting'); });
     $$('.slide').forEach(function (s) { s.removeAttribute('inert'); });
+    var wrap = $('.news-rail-wrap');
+    if (wrap && !$('.news-edit-hint')) {
+      var h = doc.createElement('div');
+      h.className = 'news-edit-hint';
+      h.innerHTML = '<strong>News cards are managed as data.</strong> To add, duplicate, reorder or delete a card, open <b>Data &rarr; News cards</b> in the CloudCannon sidebar, then save. The heading, intro and the "View more" card can be edited right here.';
+      wrap.parentNode.insertBefore(h, wrap);
+    }
   }
 
   /* =====================================================================
@@ -579,6 +586,53 @@
     upd();
   }
 
+  /* ---- news cards are DATA, not markup ----------------------------------
+     The cards live in /data/news.json (edited in CloudCannon: Data > News cards).
+     Add / duplicate / reorder / delete there and this draws them. Nothing here is
+     inside an editable region, so it is safe in both live and editor mode. */
+  var NEWS_URL = '/data/news.json';
+  var ARROW = '<svg fill="none" height="12" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="12"><path d="M3 7h8M8 4l3 3-3 3"></path></svg>';
+  function safeUrl(u) {
+    u = String(u || '').trim();
+    return /^(https?:\/\/|\/|#|mailto:)/i.test(u) ? u : (u ? 'https://' + u : '#');
+  }
+  function imgUrl(u) {
+    u = String(u || '').trim();
+    return /^(https?:)?\/\//i.test(u) || u.charAt(0) === '/' ? u : (u ? '/' + u : '');
+  }
+  function newsCardHTML(c, i) {
+    var no = (i + 1 < 10 ? '0' : '') + (i + 1);
+    var img = imgUrl(c.image);
+    var src = String(c.source || '').trim();
+    return '<a class="news-card" href="' + esc(safeUrl(c.link)) + '" rel="noopener noreferrer" target="_blank" style="transition-delay:' + (i * 90) + 'ms">' +
+      '<div class="news-thumb">' +
+        (img ? '<img alt="' + esc(c.headline || '') + '" loading="lazy" src="' + esc(img) + '">' : '') +
+        (c.tag ? '<div class="news-thumb-tag">' + esc(c.tag) + '</div>' : '') +
+      '</div>' +
+      '<div class="news-body">' +
+        '<div class="news-slug"><span class="news-slug-src">' + esc(src) + '</span><span aria-hidden="true" class="news-slug-rule"></span><span aria-hidden="true" class="news-slug-no">' + no + '</span></div>' +
+        '<div class="news-headline">' + esc(c.headline || '') + '</div>' +
+        (c.dek ? '<div class="news-dek">' + esc(c.dek) + '</div>' : '') +
+        '<span class="news-cta">' + (src ? 'Read on ' + esc(src) : 'Read more') + ' ' + ARROW + '</span>' +
+      '</div></a>';
+  }
+  var newsReady = (function () {
+    var track = $('.news-rail');
+    if (!track || !window.fetch) return Promise.resolve();
+    return fetch(NEWS_URL, { cache: 'no-cache' })
+      .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+      .then(function (d) {
+        var list = (d && d.cards) || [];
+        $$('.news-card:not(.news-more)', track).forEach(function (n) { n.remove(); });
+        var more = $('.news-more', track);
+        var tpl = doc.createElement('template');
+        tpl.innerHTML = list.map(newsCardHTML).join('');
+        track.insertBefore(tpl.content, more || null);
+        if (more) more.style.transitionDelay = (list.length * 90) + 'ms';
+      })
+      .catch(function (e) { if (window.console) console.warn('[ondc] could not load ' + NEWS_URL, e); });
+  })();
+
   function startNews(S) {
     var wrap = $('.news-rail-wrap'), track = wrap && $('.news-rail', wrap);
     if (!track) return;
@@ -616,7 +670,7 @@
     reveal(S, mb, 0.25, function (instant) { if (!instant && mb) countUp(S, mb); });
     startDeck(S);
     startDoors(S);
-    startNews(S);
+    newsReady.then(function () { if (page === S) startNews(S); });
     startAmbient(S);
 
     /* the hero is desktop-only (below 900px the page opens on the carousel) */

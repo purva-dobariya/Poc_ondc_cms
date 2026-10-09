@@ -10,6 +10,76 @@ collections_config:
     path: ''
     icon: wysiwyg
 
+  # Content that is shown as repeatable cards. One file per card group.
+  # Editors: sidebar > Data > News cards > "Add item" / duplicate / drag / delete.
+  data:
+    path: data
+    name: Data
+    icon: view_carousel
+    _enabled_editors:
+      - data
+    disable_add: true
+    disable_add_folder: true
+    disable_file_actions: true
+
+    _inputs:
+      cards:
+        type: array
+        label: News cards
+        comment: >-
+          Each item is one card in "ONDC in the News". Use "Add item" for a new
+          card, the item menu to duplicate or delete, and drag to reorder.
+          The numbers 01, 02, 03... are added automatically.
+        options:
+          structures: _structures.news_card
+      image:
+        type: image
+        label: Card image
+        comment: Upload or pick a picture. It is cropped to 16:10 automatically.
+        options:
+          resize_style: cover
+          width: 1200
+          height: 750
+      tag:
+        type: text
+        label: Category label
+        comment: Small pill on the image, e.g. Logistics
+      source:
+        type: text
+        label: Publication
+        comment: e.g. Inc42. The button reads "Read on <publication>".
+      headline:
+        type: text
+        label: Headline
+      dek:
+        type: textarea
+        label: Short summary
+      link:
+        type: url
+        label: Article link
+        comment: Full address of the article, starting with https://
+
+    _structures:
+      news_card:
+        style: select
+        values:
+          - label: News card
+            icon: newspaper
+            preview:
+              text:
+                - key: headline
+              subtext:
+                - key: source
+              image:
+                - key: image
+            value:
+              image: ''
+              tag: ''
+              source: ''
+              headline: ''
+              dek: ''
+              link: ''
+
 # Toolbar for every data-editable="source" region (home.html has ~83 of them).
 # `format` limits which block types editors can switch to, so they stay on-design.
 _editables:

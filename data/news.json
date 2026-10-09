@@ -1,0 +1,52 @@
+{
+  "cards": [
+    {
+      "image": "/images/home-news-news-digidukaan-inc42.jpg",
+      "tag": "DigiDukaan",
+      "source": "Inc42",
+      "headline": "One open network for kirana procurement",
+      "dek": "DigiDukaan connects retailers, distributors and brands directly — 10K+ retailers and 35+ brands already live in the Hyderabad pilot.",
+      "link": "https://inc42.com/buzz/how-ondc-plans-to-digitise-b2b-procurement-for-kirana-stores-through-digidukaan/"
+    },
+    {
+      "image": "/images/home-news-news-digidukaan-fmcg-bw.jpg",
+      "tag": "DigiDukaan",
+      "source": "BW Businessworld",
+      "headline": "FMCG brands back the push to modernise general trade",
+      "dek": "Major FMCG players join DigiDukaan to bring better pricing, schemes and margins to India's neighbourhood stores.",
+      "link": "https://www.businessworld.in/article/ondc-s-digidukaan-initiative-gains-fmcg-backing-to-modernise-general-trade-network-610614"
+    },
+    {
+      "image": "/images/home-news-news-transit-bs.jpg",
+      "tag": "Public Transport",
+      "source": "Business Standard",
+      "headline": "300K bus and metro tickets booked every day",
+      "dek": "Transit ticketing runs inside the apps people already use, as the network crosses 500M cumulative transactions.",
+      "link": "https://www.business-standard.com/industry/news/ondc-enables-three-lakh-daily-bus-and-metro-ticket-bookings-126060101212_1.html"
+    },
+    {
+      "image": "/images/home-news-news-uber-b2b-entrackr.webp",
+      "tag": "Logistics",
+      "source": "Entrackr",
+      "headline": "Uber enters B2B logistics in India on ONDC",
+      "dek": "Uber Direct launches through the network, opening on-demand delivery capacity to businesses of every size.",
+      "link": "https://entrackr.com/snippets/uber-india-enters-b2b-logistics-via-ondc-10898856"
+    },
+    {
+      "image": "/images/home-news-news-finserv-etbfsi.jpg",
+      "tag": "Financial Services",
+      "source": "ET BFSI",
+      "headline": "Loans, insurance and more, delivered over the network",
+      "dek": "ONDC is rolling out a full financial services suite — unsecured loans, business finance and insurance — within 18 months.",
+      "link": "https://bfsi.economictimes.indiatimes.com/articles/ondc-expands-financial-services-unsecured-loans-insurance-and-more-in-18-months/123514520"
+    },
+    {
+      "image": "/images/home-news-news-flipkart-food-adgully.jpg",
+      "tag": "Food & Beverages",
+      "source": "Adgully",
+      "headline": "Flipkart enters food delivery through ONDC",
+      "dek": "A phased rollout across urban markets plugs Flipkart into the network's restaurant supply instead of a captive platform.",
+      "link": "https://www.adgully.com/post/18439/flipkart-enters-food-delivery-ecosystem-through-ondc-integration"
+    }
+  ]
+}
