@@ -638,9 +638,29 @@
     }
   }
 
+  /* Decide editor vs live. The CloudCannon visual editor loads this page inside an
+     iframe and flags it with window.inEditorMode — but that flag can arrive a moment
+     after our script runs. So: if the page is framed by cloudcannon.com we wait for the
+     flag before touching anything; only when it never arrives (e.g. CloudCannon's plain
+     "preview") do we start the live animations. In editor mode this file changes nothing
+     except adding the class html.is-editing. */
+  function framedByCloudCannon() {
+    try {
+      if (window.self === window.top) return false;
+      var ao = window.location.ancestorOrigins;
+      if (ao && ao.length) return Array.prototype.some.call(ao, function (o) { return /cloudcannon/i.test(o); });
+      return /cloudcannon/i.test(doc.referrer || '');
+    } catch (e) { return true; }
+  }
   function init() {
     if (window.inEditorMode) { enterEditor(); return; }
-    startLive();
+    if (!framedByCloudCannon()) { startLive(); return; }
+    var tries = 0;
+    (function wait() {
+      if (window.inEditorMode) { enterEditor(); return; }
+      if (++tries < 15) { setTimeout(wait, 100); return; }
+      startLive();
+    })();
   }
   // CloudCannon fires this when the visual editor takes over the page
   doc.addEventListener('cloudcannon:load', function () { if (window.inEditorMode) enterEditor(); });
