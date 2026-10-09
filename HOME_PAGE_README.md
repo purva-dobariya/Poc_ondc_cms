@@ -3,7 +3,7 @@
 Copy these into your repo root (merge, keep your existing files):
 - `home.html`
 - `css/ondc/` (original ONDC CSS + `cms.css`)
-- `js/ondc/` (original ONDC scripts) and `js/home.js` (the animation port)
+- `js/ondc/` (original ONDC scripts) and `js/ondc-home.js` (the animation port; delete the OLD `js/home.js`)
 - `fonts/`, `images/`
 - the `_editables.content` block in `cloudcannon.config.yml`
 
