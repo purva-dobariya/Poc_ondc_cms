@@ -1,0 +1,70 @@
+/* =====================================================================
+   CMS layer for home.html — loads LAST, after the original ONDC CSS.
+   1. bridges so CloudCannon's editor wrappers don't change the look
+   2. image regions (the <img> lives inside an editable region)
+   3. EDITOR MODE (html.is-editing): every animation / pinned / hidden
+      state is neutralised so each region is visible and clickable.
+   ===================================================================== */
+
+/* 1 ── the rich-text editor wraps single-line text in <p>; make that invisible */
+[data-editable="source"] > p:only-child { display: contents; margin: 0; }
+
+/* 2 ── image regions */
+.cms-img { display: block; width: 100%; height: 100%; }
+.cms-img > p { display: contents; }
+.cms-img img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.dpi-media > .cms-img,
+.door-media > .cms-img,
+.news-thumb > .cms-img { position: absolute; inset: 0; z-index: 0; }
+.dpi-media::before, .door-media::after, .news-thumb::before, .news-thumb::after { pointer-events: none; }
+.dpi-media::before { z-index: 1; }
+.dpi-media-tag, .door-media-tag, .news-thumb-tag { z-index: 2; }
+
+/* the hero copy block is only for editors */
+.hero-source { display: none; }
+
+/* 3 ── EDITOR MODE ─────────────────────────────────────────────────── */
+html.is-editing .hero-source {
+  display: block; background: linear-gradient(135deg, #1A1A2E, #2D3748); color: #fff;
+  padding: 120px 0 56px;
+}
+html.is-editing .hero-source-note { font: 600 12px/1.5 Inter, sans-serif; letter-spacing: .06em; text-transform: uppercase; color: #8fdcff; margin: 0 0 14px; max-width: 820px; }
+html.is-editing .hero-source [data-key] { max-width: 820px; margin-bottom: 36px; font-size: 18px; line-height: 1.5; }
+html.is-editing .hero-source [data-key] p { margin: 0 0 14px; padding-left: 14px; border-left: 3px solid rgba(255,255,255,.25); }
+html.is-editing .hero-source [data-key] ul { padding-left: 22px; }
+html.is-editing .hero-source a { color: #8fdcff; text-decoration: underline; }
+
+html.is-editing .ondc-hero,
+html.is-editing .home-ambient,
+html.is-editing .intro-skip { display: none !important; }
+
+/* reveal states */
+html.is-editing .hv-rv,
+html.is-editing .news-card { opacity: 1 !important; transform: none !important; transition: none !important; }
+
+/* carousel: show every slide, one under the other */
+html.is-editing .hero { min-height: 0; }
+html.is-editing .slide { display: flex !important; align-items: center; border-bottom: 6px solid #00AEEF; }
+html.is-editing .hero-arrow,
+html.is-editing .hero-pills { display: none !important; }
+
+/* building blocks: plain list, no pin / runway */
+html.is-editing .dpi { height: auto !important; }
+html.is-editing .dpi-stage { position: static !important; height: auto !important; overflow: visible !important; padding-top: 64px !important; }
+html.is-editing .dpi-deck { display: flex !important; flex-direction: column; gap: 20px; }
+html.is-editing .dpi-card { grid-area: auto !important; width: 100% !important; height: auto !important; max-height: none !important; transform: none !important; }
+html.is-editing .dpi-media { min-height: 260px; }
+html.is-editing .dpi-controls { display: none !important; }
+
+/* rails -> wrapping grids */
+html.is-editing .doors-track,
+html.is-editing .news-rail { flex-wrap: wrap; overflow: visible !important; }
+html.is-editing .door-card,
+html.is-editing .news-card { flex: 0 0 calc(50% - 12px) !important; height: auto !important; min-height: 420px; }
+html.is-editing .doors-arrow,
+html.is-editing .doors-progress { display: none !important; }
+
+html.is-editing #site-header { position: relative; }
+
+/* count-up: the real (editable) number hides while a copy outside the region counts */
+.metric.is-counting .metric-num:not(.metric-num-ghost) { visibility: hidden; }

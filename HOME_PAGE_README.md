@@ -1,18 +1,18 @@
-# ONDC home page (CloudCannon edition)
+# ONDC home page (v2) — CloudCannon
 
-Files added to the repo:
+Copy these into your repo root (merge, keep your existing files):
+- `home.html`
+- `css/ondc/` (original ONDC CSS + `cms.css`)
+- `js/ondc/` (original ONDC scripts) and `js/home.js` (the animation port)
+- `fonts/`, `images/`
+- the `_editables.content` block in `cloudcannon.config.yml`
 
-| Path | Purpose |
-|---|---|
-| `home.html` | The new home page. 9 sections, 83 `data-editable="source"` regions. |
-| `css/home.css` | Theme ported from the original site (tokens, Space Grotesk + Inter, section looks). |
-| `js/home.js` | Carousel + rail arrows. Never touches content inside editable regions. |
-| `fonts/` | Space Grotesk 400/600/700, Inter 400–700 (woff2). |
-| `images/home/…` | Hero, building-block, audience, story, news images, logo, India map. |
-| `cloudcannon.config.yml` | Added an `_editables.content` toolbar config. |
+## Seeing the animations
+The visual editor never plays animations (it stacks everything flat so you can click and edit).
+Open the **preview/live URL of the built site** (e.g. `https://<your-site>.cloudvent.net/home.html`) in a normal browser tab.
+Edit in CloudCannon -> save -> the live URL updates after the build.
 
-Rules for editing markup later
-1. Every editable region needs a unique `data-key` (per file) and `data-path="/home.html"`.
-2. Style regions by tag/position (`.slide-content > p:first-child`), not by classes an editor could drop.
-3. JS may not change text/classes/attributes inside a region — CloudCannon saves its innerHTML.
-4. `html.is-editing` (set when `window.inEditorMode`) un-hides all carousel slides so each is editable.
+## Editing notes
+- Hero text: edit the dark "HERO" block at the top of the editor (4 beats, impact beat, headline, wordmark, title, tagline, 2 buttons, then the number list). Keep the order.
+- Link URLs are edited in the Source editor, not the visual editor.
+- Sector pills and the news "Read on..." line are static.
