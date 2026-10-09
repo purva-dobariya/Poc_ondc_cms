@@ -13,6 +13,6 @@ Open the **preview/live URL of the built site** (e.g. `https://<your-site>.cloud
 Edit in CloudCannon -> save -> the live URL updates after the build.
 
 ## Editing notes
-- Hero text: edit the dark "HERO" block at the top of the editor (4 beats, impact beat, headline, wordmark, title, tagline, 2 buttons, then the number list). Keep the order.
+- Hero text: edit the dark "HERO" block at the top of the editor. Keep the order.
 - Link URLs are edited in the Source editor, not the visual editor.
 - Sector pills and the news "Read on..." line are static.

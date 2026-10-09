@@ -68,13 +68,13 @@
       ['Sellers, buyer apps, logistics and payments', 'speak one shared language.'],
       ['And when every connection holds hands,', 'a country takes shape.']
     ],
-    impact: ['The network is live across this map.', 'Here is what it carries.'],
-    headline: 'The impact one open network has enabled',
+    impact: ['One Open network.', 'A connected India.'],
+    headline: 'Across cities, categories and communities.',
     wordmark: 'ONDC',
     title: "Building India's Digital Commerce Infrastructure",
     tagline: 'One Network. Efficiency by Design. Inclusion by Intent.',
     ctas: [['Explore the network', '#site-top'], ['Join the ecosystem', '#find-your-place']],
-    metrics: [['500M+', 'transactions till date'], ['300+', 'network participants']]
+    metrics: []   // ondc.org shows no counters inside the hero; add a [data-key="hero-numbers"] list to bring them back
   };
   var MESH_EVENTS = ['pulse-accelerate', 'participant-flare', 'city-glints', 'seller-shimmer'];
   var BEAT_WINDOWS = [
@@ -189,7 +189,7 @@
       '</div></section>' +
       '<section id="impact" aria-label="Impact" class="hero-act-impact"><div class="hero-map-dock" aria-hidden="true"></div>' +
       '<div class="hero-impact-content">' + beatBlock('beat-act2', 'h2', 'left', c.impact[0], c.impact[1]) +
-      '<p class="hero-impact-headline">' + esc(c.headline) + '</p><div class="hero-metrics">' + metricsHtml + '</div></div></section>';
+      '<p class="hero-impact-headline">' + esc(c.headline) + '</p>' + (metricsHtml ? '<div class="hero-metrics">' + metricsHtml + '</div>' : '') + '</div></section>';
     header.after(root);
 
     var canvas = $('.mesh-canvas', root);
