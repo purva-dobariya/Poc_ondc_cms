@@ -9,3 +9,18 @@ collections_config:
   pages:
     path: ''
     icon: wysiwyg
+
+# Toolbar for every data-editable="source" region (home.html has ~83 of them).
+# `format` limits which block types editors can switch to, so they stay on-design.
+_editables:
+  content:
+    format: p h1 h2 h3 h4
+    bold: true
+    italic: true
+    link: true
+    bulletedlist: true
+    numberedlist: true
+    image: true
+    removeformat: true
+    undo: true
+    redo: true
