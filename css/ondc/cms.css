@@ -71,3 +71,4 @@ html.is-editing #site-header { position: relative; }
 
 /* editor-only note above the news rail (injected by js/ondc-home.js) */
 .news-edit-hint { margin: 0 0 20px; padding: 12px 16px; border: 1px dashed #00AEEF; border-radius: 10px; background: rgba(0,174,239,.08); font: 500 14px/1.5 system-ui, sans-serif; color: #0b2a3d; }
+.testimonials .news-edit-hint { margin-bottom: 64px; }   /* leave room for the card drop-line nodes */

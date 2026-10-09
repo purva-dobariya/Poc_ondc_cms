@@ -48,8 +48,10 @@
   /* =====================================================================
      EDITOR MODE
      ===================================================================== */
+  var editorReady = false;
   function enterEditor() {
-    if (html.classList.contains('is-editing')) return;
+    if (editorReady) return;
+    editorReady = true;
     html.classList.add('is-editing');
     if (page) { page.dispose(); page = null; }
     if (heroCtl) { heroCtl.dispose(); heroCtl = null; }
@@ -688,7 +690,7 @@
      LIVE MODE
      ===================================================================== */
   function startLive() {
-    if (page || html.classList.contains('is-editing')) return;
+    if (page || editorReady) return;
     var S = page = new Scope();
 
     startCarousel(S);
@@ -737,10 +739,17 @@
   function init() {
     if (window.inEditorMode) { enterEditor(); return; }
     if (!framedByCloudCannon()) { startLive(); return; }
+    /* Framed by CloudCannon: assume the editor straight away. The flat editing layout
+       (all slides shown, hero copy block shown) must be in place BEFORE CloudCannon
+       looks for the editable regions, otherwise regions inside hidden slides / the
+       hidden hero block are "not found". The class is also set by a tiny inline script
+       in <head>; if the editor flag never arrives (plain preview) we undo it. */
+    html.classList.add('is-editing');
     var tries = 0;
     (function wait() {
       if (window.inEditorMode) { enterEditor(); return; }
-      if (++tries < 15) { setTimeout(wait, 100); return; }
+      if (++tries < 20) { setTimeout(wait, 100); return; }
+      html.classList.remove('is-editing');
       startLive();
     })();
   }
