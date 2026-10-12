@@ -1,3 +1,18 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# ONDC site — CloudCannon configuration
+#
+# The site is built with Eleventy. In CloudCannon, Site Settings → Build must be:
+#     Site generator : Eleventy
+#     Install command: npm install
+#     Build command  : npx @11ty/eleventy
+#     Output path    : _site
+#
+# Every page is a file in src/pages with a `sections` list in its front matter.
+# Editors add, duplicate, reorder and delete those sections; developers only get
+# involved when a brand new KIND of section is needed.
+# ─────────────────────────────────────────────────────────────────────────────
+
+source: ''
 paths:
   static: ''
   uploads: images
@@ -5,149 +20,709 @@ timezone: Asia/Calcutta
 markdown:
   engine: commonmark
   options: {}
+
 collections_config:
   pages:
-    path: ''
+    path: src/pages
+    glob:
+      - '*.njk'
+    name: Pages
+    singular_name: Page
     icon: wysiwyg
+    description: Every page on the site. Open one to edit its text and images, or to add, duplicate, reorder and remove whole sections.
+    create:
+      path: '[relative_base_path]/{title|slugify}.njk'
+    schemas:
+      blank:
+        name: Blank page
+        path: .cloudcannon/schemas/page.njk
+        icon: note_add
+      home_copy:
+        name: Copy of the Home page
+        path: src/pages/home.njk
+        icon: content_copy
 
-  # Content that is shown as repeatable cards. One file per card group.
-  # Editors: sidebar > Data > News cards > "Add item" / duplicate / drag / delete.
-  data:
-    path: data
-    name: Data
-    icon: view_carousel
-    _enabled_editors:
-      - data
+  site:
+    path: src/_data
+    glob:
+      - 'site.json'
+    name: Site settings
+    singular_name: Site settings
+    icon: settings
+    description: The logo, the top navigation and the footer. These appear on every page.
     disable_add: true
     disable_add_folder: true
     disable_file_actions: true
+    _enabled_editors:
+      - data
 
-    _inputs:
-      cards:
-        type: array
-        label: News cards
-        comment: >-
-          Each item is one card in "ONDC in the News". Use "Add item" for a new
-          card, the item menu to duplicate or delete, and drag to reorder.
-          The numbers 01, 02, 03... are added automatically.
-        options:
-          structures: _structures.news_card
-      image:
-        type: image
-        label: Card image
-        comment: Upload or pick a picture. It is cropped to 16:10 automatically.
-        options:
-          resize_style: cover
-          width: 1200
-          height: 750
-      tag:
-        type: text
-        label: Category label
-        comment: Small pill on the image, e.g. Logistics
-      source:
-        type: text
-        label: Publication
-        comment: e.g. Inc42. The button reads "Read on <publication>".
-      headline:
-        type: text
-        label: Headline
-      dek:
-        type: textarea
-        label: Short summary
-      link:
-        type: url
-        label: Article link
-        comment: Full address of the article, starting with https://
+# ─────────────────────────────────────────────────────────────────────────────
+# The section library: everything an editor can add to a page.
+# ─────────────────────────────────────────────────────────────────────────────
+_structures:
+  sections:
+    style: modal
+    hide_extra_inputs: false
+    values:
+      - label: Rich text
+        icon: notes
+        description: A heading and a block of text. The everyday section.
+        preview:
+          text:
+            - heading
+            - Rich text
+          subtext:
+            - body
+          icon: notes
+        value:
+          _type: rich_text
+          background: light
+          eyebrow: ''
+          heading: A new section
+          body: '<p>Write the text for this section here.</p>'
+          full_width: false
+          buttons: []
 
-      stories:
-        type: array
-        label: Network stories
-        comment: >-
-          Each item is one poster in "The Network in Action". Use "Add item" for
-          a new story, the item menu to duplicate or delete, and drag to reorder.
-          Three fit on one row; more wrap onto the next row (a swipeable rail on phones).
-        options:
-          structures: _structures.story_card
-      poster:
-        type: image
-        label: Poster image
-        comment: The LinkedIn post / quote graphic. Portrait 4:5 works best (e.g. 1080 x 1350).
-        options:
-          resize_style: cover
-          width: 1080
-          height: 1350
-      name:
-        type: text
-        label: Person's name
-        comment: Read out by screen readers only.
-      role:
-        type: text
-        label: Role and company
-        comment: e.g. Founder, SukeshKart. Read out by screen readers only.
-      quote:
-        type: textarea
-        label: Quote shown in the poster
-        comment: Same words as the poster image. Read out by screen readers only.
-      badge:
-        type: text
-        label: Label under the poster
-        comment: e.g. Seller Story
-      post_link:
-        type: url
-        label: Post link
-        comment: Address of the LinkedIn post, starting with https://
+      - label: Image or video
+        icon: perm_media
+        description: One picture, an uploaded video, or a YouTube / Vimeo video.
+        preview:
+          text:
+            - heading
+            - Image or video
+          subtext:
+            - caption
+          icon: perm_media
+        value:
+          _type: media_block
+          background: light
+          heading: ''
+          media:
+            kind: image
+            image: ''
+            alt: ''
+            video: ''
+            poster: ''
+            embed_url: ''
+          caption: ''
+          full_width: false
 
-    _structures:
-      news_card:
-        style: select
-        values:
-          - label: News card
-            icon: newspaper
-            preview:
-              text:
-                - key: headline
-              subtext:
-                - key: source
-              image:
-                - key: image
-            value:
+      - label: Cards
+        icon: grid_view
+        description: A row of cards, each with a picture or video, a title and text.
+        preview:
+          text:
+            - heading
+            - Cards
+          subtext:
+            - intro
+          icon: grid_view
+        value:
+          _type: feature_cards
+          background: light
+          heading: A row of cards
+          intro: ''
+          columns: 3
+          cards:
+            - title: First card
+              text: '<p>What this card is about.</p>'
+              media:
+                kind: image
+                image: ''
+                alt: ''
+              link_label: ''
+              link_url: ''
+
+      - label: Call to action
+        icon: campaign
+        description: A wide banner with a heading and buttons.
+        preview:
+          text:
+            - heading
+            - Call to action
+          subtext:
+            - subtext
+          icon: campaign
+        value:
+          _type: cta_banner
+          background: dark
+          heading: Ready to join the network?
+          subtext: ''
+          buttons:
+            - label: Get started
+              url: 'https://portal.ondc.org/'
+              style: primary
+              new_tab: true
+
+      - label: Hero — scrolling story
+        icon: auto_stories
+        description: The animated opening story. Use only once, at the very top of a page.
+        preview:
+          text:
+            - Hero — scrolling story
+          subtext:
+            - title
+          icon: auto_stories
+        value:
+          _type: hero_story
+          note: 'HERO — on the live site this text plays as the scroll animation. Keep the order: 4 story beats, the closing beat, its sub-line, the wordmark, title, tagline, 2 buttons.'
+          beats:
+            - line1: First line of the first beat
+              line2: Second line of the first beat
+          impact_line1: One Open network.
+          impact_line2: A connected India.
+          sub_line: ''
+          wordmark: ONDC
+          title: ''
+          tagline: ''
+          buttons: []
+
+      - label: Tagline strip
+        icon: short_text
+        description: A single large heading with one line underneath.
+        preview:
+          text:
+            - title
+            - Tagline strip
+          subtext:
+            - subtitle
+          icon: short_text
+        value:
+          _type: tagline_strip
+          title: A short, bold statement
+          subtitle: One supporting line.
+
+      - label: Sector carousel
+        icon: view_carousel
+        description: The full-screen slides with a photo, a headline and "By the numbers". Use once per page.
+        preview:
+          text:
+            - Sector carousel
+          subtext:
+            - slides
+          icon: view_carousel
+        value:
+          _type: hero_carousel
+          anchor_id: site-top
+          slides:
+            - pill: New sector
               image: ''
+              sector: Sector name
+              title: Headline for this sector
+              cta_label: Explore →
+              cta_url: '#'
+              badge: Live
+              figures:
+                - value: '0'
+                  label: What this number counts
+                  word_style: false
+              points: []
+
+      - label: Key numbers
+        icon: insights
+        description: A row of big numbers that count up as the reader arrives.
+        preview:
+          text:
+            - title
+            - Key numbers
+          subtext:
+            - tagline
+          icon: insights
+        value:
+          _type: metrics
+          anchor_id: financial
+          title: The impact one open network has enabled
+          items:
+            - value: 100+
+              label: What this number counts
+          tagline: ''
+
+      - label: Building blocks deck
+        icon: layers
+        description: The dark deck of cards that slide across as the reader scrolls.
+        preview:
+          text:
+            - title
+            - Building blocks deck
+          subtext:
+            - intro
+          icon: layers
+        value:
+          _type: building_blocks
+          anchor_id: infrastructure
+          title: Building Blocks Behind the Network
+          intro: ''
+          cards:
+            - name: New building block
+              tagline: One line about it.
+              details: ''
+              image: ''
+              image_tag: ''
+              coming_soon: false
+
+      - label: Doors — find your place
+        icon: meeting_room
+        description: A swipeable row of large cards, each with a picture, a list and a button.
+        preview:
+          text:
+            - title
+            - Doors
+          subtext:
+            - intro
+          icon: meeting_room
+        value:
+          _type: doors
+          anchor_id: find-your-place
+          title: Find Your Place on the Network
+          intro: ''
+          cards:
+            - image: ''
               tag: ''
-              source: ''
-              headline: ''
-              dek: ''
-              link: ''
-      story_card:
-        style: select
-        values:
-          - label: Network story
-            icon: format_quote
-            preview:
-              text:
-                - key: name
-              subtext:
-                - key: role
-              image:
-                - key: poster
-            value:
-              poster: ''
+              heading: For…
+              lead: ''
+              bullets: []
+              cta_label: Learn more
+              cta_url: '#'
+              new_tab: false
+
+      - label: Story posters
+        icon: format_quote
+        description: Quote posters from people on the network, linked to their posts.
+        preview:
+          text:
+            - title
+            - Story posters
+          subtext:
+            - intro
+          icon: format_quote
+        value:
+          _type: stories
+          anchor_id: stories
+          title: The Network in Action
+          intro: ''
+          items:
+            - poster: ''
               name: ''
               role: ''
               quote: ''
               badge: Seller Story
               post_link: ''
 
-# Toolbar for every data-editable="source" region (home.html has ~83 of them).
-# `format` limits which block types editors can switch to, so they stay on-design.
+      - label: News rail
+        icon: newspaper
+        description: A swipeable row of press cards, numbered automatically.
+        preview:
+          text:
+            - title
+            - News rail
+          subtext:
+            - intro
+          icon: newspaper
+        value:
+          _type: news
+          title: ONDC in the News
+          intro: ''
+          cards:
+            - image: ''
+              tag: ''
+              source: ''
+              headline: ''
+              dek: ''
+              link: ''
+          more:
+            show: true
+            label: Stay in the loop
+            headline: View more on LinkedIn
+            dek: ''
+            cta_label: View on LinkedIn
+            url: 'https://www.linkedin.com/company/open-network-for-digital-commerce'
+
+  # ── small repeating pieces ──────────────────────────────────────────────
+  buttons:
+    style: select
+    values:
+      - label: Button
+        icon: smart_button
+        value:
+          label: Button text
+          url: '#'
+          style: primary
+          new_tab: false
+  bullets:
+    style: select
+    values:
+      - label: Bullet
+        icon: check
+        value:
+          text: ''
+  figures:
+    style: select
+    values:
+      - label: Number
+        icon: pin
+        value:
+          value: '0'
+          label: ''
+          word_style: false
+
+# ─────────────────────────────────────────────────────────────────────────────
+# What each field looks like in the editor.
+# ─────────────────────────────────────────────────────────────────────────────
+_inputs:
+  sections:
+    type: array
+    label: Page sections
+    comment: The blocks this page is made of. Use + to add one, the ⋮ menu to duplicate or delete, and drag to reorder.
+    options:
+      structures: _structures.sections
+      empty_type: array
+
+  # --- page settings ---
+  title:
+    type: text
+    label: Title
+  details:
+    type: textarea
+    label: Description
+  description:
+    type: textarea
+    label: Search engine description
+    comment: One or two sentences. Shown in Google results and when the page is shared.
+  permalink:
+    type: text
+    label: Page address
+    comment: The address this page lives at, for example /contact.html — keep it unique.
+  preload_image:
+    type: image
+    label: First image to load
+    comment: Optional. The one large image at the very top of the page, loaded early so it appears faster.
+  layout:
+    type: hidden
+
+  # --- shared text ---
+  heading:
+    type: text
+    label: Heading
+  subtitle:
+    type: text
+    label: Sub heading
+  eyebrow:
+    type: text
+    label: Small label above the heading
+  intro:
+    type: textarea
+    label: Intro text
+  tagline:
+    type: textarea
+    label: Closing line
+  lead:
+    type: textarea
+    label: Summary
+  body:
+    type: html
+    label: Text
+    options:
+      bold: true
+      italic: true
+      link: true
+      bulletedlist: true
+      numberedlist: true
+      subheading: true
+      removeformat: true
+      undo: true
+      redo: true
+  text:
+    type: html
+    label: Text
+    options:
+      bold: true
+      italic: true
+      link: true
+      removeformat: true
+      undo: true
+      redo: true
+  subtext:
+    type: textarea
+    label: Supporting line
+  note:
+    type: textarea
+    label: Note for editors
+    comment: Only shown inside the CMS, never on the live site.
+  caption:
+    type: textarea
+    label: Caption
+
+  # --- layout choices ---
+  background:
+    type: select
+    label: Background
+    options:
+      values:
+        - light
+        - white
+        - tint
+        - dark
+  full_width:
+    type: checkbox
+    label: Use the full width
+  columns:
+    type: select
+    label: Cards per row
+    options:
+      values:
+        - 2
+        - 3
+        - 4
+  anchor_id:
+    type: text
+    label: Link anchor
+    comment: Lets menu links jump to this section, for example find-your-place. Change only if you know a link points here.
+
+  # --- links and buttons ---
+  buttons:
+    type: array
+    label: Buttons
+    options:
+      structures: _structures.buttons
+  label:
+    type: text
+    label: Label
+  url:
+    type: url
+    label: Link address
+  link:
+    type: url
+    label: Link address
+  link_url:
+    type: url
+    label: Link address
+  link_label:
+    type: text
+    label: Link text
+  cta_label:
+    type: text
+    label: Button text
+  cta_url:
+    type: url
+    label: Button link
+  post_link:
+    type: url
+    label: Link to the post
+  new_tab:
+    type: checkbox
+    label: Open in a new tab
+  style:
+    type: select
+    label: Button style
+    options:
+      values:
+        - primary
+        - secondary
+
+  # --- pictures and video ---
+  image:
+    type: image
+    label: Image
+    comment: Upload a new picture or pick one already on the site. Use the crop tool to change the framing.
+  poster:
+    type: image
+    label: Image
+  logo:
+    type: image
+    label: Logo
+  alt:
+    type: text
+    label: Image description
+    comment: Describes the picture for screen readers and when the image cannot load.
+  image_alt:
+    type: text
+    label: Image description
+  media:
+    type: object
+    label: Picture or video
+    comment: Choose a picture, upload a video file, or paste a YouTube / Vimeo link.
+  kind:
+    type: select
+    label: What to show
+    options:
+      values:
+        - value: image
+          label: A picture
+        - value: video_file
+          label: A video file I upload
+        - value: video_embed
+          label: A YouTube or Vimeo link
+  video:
+    type: file
+    label: Video file
+    comment: An .mp4 works everywhere. Keep it under about 20 MB so the page stays fast.
+  embed_url:
+    type: url
+    label: YouTube or Vimeo link
+    comment: Paste the normal address of the video, for example https://www.youtube.com/watch?v=…
+
+  # --- lists inside sections ---
+  cards:
+    type: array
+    label: Cards
+    comment: Use + to add a card, the ⋮ menu to duplicate or delete one, and drag to reorder.
+  items:
+    type: array
+    label: Items
+    comment: Use + to add, the ⋮ menu to duplicate or delete, and drag to reorder.
+  slides:
+    type: array
+    label: Slides
+    comment: Use + to add a slide, the ⋮ menu to duplicate or delete one, and drag to reorder.
+  beats:
+    type: array
+    label: Story beats
+    comment: Four beats work best. Each one fades in as the reader scrolls.
+  bullets:
+    type: array
+    label: Bullet points
+    options:
+      structures: _structures.bullets
+  points:
+    type: array
+    label: Bullet points
+    options:
+      structures: _structures.bullets
+  figures:
+    type: array
+    label: Numbers
+    options:
+      structures: _structures.figures
+  nav:
+    type: array
+    label: Menu
+  children:
+    type: array
+    label: Drop-down links
+  links:
+    type: array
+    label: Links
+  social:
+    type: array
+    label: Social links
+
+  # --- individual list fields ---
+  line1:
+    type: text
+    label: First line
+  line2:
+    type: text
+    label: Second line
+  impact_line1:
+    type: text
+    label: Closing line 1
+  impact_line2:
+    type: text
+    label: Closing line 2
+  sub_line:
+    type: text
+    label: Line under the closing lines
+  wordmark:
+    type: text
+    label: Wordmark
+  pill:
+    type: text
+    label: Tab name
+    comment: The short name shown in the row of buttons under the slide.
+  sector:
+    type: text
+    label: Sector label
+  badge:
+    type: text
+    label: Status badge
+    comment: For example Live or Upcoming.
+  value:
+    type: text
+    label: Number
+  word_style:
+    type: checkbox
+    label: This is a word, not a number
+    comment: Tick when the value is a word such as "Marine" so it is sized for text.
+  name:
+    type: text
+    label: Name
+  role:
+    type: text
+    label: Role and company
+  quote:
+    type: textarea
+    label: Quote
+    comment: The same words that appear on the poster. Used by screen readers.
+  tag:
+    type: text
+    label: Small label on the picture
+  image_tag:
+    type: text
+    label: Small label on the picture
+  source:
+    type: text
+    label: Publication
+    comment: The button reads "Read on …" followed by this.
+  headline:
+    type: text
+    label: Headline
+  dek:
+    type: textarea
+    label: Short summary
+  coming_soon:
+    type: checkbox
+    label: Mark as coming soon
+  show:
+    type: checkbox
+    label: Show this card
+  more:
+    type: object
+    label: Last card ("View more")
+  footer:
+    type: object
+    label: Footer
+  platform:
+    type: select
+    label: Network
+    options:
+      values:
+        - linkedin
+        - instagram
+        - youtube
+        - facebook
+        - x
+  blurb:
+    type: textarea
+    label: Footer blurb
+  copyright:
+    type: text
+    label: Copyright line
+  logo_alt:
+    type: text
+    label: Logo description
+
+# Toolbar for the click-to-edit regions in the visual editor.
 _editables:
   content:
-    format: p h1 h2 h3 h4
+    format: p h2 h3 h4
     bold: true
     italic: true
     link: true
     bulletedlist: true
     numberedlist: true
-    image: true
     removeformat: true
     undo: true
     redo: true
+  block:
+    format: p h3 h4
+    bold: true
+    italic: true
+    link: true
+    bulletedlist: true
+    numberedlist: true
+    removeformat: true
+  text:
+    bold: true
+    italic: true
+    link: true
+    removeformat: true

@@ -58,15 +58,6 @@
     $$('.ondc-hero, .home-ambient, .intro-skip, .metric-num-ghost').forEach(function (n) { n.remove(); });
     $$('.is-counting').forEach(function (n) { n.classList.remove('is-counting'); });
     $$('.slide').forEach(function (s) { s.removeAttribute('inert'); });
-    function hint(before, html_) {
-      if (!before || before.previousElementSibling && before.previousElementSibling.classList.contains('news-edit-hint')) return;
-      var h = doc.createElement('div');
-      h.className = 'news-edit-hint';
-      h.innerHTML = html_;
-      before.parentNode.insertBefore(h, before);
-    }
-    hint($('.news-rail-wrap'), '<strong>News cards are managed as data.</strong> To add, duplicate, reorder or delete a card, open the <b>Data</b> collection in the CloudCannon sidebar &rarr; <b>news</b>, then save. The heading, intro and the "View more" card can be edited right here.');
-    hint($('.net-grid'), '<strong>These story posters are managed as data.</strong> To add, duplicate, reorder or delete one, open the <b>Data</b> collection in the CloudCannon sidebar &rarr; <b>stories</b>, then save. The heading and intro can be edited right here.');
   }
 
   /* =====================================================================
@@ -590,78 +581,9 @@
     upd();
   }
 
-  /* ---- news cards are DATA, not markup ----------------------------------
-     The cards live in /data/news.json (edited in CloudCannon: Data > News cards).
-     Add / duplicate / reorder / delete there and this draws them. Nothing here is
-     inside an editable region, so it is safe in both live and editor mode. */
-  var NEWS_URL = '/data/news.json';
-  var ARROW = '<svg fill="none" height="12" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="12"><path d="M3 7h8M8 4l3 3-3 3"></path></svg>';
-  function safeUrl(u) {
-    u = String(u || '').trim();
-    return /^(https?:\/\/|\/|#|mailto:)/i.test(u) ? u : (u ? 'https://' + u : '#');
-  }
-  function imgUrl(u) {
-    u = String(u || '').trim();
-    return /^(https?:)?\/\//i.test(u) || u.charAt(0) === '/' ? u : (u ? '/' + u : '');
-  }
-  function newsCardHTML(c, i) {
-    var no = (i + 1 < 10 ? '0' : '') + (i + 1);
-    var img = imgUrl(c.image);
-    var src = String(c.source || '').trim();
-    return '<a class="news-card" href="' + esc(safeUrl(c.link)) + '" rel="noopener noreferrer" target="_blank" style="transition-delay:' + (i * 90) + 'ms">' +
-      '<div class="news-thumb">' +
-        (img ? '<img alt="' + esc(c.headline || '') + '" loading="lazy" src="' + esc(img) + '">' : '') +
-        (c.tag ? '<div class="news-thumb-tag">' + esc(c.tag) + '</div>' : '') +
-      '</div>' +
-      '<div class="news-body">' +
-        '<div class="news-slug"><span class="news-slug-src">' + esc(src) + '</span><span aria-hidden="true" class="news-slug-rule"></span><span aria-hidden="true" class="news-slug-no">' + no + '</span></div>' +
-        '<div class="news-headline">' + esc(c.headline || '') + '</div>' +
-        (c.dek ? '<div class="news-dek">' + esc(c.dek) + '</div>' : '') +
-        '<span class="news-cta">' + (src ? 'Read on ' + esc(src) : 'Read more') + ' ' + ARROW + '</span>' +
-      '</div></a>';
-  }
-  var newsReady = (function () {
-    var track = $('.news-rail');
-    if (!track || !window.fetch) return Promise.resolve();
-    return fetch(NEWS_URL, { cache: 'no-cache' })
-      .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
-      .then(function (d) {
-        var list = (d && d.cards) || [];
-        $$('.news-card:not(.news-more)', track).forEach(function (n) { n.remove(); });
-        var more = $('.news-more', track);
-        var tpl = doc.createElement('template');
-        tpl.innerHTML = list.map(newsCardHTML).join('');
-        track.insertBefore(tpl.content, more || null);
-        if (more) more.style.transitionDelay = (list.length * 90) + 'ms';
-      })
-      .catch(function (e) { if (window.console) console.warn('[ondc] could not load ' + NEWS_URL, e); });
-  })();
-
-  /* ---- "The Network in Action" story posters: /data/stories.json ---------- */
-  var LINKEDIN = '<svg aria-hidden="true" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"></path></svg>';
-  function storyCardHTML(c, i) {
-    var who = [c.name, c.role].filter(Boolean).join(', ');
-    var label = who + (c.quote ? (who ? ': ' : '') + '“' + c.quote + '”' : '');
-    var img = imgUrl(c.poster);
-    return '<a aria-label="' + esc(label + (label ? ' — ' : '') + 'open the post') + '" class="net-card hv-rv" href="' + esc(safeUrl(c.post_link)) +
-      '" rel="noopener noreferrer" target="_blank" style="transition-delay:' + (120 + i * 110) + 'ms"><span aria-hidden="true" class="net-node"></span>' +
-      '<div class="net-poster">' + (img ? '<img alt="' + esc(label) + '" loading="lazy" src="' + esc(img) + '">' : '') + '</div>' +
-      '<div aria-hidden="true" class="net-foot"><span class="net-tag">' + esc(c.badge || '') + '</span>' +
-      '<span class="net-open">' + LINKEDIN + ' View post</span></div></a>';
-  }
-  var storiesReady = (function () {
-    var grid = $('.net-grid');
-    if (!grid || !window.fetch) return Promise.resolve();
-    return fetch('/data/stories.json', { cache: 'no-cache' })
-      .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
-      .then(function (d) {
-        var list = (d && d.stories) || [];
-        grid.innerHTML = list.map(storyCardHTML).join('');
-        // the section's reveal may already have fired: show late cards straight away
-        if ($('.testimonials.hv-done')) $$('.net-card', grid).forEach(function (c) { c.style.transitionDelay = '0ms'; });
-      })
-      .catch(function (e) { if (window.console) console.warn('[ondc] could not load /data/stories.json', e); });
-  })();
+  /* The news cards and the story posters are rendered by the build from the
+     page's own data (src/pages/*.njk -> sections), so there is nothing to fetch
+     here any more. This file only animates what the HTML already contains. */
 
   function startNews(S) {
     var wrap = $('.news-rail-wrap'), track = wrap && $('.news-rail', wrap);
@@ -700,15 +622,9 @@
     reveal(S, mb, 0.25, function (instant) { if (!instant && mb) countUp(S, mb); });
     startDeck(S);
     startDoors(S);
-    newsReady.then(function () { if (page === S) startNews(S); });
-    startAmbient(S);
-
-    /* the hero is desktop-only (below 900px the page opens on the carousel) */
-    var mq = matchMedia('(max-width: 900px)');
-    var syncHero = function () { if (mq.matches) { if (heroCtl) heroCtl.dispose(); } else buildHero(); };
-    mq.addEventListener('change', syncHero);
-    S.add(function () { mq.removeEventListener('change', syncHero); });
-    syncHero();
+    startNews(S);
+    $$('.block-cards').forEach(function (el) { reveal(S, el, 0.18); });
+    if ($('[data-key="hero-story"]')) startAmbient(S);
 
     /* nav "Sign Up" and any element carrying data-href */
     $$('[data-href]').forEach(function (b) {
@@ -720,6 +636,18 @@
       var t = doc.getElementById(location.hash.slice(1));
       if (t) t.scrollIntoView({ behavior: 'instant', block: 'start' });
     }
+
+    /* The scroll story only exists on pages that carry a "Hero — scrolling story"
+       section. Other pages (About, a new page an editor made) must not grow one. */
+    if (!$('[data-key="hero-story"]')) return;
+
+    /* the hero is desktop-only (below 900px the page opens on the carousel) */
+    var mq = matchMedia('(max-width: 900px)');
+    var syncHero = function () { if (mq.matches) { if (heroCtl) heroCtl.dispose(); } else buildHero(); };
+    mq.addEventListener('change', syncHero);
+    S.add(function () { mq.removeEventListener('change', syncHero); });
+    syncHero();
+
   }
 
   /* Decide editor vs live. The CloudCannon visual editor loads this page inside an

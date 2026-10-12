@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ title }}</title>
+  <meta name="description" content="{{ description }}">
+  <link rel="icon" href="/images/ondc-favicon.png" type="image/png">
+  <link rel="stylesheet" href="/css/ondc/styles.css">
+  <link rel="stylesheet" href="/css/ondc/fx.css">
+  <link rel="stylesheet" href="/css/ondc/hero.css">
+  <link rel="stylesheet" href="/css/ondc/scale.css">
+{% if preload_image %}  <link rel="preload" as="image" href="{{ preload_image }}" fetchpriority="high">
+{% endif %}  <link rel="preload" href="/fonts/space-grotesk-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+  <link rel="preload" href="/fonts/space-grotesk-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+  <link rel="stylesheet" href="/css/ondc/mobile.css">
+  <!-- Styles for the section types editors can add from the CMS. -->
+  <link rel="stylesheet" href="/css/ondc/blocks.css">
+  <!-- CMS layer: editor-mode overrides + small bridges. Keep LAST. -->
+  <link rel="stylesheet" href="/css/ondc/cms.css">
+  <script>
+    /* Inside the CloudCannon editor frame, switch to the flat editing layout before anything paints.
+       (js/ondc-home.js undoes this if the page turns out to be a plain preview.) */
+    try {
+      if (window.self !== window.top) {
+        var ao = window.location.ancestorOrigins, fromCC = false;
+        if (ao && ao.length) { for (var i = 0; i < ao.length; i++) if (/cloudcannon/i.test(ao[i])) fromCC = true; }
+        else fromCC = /cloudcannon/i.test(document.referrer || '');
+        if (fromCC) document.documentElement.classList.add('is-editing');
+      }
+    } catch (e) {}
+  </script>
+</head>
+<body class="home">
+<div id="root">
+{% include "partials/site-header.njk" %}
+<editable-array data-editable="array" data-prop="sections" data-id-key="_type" data-component-key="_type">
+{%- for section in sections %}
+{% include "sections/" + section._type + ".njk" %}
+{%- endfor %}
+</editable-array>
+{% include "partials/site-footer.njk" %}
+</div>
+  <script src="/js/ondc/fx.js" defer></script>
+  <script src="/js/ondc/hero-map.js" defer></script>
+  <script src="/js/ondc/home-network.js" defer></script>
+  <script src="/js/ondc-home.js?v=8" defer></script>
+</body>
+</html>
