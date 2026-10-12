@@ -67,7 +67,7 @@
   "footer": {
     "logo": "/images/ondc-logo.svg",
     "logo_alt": "ONDC — Open Network for Digital Commerce",
-    "blurb": "India's open network for commerce — not an app, not a platform. Infrastructure for everyone. Just for test",
+    "blurb": "India's open network for commerce — not an app, not a platform. Infrastructure for everyone.",
     "link_columns": [
       {
         "heading": "About ONDC",
@@ -216,14 +216,9 @@
         "label": "ONDC on X",
         "url": "https://x.com/ONDC_Official",
         "platform": "x"
-      },
-      {
-        "label": "Just for an example",
-        "url": "https://www.youtube.com/",
-        "platform": ""
       }
     ],
-    "background_image": "/images/hero.jpg"
+    "background_image": "/images/footer-image.webp"
   },
   "title": "ONDC"
 }
