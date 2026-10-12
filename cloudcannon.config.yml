@@ -48,7 +48,7 @@ collections_config:
     path: src/_data
     glob:
       - 'site.json'
-    name: Site settings
+    name: Header & Footer
     singular_name: Header & Footer
     icon: settings
     description: The logo, the top navigation and the footer. These appear on every page.
