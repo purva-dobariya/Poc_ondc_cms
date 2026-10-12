@@ -49,7 +49,7 @@ collections_config:
     glob:
       - 'site.json'
     name: Site settings
-    singular_name: Site settings
+    singular_name: Header & Footer
     icon: settings
     description: The logo, the top navigation and the footer. These appear on every page.
     disable_add: true
