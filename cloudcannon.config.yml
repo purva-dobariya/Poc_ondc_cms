@@ -32,15 +32,17 @@ collections_config:
     description: Every page on the site. Open one to edit its text and images, or to add, duplicate, reorder and remove whole sections.
     create:
       path: '[relative_base_path]/{title|slugify}.njk'
+    # Schema files must NOT live in src/pages: CloudCannon treats a file used as a
+    # schema as a template and hides it from the Pages list. Keep them in schemas/.
     schemas:
       blank:
         name: Blank page
         path: schemas/page.njk
         icon: note_add
-      home_copy:
-        name: Copy of the Home page
-        path: src/pages/home.njk
-        icon: content_copy
+      landing:
+        name: Landing page starter
+        path: schemas/landing-page.njk
+        icon: article
 
   site:
     path: src/_data

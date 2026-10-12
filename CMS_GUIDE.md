@@ -64,10 +64,13 @@ Save, and the change is live after the build.
 In **Pages**, click **+**:
 
 - **Blank page** — starts with one text section,
-- **Copy of the Home page** — the whole home page, ready to cut down.
+- **Landing page starter** — text, an image, three cards and a call to action.
 
-To copy any other page, use the **⋮** menu on it in the Pages list and choose Duplicate.
-Set **Page address** (for example `/contact.html`) and keep it unique.
+To copy an existing page, use the **⋮** menu on it in the Pages list and choose
+Duplicate. Set **Page address** (for example `/contact.html`) and keep it unique.
+
+Developers: never point a schema at a file inside `src/pages`. CloudCannon treats a
+file used as a schema as a template and hides it from the Pages list.
 
 ### Site-wide bits
 **Site settings** holds the logo, the top menu (including the drop-down) and the whole
