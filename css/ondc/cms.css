@@ -69,10 +69,5 @@ html.is-editing #site-header { position: relative; }
 /* count-up: the real (editable) number hides while a copy outside the region counts */
 .metric.is-counting .metric-num:not(.metric-num-ghost) { visibility: hidden; }
 
-/* ── Page sections are a list the CMS can add to, reorder and delete ──────
-   The wrapper elements CloudCannon needs must not create boxes of their own. */
-editable-array,
-editable-array-item { display: contents; }
-
 /* Sections added from the CMS: show them fully in the editor, no scroll reveal */
 html.is-editing .block-card { opacity: 1 !important; transform: none !important; }

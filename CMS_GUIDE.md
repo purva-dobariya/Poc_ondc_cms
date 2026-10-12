@@ -32,8 +32,14 @@ The page addresses do not change: `/home.html`, `/index.html`, `/about.html`.
 ## 2. What editors can do
 
 ### Text, numbers, headings, buttons
-Open **Pages → Home**. Click any text on the page to edit it, or use the form in the
-sidebar. Every number, heading, description, button label and small print is a field.
+Open **Pages → Home**. The page preview is on the right; the form is on the left.
+Open a section in **Page sections** and every number, heading, description, button
+label and piece of small print in it is a field. Save, and the preview refreshes once
+the build finishes.
+
+Editing happens in that form rather than by clicking text on the page. Click-to-edit
+needs a framework renderer (Astro, React or Vue) that Eleventy does not have, so the
+preview here is read-only. Everything is still editable without a developer.
 
 ### Images and video
 Every picture is an image field: **Upload** a new one or pick an existing one, and use
@@ -68,8 +74,9 @@ Set **Page address** (for example `/contact.html`) and keep it unique.
 footer. Changing it changes every page.
 
 ### Previewing
-The visual editor shows the page as it will look. Use the device buttons for desktop and
-mobile. Nothing is public until the build finishes and the site is published.
+The visual editor shows the page as it will look, next to the form. Use the device
+buttons for desktop and mobile. Nothing is public until the build finishes and the site
+is published.
 
 ---
 
@@ -114,14 +121,14 @@ css/ondc/blocks.css       styles for the section types editors can add
 **To add a new KIND of section:**
 
 1. Add `src/_includes/sections/<name>.njk`. Its data arrives as `section`.
-2. Put `data-editable="array-item" data-id="{{ section._type }}" data-component="{{ section._type }}"`
-   on the section's root element so the visual editor can see it.
-3. Add a value to `_structures.sections` in `cloudcannon.config.yml` with `_type: <name>`,
+2. Add a value to `_structures.sections` in `cloudcannon.config.yml` with `_type: <name>`,
    a label, an icon and sensible starting content.
-4. Add any new field names to `_inputs` so they get a proper label in the editor.
+3. Add any new field names to `_inputs` so they get a proper label in the editor.
 
-**Click-to-edit** uses `data-editable="text"` / `data-editable="image"` with a `data-prop`
-that is relative to the section (or to the array item it sits in).
+**No `data-editable` attributes.** CloudCannon's array and component regions need a
+registration script that only the Astro / React / Vue renderers provide; on Eleventy they
+fail with "Failed to find a registered component". Editing therefore runs through the
+sidebar form, which is driven entirely by `cloudcannon.config.yml`.
 
 **`js/ondc-home.js`** only animates what the HTML already contains — it never rewrites
 the contents of an editable region, and it skips the scroll story on pages that do not

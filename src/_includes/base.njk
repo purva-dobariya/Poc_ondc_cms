@@ -34,11 +34,11 @@
 <body class="home">
 <div id="root">
 {% include "partials/site-header.njk" %}
-<editable-array data-editable="array" data-prop="sections" data-id-key="_type" data-component-key="_type">
+
 {%- for section in sections %}
 {% include "sections/" + section._type + ".njk" %}
 {%- endfor %}
-</editable-array>
+
 {% include "partials/site-footer.njk" %}
 </div>
   <script src="/js/ondc/fx.js" defer></script>
