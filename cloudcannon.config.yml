@@ -4,7 +4,7 @@
 # The site is built with Eleventy. In CloudCannon, Site Settings → Build must be:
 #     Site generator : Eleventy
 #     Install command: npm install
-#     Build command  : npx @11ty/eleventy
+#     Build command  : npx @11ty/eleventy --config=eleventy.config.js
 #     Output path    : _site
 #
 # Every page is a file in src/pages with a `sections` list in its front matter.
@@ -35,7 +35,7 @@ collections_config:
     schemas:
       blank:
         name: Blank page
-        path: .cloudcannon/schemas/page.njk
+        path: schemas/page.njk
         icon: note_add
       home_copy:
         name: Copy of the Home page

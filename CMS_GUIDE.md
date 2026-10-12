@@ -15,8 +15,12 @@ build settings have to change once. In CloudCannon: **Site Settings → Build**
 | --------------- | -------------------- |
 | Site generator  | Eleventy             |
 | Install command | `npm install`        |
-| Build command   | `npx @11ty/eleventy` |
+| Build command   | `npx @11ty/eleventy --config=eleventy.config.js` |
 | Output path     | `_site`              |
+
+> The repo deliberately contains **no hidden (dot) files**. macOS Finder hides
+> those, and copying a folder without them is what makes the build fail with a
+> `TemplateLayoutPathResolver` error.
 
 Then push this repo and let the build run. Until the build settings are changed the
 site will not publish.
@@ -95,9 +99,9 @@ The other sections can be used as many times as you like.
 ## 4. How it fits together (for developers)
 
 ```
-.eleventy.js              build config (passthrough for css/js/images/fonts)
+eleventy.config.js        build config (passthrough for css/js/images/fonts)
 cloudcannon.config.yml    the section library + every field's editor
-.cloudcannon/schemas/     the "blank page" starting point
+schemas/page.njk          the "blank page" starting point
 src/_data/site.json       logo, menu, footer — every page uses it
 src/pages/*.njk           one file per page; front matter holds `sections`
 src/_includes/base.njk    the page shell; loops over `sections`
