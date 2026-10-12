@@ -1058,7 +1058,7 @@ html body footer::before {
   position: absolute;
   inset: 0;
   z-index: 0;
-  background: var(--bkc-canvas) url(/images/footer-image.webp) center bottom / cover no-repeat;
+  background: var(--bkc-canvas) var(--footer-image, url(/images/footer-image.webp)) center bottom / cover no-repeat;
   -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 clamp(90px, 12vw, 170px));
   mask-image: linear-gradient(to bottom, transparent 0, #000 clamp(90px, 12vw, 170px));
 }
@@ -1077,7 +1077,7 @@ html body footer .container {
     background-color: var(--bkc-canvas);
     background-image:
       linear-gradient(to bottom, var(--bkc-canvas) calc(100% - 57vw), transparent calc(100% - 32vw)),
-      url(/images/footer-image.webp);
+      var(--footer-image, url(/images/footer-image.webp));
     background-size: 100% 100%, 100% auto;
     background-position: top, center bottom;
     background-repeat: no-repeat;

@@ -65,8 +65,10 @@
   "cta_label": "Sign Up",
   "cta_url": "https://portal.ondc.org/",
   "footer": {
+    "logo": "/images/ondc-logo.svg",
+    "logo_alt": "ONDC — Open Network for Digital Commerce",
     "blurb": "India's open network for commerce — not an app, not a platform. Infrastructure for everyone.",
-    "columns": [
+    "link_columns": [
       {
         "heading": "About ONDC",
         "links": [
@@ -215,7 +217,8 @@
         "url": "https://x.com/ONDC_Official",
         "platform": "x"
       }
-    ]
+    ],
+    "background_image": "/images/footer-image.webp"
   },
   "title": "ONDC"
 }

@@ -73,8 +73,24 @@ Developers: never point a schema at a file inside `src/pages`. CloudCannon treat
 file used as a schema as a template and hides it from the Pages list.
 
 ### Site-wide bits
-**Site settings** holds the logo, the top menu (including the drop-down) and the whole
+**Site settings** holds the logo, the top menu (including the drop-down) and the shared
 footer. Changing it changes every page.
+
+### The footer
+Every page ends with a **Footer** section, the last item in **Page sections**. It has one
+tick box, *Use the shared footer from Site settings*:
+
+- **Ticked** (the normal case) — the footer comes from **Site settings → Footer**, so one
+  edit updates every page. The fields there are the logo, the blurb, the link columns,
+  the social links, the copyright line and the background artwork.
+- **Unticked** — that one page gets its own footer, and the same fields appear right there
+  in the section.
+
+The wide illustration behind the footer is now a normal image field, so it can be
+replaced without a developer. A long, low picture works best, about 2400 x 900.
+
+To drop the footer from a page entirely, delete the Footer section. Add it back from
+**+ Add Page section** whenever you want it again.
 
 ### Previewing
 The visual editor shows the page as it will look, next to the form. Use the device
@@ -99,6 +115,7 @@ is published.
 | Doors — find your place | Swipeable row of large cards with a list and a button. |
 | Story posters | Quote posters linked to LinkedIn posts. |
 | News rail | Swipeable press cards, numbered automatically. |
+| Footer | The site footer. Shared across pages by default. |
 
 **Use once per page:** Hero — scrolling story, Sector carousel, Building blocks deck.
 They each take over the scroll, so a second copy on the same page will fight the first.
@@ -116,7 +133,7 @@ src/_data/site.json       logo, menu, footer — every page uses it
 src/pages/*.njk           one file per page; front matter holds `sections`
 src/_includes/base.njk    the page shell; loops over `sections`
 src/_includes/sections/   one template per section type
-src/_includes/partials/   header, footer, social icon, media (image/video/embed)
+src/_includes/partials/   header, footer body, social icon, media (image/video/embed)
 css/ js/ images/ fonts/   unchanged assets, copied straight through
 css/ondc/blocks.css       styles for the section types editors can add
 ```

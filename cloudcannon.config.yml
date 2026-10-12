@@ -310,6 +310,26 @@ _structures:
               badge: Seller Story
               post_link: ''
 
+      - label: Footer
+        icon: call_to_action
+        description: The site footer — logo, blurb, link columns, social links and the background artwork.
+        preview:
+          text:
+            - Footer
+          subtext:
+            - blurb
+          icon: call_to_action
+        value:
+          _type: site_footer
+          use_site_settings: true
+          logo: ''
+          logo_alt: ''
+          blurb: ''
+          link_columns: []
+          copyright: ''
+          social: []
+          background_image: ''
+
       - label: News rail
         icon: newspaper
         description: A swipeable row of press cards, numbered automatically.
@@ -357,6 +377,32 @@ _structures:
         icon: check
         value:
           text: ''
+  link_columns:
+    style: select
+    values:
+      - label: Link column
+        icon: view_column
+        value:
+          heading: New column
+          links: []
+  links:
+    style: select
+    values:
+      - label: Link
+        icon: link
+        value:
+          label: ''
+          url: ''
+          new_tab: false
+  social:
+    style: select
+    values:
+      - label: Social link
+        icon: share
+        value:
+          label: ''
+          url: ''
+          platform: linkedin
   figures:
     style: select
     values:
@@ -604,9 +650,29 @@ _inputs:
   links:
     type: array
     label: Links
+    comment: Use + to add a link, the item menu to duplicate or delete, and drag to reorder.
+    options:
+      structures: _structures.links
+  link_columns:
+    type: array
+    label: Footer link columns
+    comment: Each column has a heading and its own list of links.
+    options:
+      structures: _structures.link_columns
   social:
     type: array
     label: Social links
+    options:
+      structures: _structures.social
+  use_site_settings:
+    type: checkbox
+    label: Use the shared footer from Site settings
+    comment: Leave ticked so every page shows the same footer. Untick only to give this one page its own footer.
+  background_image:
+    type: image
+    label: Footer background artwork
+    comment: The wide illustration behind the footer. A long, low image works best (about 2400 x 900).
+
 
   # --- individual list fields ---
   line1:
