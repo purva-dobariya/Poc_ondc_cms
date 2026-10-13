@@ -81,6 +81,7 @@ html.is-editing .bk-rv { opacity: 1 !important; transform: none !important; tran
    in the editor; hide them so they cannot cover the editable content. */
 html.is-editing .bk-tl-stage,
 html.is-editing .bk-people-stage { display: none !important; }
+html.is-editing .bk-tl-content   { margin-top: 0 !important; }
 
 /* The timeline pins itself over a tall scroll runway on the live site.
    Flatten it so every year is visible and clickable in the editor. */
