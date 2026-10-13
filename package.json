@@ -5,9 +5,16 @@
   "description": "ONDC site built with Eleventy so CloudCannon can add, remove, duplicate and reorder page sections.",
   "scripts": {
     "build": "eleventy",
-    "start": "eleventy --serve"
+    "start": "eleventy --serve",
+    "browser": "bookshop-browser"
   },
   "devDependencies": {
-    "@11ty/eleventy": "2.0.1"
+    "@11ty/eleventy": "2.0.1",
+    "@bookshop/generate": "3.19.0",
+    "@bookshop/browser": "3.19.0",
+    "@bookshop/eleventy-engine": "3.19.0"
+  },
+  "dependencies": {
+    "@bookshop/eleventy-bookshop": "3.19.0"
   }
 }

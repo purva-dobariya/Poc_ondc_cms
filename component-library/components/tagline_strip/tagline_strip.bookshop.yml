@@ -1,0 +1,10 @@
+spec:
+  structures:
+  - sections
+  label: Tagline strip
+  description: A single large heading with one line underneath.
+  icon: short_text
+blueprint:
+  title: A short, bold statement
+  subtitle: One supporting line.
+_inputs: {}

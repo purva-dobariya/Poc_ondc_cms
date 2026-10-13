@@ -1,0 +1,16 @@
+spec:
+  structures:
+  - sections
+  label: Footer
+  description: The site footer — logo, blurb, link columns, social links and the background artwork.
+  icon: call_to_action
+blueprint:
+  use_site_settings: true
+  logo: ''
+  logo_alt: ''
+  blurb: ''
+  link_columns: []
+  copyright: ''
+  social: []
+  background_image: ''
+_inputs: {}

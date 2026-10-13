@@ -35,10 +35,7 @@
 <div id="root">
 {% include "partials/site-header" %}
 
-{%- for section in sections %}
-{%- assign section_template = "sections/" | append: section._type %}
-{% include section_template %}
-{%- endfor %}
+{% bookshop_include "page" sections: sections %}
 
 </div>
   <script src="/js/ondc/fx.js" defer></script>
