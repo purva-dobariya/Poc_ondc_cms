@@ -93,5 +93,15 @@ html.is-editing .bk-hero-about { min-height: 0 !important; padding: 120px 0 64px
 /* The award lightbox is a dialog, closed until a card is clicked. */
 html.is-editing .bk-lightbox { display: none !important; }
 
-/* The scroll-progress bar has nothing to track inside the editor frame. */
+/* ── Shared chrome in the editor ─────────────────────────────────────── */
+/* The navbar is position:sticky at z-index 300/100 on the live site. Inside the
+   editor frame it then floats over the FIRST section and swallows that
+   section's hover controls, so the top section cannot be selected or edited.
+   Chrome is not editable on the page anyway (it is edited under
+   "Header & Footer"), so pin it in place and drop it behind the content. */
+html.is-editing .navbar { position: static !important; z-index: 0 !important; }
 html.is-editing .scroll-progress { display: none !important; }
+
+/* Give the first section room so its controls are never clipped by the frame. */
+html.is-editing #root > *:first-child,
+html.is-editing main.bk > *:first-child { scroll-margin-top: 0; }

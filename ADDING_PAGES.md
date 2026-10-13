@@ -1,31 +1,67 @@
 # Adding pages — architecture and how-to
 
-The About page (`/about-us.html`) is now in the CMS. It is also the worked example
-for the remaining 47 ondc.org pages: everything below is the pattern it follows.
+Two pages are in the CMS: the home page and `/about-us.html`. The About page is
+the worked example for the remaining 47 ondc.org pages.
 
 ---
 
-## What changed to make a second page possible
+## The rule that keeps pages from breaking
 
-The repo previously hard-coded the home page's CSS and JavaScript into
-`src/_includes/base.liquid`. That works for one page and breaks on the second,
-because About needs `beckn.css` and `type-boost.css` and must **not** load the
-home page's carousel code.
+**Shared chrome is not a page section.** The navbar, the sector pill row and the
+footer appear on every page, so they are rendered by the layout
+(`src/_includes/base.liquid`) from `src/_data/site.json`, not by components in a
+page's `sections` list.
 
-**Assets are now declared per page.** `base.liquid` loops over two lists:
+This was a deliberate change after the chrome repeatedly rendered empty. The
+reason it failed: a Bookshop component is re-rendered **in the browser** during
+live editing, where site-wide data may not be available. Chrome rendered that way
+is empty in the editor whenever that data does not arrive. Rendered by the layout,
+it is baked into the HTML at build time and is correct on every page, always.
 
-```liquid
-{% for sheet in styles %}  <link rel="stylesheet" href="/css/ondc/{{ sheet }}.css">
-{% endfor %}
-...
-{% for script in scripts %}  <script src="{{ script }}" defer></script>
-{% endfor %}
+What this gives up: editing the nav or footer no longer updates the preview as you
+type — you save and the next build shows it. That was already true of the navbar,
+and it is a better trade than a footer that is sometimes blank.
+
+| | Where it lives | How it is edited |
+| --- | --- | --- |
+| Navbar | `src/_includes/chrome/header.liquid` | **Header & Footer** in the sidebar |
+| Sector pills | `src/_includes/chrome/sector-rail.liquid` | **Header & Footer** → Sector links |
+| Footer | `src/_includes/chrome/footer.liquid` | **Header & Footer** → Footer |
+| Page content | `component-library/components/*` | **Page sections** on each page |
+
+A page turns the sector rail on with `show_sector_rail: true` in its front matter.
+A page that needs its own footer sets `page_footer:` with the same fields as
+`site.footer`; otherwise every page shares one.
+
+### Page structure
+
+```
+<body>
+  [scroll progress bar, if show_progress]
+  navbar                      ← chrome, from the layout
+  <div id="root"> or <main class="bk">
+    page sections             ← the editable array
+  </...>
+  sector rail, if enabled     ← chrome
+  footer                      ← chrome
+</body>
 ```
 
-Defaults live in `src/pages/pages.json`; a page overrides them in its own front
-matter. Note the `override:` prefix — Eleventy **concatenates** arrays through the
-data cascade, so without it a page's list is appended to the default instead of
-replacing it:
+Chrome sits **outside** the page wrapper, matching ondc.org. This matters on
+category pages: `beckn.css` is scoped to `.bk` and its own header says it "must
+not leak into that chrome".
+
+---
+
+## Stylesheets
+
+`category-chrome.css` owns the design tokens, the reset, the container, the
+navbar and the footer grid. **The layout always loads it first, on every page**,
+outside the per-page list, so a new page can never lose its chrome styling. It
+must come before `fx.css`, which layers the site finish on top.
+
+Everything after that is per-page. `base.liquid` loops over two lists whose
+defaults live in `src/pages/pages.json`:
 
 ```yaml
 override:styles: [fx, scale, type-boost, beckn, mobile]
@@ -34,15 +70,24 @@ override:scripts:
   - /js/ondc/beckn.js
 ```
 
-`blocks.css` and `cms.css` are always loaded last, in that order. `cms.css` must
-stay last: it is the editor layer.
+The `override:` prefix is required. Eleventy **concatenates** arrays through the
+data cascade, so without it a page's list is appended to the default instead of
+replacing it — you get every stylesheet twice.
 
-Three more per-page switches, all `type: hidden` so editors never see them:
+`blocks.css` and `cms.css` always load last, in that order. `cms.css` is the
+editor layer and must stay last.
+
+| Page | Stylesheets |
+| --- | --- |
+| Home | category-chrome, styles, fx, hero, scale, mobile |
+| About | category-chrome, fx, scale, type-boost, beckn, mobile |
+
+Three more per-page switches, all hidden from editors:
 
 | Field | Purpose | Home | About |
 | --- | --- | --- | --- |
 | `body_class` | class on `<body>` | `home` | *(none)* |
-| `wrapper_tag` / `wrapper_id` / `wrapper_class` | the element wrapping the sections | `div#root` | `main.bk` |
+| `wrapper_tag` / `wrapper_id` / `wrapper_class` | the element around the sections | `div#root` | `main.bk` |
 | `show_progress` | the scroll-progress bar | off | on |
 
 ---
@@ -50,114 +95,100 @@ Three more per-page switches, all `type: hidden` so editors never see them:
 ## URLs
 
 Every page is served flat at `/<slug>.html`, which is what
-`collections_config.pages.url: /[slug].html` in `cloudcannon.config.yml` expects.
-The two must agree — when they disagree CloudCannon shows "No preview available"
-even though the build succeeded.
+`collections_config.pages.url: /[slug].html` expects. The two must agree — when
+they disagree CloudCannon shows "No preview available" even though the build
+succeeded.
 
-ondc.org serves most pages under `/pages/`. All 27 of those links in
-`src/_data/site.json`, plus 12 in the home page's own content, were rewritten to
-the flat form. Keep new pages flat too.
-
-The links in the header, footer and sector rail already point at the remaining 46
-pages. They 404 until each page is built — that is expected, and each one starts
-working the moment its page lands.
+Links in the header, footer and sector rail already point at the remaining 46
+pages. They 404 until each page is built, and start working the moment it lands.
 
 ---
 
 ## The component library
 
-22 components. Each is a folder under `component-library/components/<name>/` with
-a template and a `.bookshop.yml` spec.
+19 components, each a folder under `component-library/components/<name>/` with a
+template and a `.bookshop.yml` spec. All are page content; none is chrome.
 
-**Added for the About page**, and all reusable:
+**Added for the About page**, all reusable:
 
 | Component | What it is | Where it is used again |
 | --- | --- | --- |
 | `page_hero` | Full-bleed hero: photo, heading, paragraphs, buttons | ~46 of the 48 pages |
-| `closing_cta` | Short closing heading + buttons above the footer | ~44 pages |
+| `closing_cta` | Short closing heading + buttons | ~44 pages |
 | `numbered_lists` | A lead beside groups of auto-numbered points | sector pages, careers |
 | `institutions` | Named organisations + a logo strip with a counter | about, investor pages |
 | `people_grid` | Photo, name, role, organisation | about, careers |
-| `awards` | Featured award + awards grouped by year, with a lightbox | about |
+| `awards` | Featured award + awards by year, with a lightbox | about |
 | `timeline` | Year-by-year story with the animated India map | about |
-| `sector_rail` | The sector pill row above the footer | 21 pages |
-
-`site_header` is the one component with **no** `structures` key, so it does not
-appear in "Add Page section". It is page chrome, not a section.
 
 ### Two rules that are not optional
 
-**1. A component reads shared data itself.** It must not receive it through a
-helper or the layout. `site_footer` and `sector_rail` read `site.footer.*` and
-`site.sectors.*` directly, and those keys are exposed to live editing by
-`data_config` in `cloudcannon.config.yml`. Pass data in from outside and the
-section renders empty in the editor while looking fine on the live site.
+**1. A component reads the data it needs itself.** It must not receive data
+through a helper or the layout — Bookshop re-renders components in the browser,
+and anything passed in from outside is gone. This is the same failure that moved
+the chrome into the layout.
 
 **2. Anything that animates needs an editor rule in `css/ondc/cms.css`.**
 `.bk-rv` starts at `opacity: 0` and only reveals on scroll. The editor never
-scrolls, so without a rule the whole page renders invisible. The rules added for
-About cover `.bk-rv`, the two canvases, the pinned timeline, the full-height hero,
-the award lightbox and the progress bar.
+scrolls, so without a rule the page renders invisible. The navbar is also pinned
+to `position: static` in editor mode — left sticky it floats over the first
+section and swallows that section's hover controls, making the top section
+impossible to select.
 
 ---
 
 ## Adding the next page
 
-1. **Read the original.** Note its `<section>` classes, its stylesheets and its
-   scripts.
-2. **Match sections to components.** Most pages are the archetypes in the table
-   above. A new *visual treatment* of an existing content model is a variant
-   field, not a new component — that is what keeps this at 22 rather than 45.
-3. **Copy any new CSS/JS** into `css/ondc/` and `js/ondc/`, and new images into
+1. **Read the original.** Note its `<section>` classes, stylesheets and scripts.
+2. **Match sections to components.** Most pages are the archetypes above. A new
+   *visual treatment* of an existing content model is a variant field, not a new
+   component — that is what keeps this at 19 rather than 45.
+3. **Copy any new CSS/JS** into `css/ondc/` and `js/ondc/`, new images into
    `images/<page>/`.
 4. **Create `src/pages/<slug>.liquid`** with `permalink: /<slug>.html` and the
    content as front matter under `sections:`, each item carrying
    `_bookshop_name: <component>`.
-5. **Declare its assets** with `override:styles` and `override:scripts`.
-6. **If a new component was needed**, add its `_inputs` entries to
+5. **Declare its assets** with `override:styles` and `override:scripts`. Do not
+   list `category-chrome` — the layout always loads it.
+6. **Do not add header, footer or sector rail to `sections`.** Set
+   `show_sector_rail: true` if the page needs the pill row.
+7. **If a new component was needed**, add its `_inputs` entries to
    `cloudcannon.config.yml` and its editor rules to `cms.css`.
-7. **Build and check**: `npx @11ty/eleventy && npx @bookshop/generate --editable-regions`.
+8. **Build and check**: `npx @11ty/eleventy && npx @bookshop/generate --editable-regions`.
 
 ### Inline page scripts
 
-The About page carried 20 KB of inline JavaScript. It was split into three files
-by responsibility rather than copied as one blob:
+The About page carried 20 KB of inline JavaScript, split by responsibility:
 
-- `js/ondc/scroll-progress.js` — generic, reused by ~20 pages, and made null-safe
-- `js/ondc/awards-lightbox.js` — belongs with the `awards` component
-- `js/ondc/journey-map.js` — belongs with the `timeline` component
+- `js/ondc/scroll-progress.js` — generic, ~20 pages, made null-safe
+- `js/ondc/awards-lightbox.js` — belongs with `awards`
+- `js/ondc/journey-map.js` — belongs with `timeline`
 
-Expect to do the same for the other bespoke pages (`careers`, `complaint`,
-`network-participants` each carry 20 KB+ of inline script).
+Expect the same for `careers`, `complaint` and `network-participants`, which each
+carry 20 KB+ of inline script.
 
 ---
 
-## How this page was verified
-
-The build was run and the output compared against the live ondc.org page:
+## Verified by building
 
 | Check | Result |
 | --- | --- |
-| Visible page text | **1066 of 1066 words identical (100%)** |
-| Sections, in order | 7 of 7 match |
-| Numbered points / people / awards | 9 / 11 / 7 — all match |
-| Timeline years, entries, milestones | 6 / 26 / 5 — all match |
-| Sector pill classes | 12 of 12 match, including `pill-life` |
-| Local asset references | 103 resolve, 0 missing |
-| Bookshop components loaded | 22, one Bookshop |
-| Editable regions on the page | 9 |
-| Home page stylesheet + script order | unchanged |
+| About page sections, text vs ondc.org | **1044 / 1044 words identical** |
+| Footer text vs ondc.org | **83 / 83 words identical** |
+| Sector rail text vs ondc.org | **22 / 22 words identical** |
+| Footer rendered into the HTML | both pages: 21 links, 3 columns, logo, copyright |
+| Home page body text, before vs after | **1708 / 1708 words identical** |
+| Local asset references | 0 missing |
+| Nested `<main>` elements | fixed — the sections wrapper is now a `div` |
+| Components loaded by Bookshop | 19, one Bookshop |
 
-### What was not verified
+### Not verified
 
-The CloudCannon editor itself. Live re-rendering, click-to-edit on the new
-sections and the editor-mode CSS can only be confirmed in a real editor — push to
-a test branch and check there before merging.
+The CloudCannon editor itself. Worth checking on a test branch:
 
-Two things to look at specifically:
-
-- **The timeline in the editor.** It is the most heavily pinned section on the
-  site. The `cms.css` rules flatten it, but that is untested.
-- **The board-of-directors canvas.** `about-board-network.js` targets
-  `#boardNetworkCanvas`; the canvas is hidden in editor mode, so the script should
-  idle rather than error.
+- **The first section is selectable.** This was the navbar overlap; the fix is a
+  `cms.css` rule, untested in a real editor.
+- **The timeline in editor mode.** It is the most heavily pinned section on the
+  site and `cms.css` flattens it.
+- **The footer shows content.** It is now in the built HTML, so it should appear
+  immediately — but it will not update until you save and rebuild.

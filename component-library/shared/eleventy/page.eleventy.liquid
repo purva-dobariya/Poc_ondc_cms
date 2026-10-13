@@ -1,7 +1,7 @@
-<main data-editable="array" data-prop="sections" data-id-key="_bookshop_name" data-component-key="_bookshop_name">
+<div class="page-sections" data-editable="array" data-prop="sections" data-id-key="_bookshop_name" data-component-key="_bookshop_name">
   {% for block in sections %}
     <editable-array-item data-component="{{block._bookshop_name}}" data-id="{{block._bookshop_name}}">
       {% bookshop "{{block._bookshop_name}}" bind: block %}
     </editable-array-item>
   {% endfor %}
-</main>
+</div>
