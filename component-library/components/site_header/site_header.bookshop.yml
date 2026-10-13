@@ -1,0 +1,10 @@
+spec:
+  label: Site header
+  description: The logo, top navigation and Sign Up button. Shared by every page.
+  icon: menu
+
+# No props: the component reads site.* directly, which is what makes it
+# live-render in the editor (site is exposed via data_config).
+blueprint: {}
+
+_inputs: {}
