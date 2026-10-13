@@ -16,12 +16,12 @@ source: ''
 paths:
   static: ''
   uploads: images
-  data: src/_data
 timezone: Asia/Calcutta
 # Exposes src/_data/site.json to Bookshop's live rendering in the Visual Editor.
 # Without this, components that read site.* render empty while editing.
 data_config:
-  site: true               # ← exposes it to live rendering
+  site:
+    path: src/_data/site.json               # ← exposes it to live rendering
 markdown:
   engine: commonmark
   options: {}
