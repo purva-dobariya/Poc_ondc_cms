@@ -9,7 +9,7 @@
     },
     {
       "label": "About",
-      "url": "/about.html",
+      "url": "/about-us.html",
       "new_tab": false
     },
     {
@@ -24,12 +24,12 @@
     },
     {
       "label": "Resources",
-      "url": "/pages/resources.html",
+      "url": "/resources.html",
       "new_tab": false
     },
     {
       "label": "Complaints",
-      "url": "/pages/complaint.html",
+      "url": "/complaint.html",
       "new_tab": false
     },
     {
@@ -38,32 +38,109 @@
       "children": [
         {
           "label": "Network Participants",
-          "url": "/pages/network-participants.html"
+          "url": "/network-participants.html"
         },
         {
           "label": "Ecosystem Participants",
-          "url": "/pages/ecosystem-participants.html"
+          "url": "/ecosystem-participants.html"
         }
       ]
     },
     {
       "label": "RFPs/RFQs",
-      "url": "/pages/rfp.html",
+      "url": "/rfp.html",
       "new_tab": false
     },
     {
       "label": "Contact",
-      "url": "/pages/contact-us.html",
+      "url": "/contact-us.html",
       "new_tab": false
     },
     {
       "label": "Careers",
-      "url": "/pages/careers.html",
+      "url": "/careers.html",
       "new_tab": false
     }
   ],
   "cta_label": "Sign Up",
   "cta_url": "https://portal.ondc.org/",
+  "sectors": {
+    "label": "Explore other sectors",
+    "links": [
+      {
+        "label": "D2C Retail",
+        "url": "/d2c-retail.html",
+        "variant": "",
+        "new_tab": false
+      },
+      {
+        "label": "DigiDukaan",
+        "url": "/digidukaan.html",
+        "variant": "",
+        "new_tab": false
+      },
+      {
+        "label": "Food & Beverages",
+        "url": "/food-and-beverages.html",
+        "variant": "",
+        "new_tab": false
+      },
+      {
+        "label": "Amazing India",
+        "url": "/impact-retail.html",
+        "variant": "",
+        "new_tab": false
+      },
+      {
+        "label": "Hyperlocal Logistics",
+        "url": "/hyperlocal-logistics.html",
+        "variant": "",
+        "new_tab": false
+      },
+      {
+        "label": "Public Transport",
+        "url": "/public-transport.html",
+        "variant": "",
+        "new_tab": false
+      },
+      {
+        "label": "Shared Mobility",
+        "url": "/shared-mobility.html",
+        "variant": "",
+        "new_tab": false
+      },
+      {
+        "label": "Tourism",
+        "url": "/tourism.html",
+        "variant": "",
+        "new_tab": false
+      },
+      {
+        "label": "Credit",
+        "url": "/credit.html",
+        "variant": "",
+        "new_tab": false
+      },
+      {
+        "label": "Investments",
+        "url": "/investments.html",
+        "variant": "",
+        "new_tab": false
+      },
+      {
+        "label": "Insurance",
+        "url": "/coming-soon.html#insurance",
+        "variant": "",
+        "new_tab": false
+      },
+      {
+        "label": "Life@ONDC",
+        "url": "/careers.html",
+        "variant": "pill-life",
+        "new_tab": false
+      }
+    ]
+  },
   "footer": {
     "logo": "/images/ondc-logo.svg",
     "logo_alt": "ONDC — Open Network for Digital Commerce",
@@ -74,17 +151,17 @@
         "links": [
           {
             "label": "Overview",
-            "url": "/about.html",
+            "url": "/about-us.html",
             "new_tab": false
           },
           {
             "label": "Board Of Directors",
-            "url": "/about.html#board-of-directors",
+            "url": "/about-us.html#board-of-directors",
             "new_tab": false
           },
           {
             "label": "Careers",
-            "url": "/pages/careers.html",
+            "url": "/careers.html",
             "new_tab": false
           },
           {
@@ -99,12 +176,12 @@
           },
           {
             "label": "Annual Newsletter — FY25-26 in Focus",
-            "url": "/assets/newsletters/ondc-fy25-26-in-focus.pdf",
+            "url": "https://ondc.org/public/assets/newsletters/ondc-fy25-26-in-focus.pdf",
             "new_tab": true
           },
           {
             "label": "Quarterly Newsletter — ONDC Pulse FY26-27 Q1",
-            "url": "/assets/newsletters/ondc-pulse-2026-27-q1.pdf",
+            "url": "https://ondc.org/public/assets/newsletters/ondc-pulse-2026-27-q1.pdf",
             "new_tab": true
           }
         ]
@@ -114,22 +191,22 @@
         "links": [
           {
             "label": "Buyer Network Participant",
-            "url": "/pages/buyer-network-participants.html",
+            "url": "/buyer-network-participants.html",
             "new_tab": false
           },
           {
             "label": "Seller Network Participant",
-            "url": "/pages/seller-network-participants.html",
+            "url": "/seller-network-participants.html",
             "new_tab": false
           },
           {
             "label": "Gateway",
-            "url": "/pages/gateway.html",
+            "url": "/gateway.html",
             "new_tab": false
           },
           {
             "label": "Technology Service Provider",
-            "url": "/pages/technology-service-provider.html",
+            "url": "/technology-service-provider.html",
             "new_tab": false
           }
         ]
@@ -139,52 +216,52 @@
         "links": [
           {
             "label": "Resources",
-            "url": "/pages/resources.html",
+            "url": "/resources.html",
             "new_tab": false
           },
           {
             "label": "Contact Us",
-            "url": "/pages/contact-us.html",
+            "url": "/contact-us.html",
             "new_tab": false
           },
           {
             "label": "Complaint",
-            "url": "/pages/complaint.html",
+            "url": "/complaint.html",
             "new_tab": false
           },
           {
             "label": "Network Participants",
-            "url": "/pages/network-participants.html",
+            "url": "/network-participants.html",
             "new_tab": false
           },
           {
             "label": "Ecosystem Participants",
-            "url": "/pages/ecosystem-participants.html",
+            "url": "/ecosystem-participants.html",
             "new_tab": false
           },
           {
             "label": "Payment Assurance Program",
-            "url": "/pages/payment-assurance-program.html",
+            "url": "/payment-assurance-program.html",
             "new_tab": false
           },
           {
             "label": "RFPs/RFQs",
-            "url": "/pages/rfp.html",
+            "url": "/rfp.html",
             "new_tab": false
           },
           {
             "label": "Privacy Policy",
-            "url": "/pages/privacy-policy.html",
+            "url": "/privacy-policy.html",
             "new_tab": false
           },
           {
             "label": "Cookie Policy",
-            "url": "/pages/cookie-policy.html",
+            "url": "/cookie-policy.html",
             "new_tab": false
           },
           {
             "label": "Terms and Conditions",
-            "url": "/pages/terms-and-conditions.html",
+            "url": "/terms-and-conditions.html",
             "new_tab": false
           }
         ]

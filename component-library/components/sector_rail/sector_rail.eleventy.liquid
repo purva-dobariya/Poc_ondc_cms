@@ -1,0 +1,9 @@
+{% if use_site_settings %}{% assign rail_label = site.sectors.label %}{% assign rail_links = site.sectors.links %}{% else %}{% assign rail_label = label %}{% assign rail_links = links %}{% endif %}
+<nav class="more-sectors" aria-label="{{ rail_label }}">
+    <div class="container">
+      <div class="more-lbl">{{ rail_label }}</div>
+      <div class="pill-row">
+{% for link in rail_links %}        <a class="pill{% if link.variant %} {{ link.variant }}{% endif %}" href="{{ link.url }}"{% if link.new_tab %} rel="noopener" target="_blank"{% endif %}>{{ link.label }}</a>
+{% endfor %}      </div>
+    </div>
+  </nav>

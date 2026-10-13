@@ -1,0 +1,16 @@
+spec:
+  structures: [sections]
+  label: Page hero
+  description: The large opening banner — background photo, heading, intro paragraphs and buttons.
+  icon: wallpaper
+
+blueprint:
+  eyebrow: ''
+  heading: A heading for this page
+  heading_accent: ''
+  background_image: ''
+  paragraphs:
+    - text: One or two sentences introducing the page.
+  buttons: []
+
+_inputs: {}

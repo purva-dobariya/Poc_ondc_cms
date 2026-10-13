@@ -71,3 +71,27 @@ html.is-editing #site-header { position: relative; }
 
 /* Sections added from the CMS: show them fully in the editor, no scroll reveal */
 html.is-editing .block-card { opacity: 1 !important; transform: none !important; }
+
+/* ── Page-archetype sections (About and later pages) ─────────────────── */
+/* .bk-rv starts at opacity 0 and only reveals on scroll. In the editor the
+   scroll engine never runs, so without this every section renders invisible. */
+html.is-editing .bk-rv { opacity: 1 !important; transform: none !important; transition: none !important; }
+
+/* The timeline and board-of-directors canvases are decorative and never paint
+   in the editor; hide them so they cannot cover the editable content. */
+html.is-editing .bk-tl-stage,
+html.is-editing .bk-people-stage { display: none !important; }
+
+/* The timeline pins itself over a tall scroll runway on the live site.
+   Flatten it so every year is visible and clickable in the editor. */
+html.is-editing .bk-tl { height: auto !important; min-height: 0 !important; }
+html.is-editing .bk-tl-content { position: static !important; height: auto !important; }
+
+/* The hero fills the viewport on the live site; let it size to its content. */
+html.is-editing .bk-hero-about { min-height: 0 !important; padding: 120px 0 64px !important; }
+
+/* The award lightbox is a dialog, closed until a card is clicked. */
+html.is-editing .bk-lightbox { display: none !important; }
+
+/* The scroll-progress bar has nothing to track inside the editor frame. */
+html.is-editing .scroll-progress { display: none !important; }

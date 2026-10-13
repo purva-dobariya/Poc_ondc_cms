@@ -30,7 +30,8 @@ module.exports = function (eleventyConfig) {
     css: "css",
     js: "js",
     images: "images",
-    fonts: "fonts"
+    fonts: "fonts",
+    files: "files"
   });
 
   // "a\nb" -> "a<br>b"  (used for labels that wrap onto two lines)

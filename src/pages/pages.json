@@ -1,3 +1,7 @@
 {
-  "layout": "base.liquid"
+  "layout": "base.liquid",
+  "wrapper_tag": "div",
+  "wrapper_id": "root",
+  "styles": ["styles", "fx", "scale", "mobile"],
+  "scripts": ["/js/ondc/fx.js"]
 }

@@ -1,0 +1,18 @@
+<section class="bk-panel bk-matters" data-screen-label="{{ screen_label | default: "Why it matters" }}">
+      <div class="bk-matters-grid">
+        <div class="bk-reality-lead bk-rv">
+{% if eyebrow %}          <div class="bk-eyebrow">{{ eyebrow }}</div>
+{% endif %}          <h2 class="bk-h2">{{ heading }}{% if heading_accent %} <em>{{ heading_accent }}</em>{% endif %}</h2>
+{% if lead %}          <p>{{ lead }}</p>
+{% endif %}        </div>
+        <div>
+{% for group in groups %}          <div class="bk-eyebrow{% unless forloop.first %} bk-matters-gap{% endunless %} bk-rv">{{ group.heading }}</div>
+{% if group.intro %}          <p class="bk-matters-sub bk-rv">{{ group.intro }}</p>
+{% endif %}          <div class="bk-barriers bk-rv bk-rv-d1">
+{% for item in group.items %}            <div class="bk-barrier"><span class="bk-barrier-n">{% if forloop.index < 10 %}0{% endif %}{{ forloop.index }}</span>
+              <p class="bk-barrier-t">{{ item.text }}</p>
+            </div>
+{% endfor %}          </div>
+{% endfor %}        </div>
+      </div>
+    </section>

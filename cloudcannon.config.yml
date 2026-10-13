@@ -477,6 +477,103 @@ _inputs:
     type: text
     label: Logo description
 
+  # --- fields used by the page-archetype components (About and later pages) ---
+  heading_accent:
+    type: text
+    label: Highlighted tail of the heading
+    comment: Shown in the accent style at the end of the heading. Leave empty for a plain heading.
+  screen_label:
+    type: text
+    label: Section name for screen readers
+    comment: Optional. Describes this section to assistive technology.
+  paragraphs:
+    type: array
+    label: Paragraphs
+    comment: Use + to add a paragraph, the item menu to duplicate or delete, and drag to reorder.
+  groups:
+    type: array
+    label: Groups
+    comment: Each group has a heading and its own numbered list. Numbering is automatic.
+  rows:
+    type: array
+    label: Organisations
+  people:
+    type: array
+    label: People
+    comment: Use + to add a person, the item menu to duplicate or delete, and drag to reorder.
+  photo:
+    type: image
+    label: Photo
+    comment: A square portrait works best.
+  org:
+    type: text
+    label: Organisation
+  logos:
+    type: object
+    label: Logo strip
+  count:
+    type: text
+    label: Number
+    comment: Counts up as the reader scrolls into view.
+  count_label:
+    type: text
+    label: What the number counts
+  featured:
+    type: object
+    label: Featured item
+  awards:
+    type: array
+    label: Awards
+  years:
+    type: array
+    label: Years
+    comment: Use + to add a year, the item menu to duplicate or delete, and drag to reorder.
+  year:
+    type: text
+    label: Year
+  entries:
+    type: array
+    label: Entries
+  meta:
+    type: text
+    label: Date or label
+  is_milestone:
+    type: checkbox
+    label: Show as a highlighted milestone
+  milestone_title:
+    type: text
+    label: Milestone headline
+    comment: Used when the milestone has no number.
+  milestone_number:
+    type: text
+    label: Milestone number
+    comment: Optional. Shown large, and counts up. Leave empty to use the headline instead.
+  milestone_suffix:
+    type: text
+    label: Milestone number suffix
+    comment: For example M+ or %.
+  finale:
+    type: object
+    label: Closing figure
+  number:
+    type: text
+    label: Number
+  suffix:
+    type: text
+    label: Suffix
+  action:
+    type: select
+    label: What this button does
+    options:
+      values:
+        - value: link
+          label: Go to a link
+        - value: signup
+          label: Open the ONDC sign-up portal
+  sectors:
+    type: object
+    label: Sector links
+
 # Toolbar for the click-to-edit regions in the visual editor.
 _editables:
   content:

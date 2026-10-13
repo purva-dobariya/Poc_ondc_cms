@@ -1,0 +1,7 @@
+<section class="bk-about-close" data-screen-label="{{ screen_label | default: "Closing" }}">
+      <h2 class="bk-h2 bk-rv">{{ heading }}{% if heading_accent %} <em>{{ heading_accent }}</em>{% endif %}</h2>
+{% if buttons %}      <div class="bk-hero-actions bk-rv bk-rv-d1">
+{% for button in buttons %}{% if button.action == "signup" %}        <button type="button" class="bk-btn {% if button.style == "solid" %}bk-btn-solid{% else %}bk-btn-ghost{% endif %}" onclick="ONDCSignup.open()">{{ button.label }}</button>
+{% else %}        <a class="bk-btn {% if button.style == "solid" %}bk-btn-solid{% else %}bk-btn-ghost{% endif %}" href="{{ button.url }}"{% if button.new_tab %} target="_blank" rel="noopener"{% endif %}>{{ button.label }}</a>
+{% endif %}{% endfor %}      </div>
+{% endif %}    </section>

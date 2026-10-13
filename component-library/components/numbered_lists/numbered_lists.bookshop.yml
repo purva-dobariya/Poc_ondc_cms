@@ -1,0 +1,19 @@
+spec:
+  structures: [sections]
+  label: Numbered lists
+  description: A lead paragraph beside one or more groups of automatically numbered points.
+  icon: format_list_numbered
+
+blueprint:
+  screen_label: ''
+  eyebrow: ''
+  heading: A heading for this section
+  heading_accent: ''
+  lead: ''
+  groups:
+    - heading: First group
+      intro: ''
+      items:
+        - text: First point
+
+_inputs: {}
