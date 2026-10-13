@@ -13,7 +13,6 @@ module.exports = function (eleventyConfig) {
   // Bookshop resolves bookshopLocations from the project root, but LiquidJS
   // resolves includes from the input dir (src). Adding "." lets Liquid find
   // the component library at the root, so both agree.
-  eleventyConfig.ignores.add("src/component-library/**");
   eleventyConfig.setLiquidOptions({
     root: ["src/_includes", "src", "."],
     dynamicPartials: true,
