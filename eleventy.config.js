@@ -10,11 +10,21 @@
 const pluginBookshop = require("@bookshop/eleventy-bookshop");
 
 module.exports = function (eleventyConfig) {
+  // Bookshop resolves bookshopLocations from the project root, but LiquidJS
+  // resolves includes from the input dir (src). Adding "." lets Liquid find
+  // the component library at the root, so both agree.
+  eleventyConfig.setLiquidOptions({
+    root: ["src/_includes", "src", "."],
+    dynamicPartials: true,
+    extname: ".liquid",
+    strictFilters: true,
+    jsTruthy: true
+  });
+
   eleventyConfig.addPlugin(pluginBookshop({
     bookshopLocations: ["component-library"],
     pathPrefix: ''
   }));
-
   // Assets keep their current URLs (/css/..., /js/..., /images/..., /fonts/...)
   eleventyConfig.addPassthroughCopy({
     css: "css",
