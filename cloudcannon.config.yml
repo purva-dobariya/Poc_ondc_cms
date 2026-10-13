@@ -25,23 +25,23 @@ collections_config:
   pages:
     path: src/pages
     glob:
-      - '*.njk'
+      - '*.liquid'
     name: Pages
     singular_name: Page
     icon: wysiwyg
     description: Every page on the site. Open one to edit its text and images, or to add, duplicate, reorder and remove whole sections.
     create:
-      path: '[relative_base_path]/{title|slugify}.njk'
+      path: '[relative_base_path]/{title|slugify}.liquid'
     # Schema files must NOT live in src/pages: CloudCannon treats a file used as a
     # schema as a template and hides it from the Pages list. Keep them in schemas/.
     schemas:
       blank:
         name: Blank page
-        path: schemas/page.njk
+        path: schemas/page.liquid
         icon: note_add
       landing:
         name: Landing page starter
-        path: schemas/landing-page.njk
+        path: schemas/landing-page.liquid
         icon: article
 
   site:

@@ -33,10 +33,11 @@
 </head>
 <body class="home">
 <div id="root">
-{% include "partials/site-header.njk" %}
+{% include "partials/site-header" %}
 
 {%- for section in sections %}
-{% include "sections/" + section._type + ".njk" %}
+{%- assign section_template = "sections/" | append: section._type %}
+{% include section_template %}
 {%- endfor %}
 
 </div>

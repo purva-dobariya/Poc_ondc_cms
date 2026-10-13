@@ -1,7 +1,7 @@
 /* Eleventy build.
- * Pages live in src/pages as .njk files whose front matter holds a `sections`
+ * Pages live in src/pages as .liquid files whose front matter holds a `sections`
  * list. Each section is rendered by the matching template in
- * src/_includes/sections/<type>.njk — that is what lets CloudCannon add,
+ * src/_includes/sections/<type>.liquid — that is what lets CloudCannon add,
  * duplicate, delete and reorder sections without a developer.
  *
  * Build command in CloudCannon:  npx @11ty/eleventy
@@ -36,7 +36,7 @@ module.exports = function (eleventyConfig) {
 
   return {
     dir: { input: "src", includes: "_includes", data: "_data", output: "_site" },
-    htmlTemplateEngine: "njk",
-    markdownTemplateEngine: "njk"
+    htmlTemplateEngine: "liquid",
+    markdownTemplateEngine: "liquid"
   };
 };
