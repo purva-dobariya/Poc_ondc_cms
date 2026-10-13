@@ -24,6 +24,7 @@ markdown:
 collections_config:
   pages:
     path: src/pages
+    url: /[slug].html
     glob:
       - '*.liquid'
     name: Pages
