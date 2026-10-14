@@ -144,6 +144,31 @@ html.is-editing .bk-contact-form .send-options {
    at is a field on the section. */
 html.is-editing .bk-contact-map { pointer-events: none; }
 
+/* ── Complaints page ─────────────────────────────────────────────────── */
+/* The spine's blue line grows with the scroll position and each step's dot
+   turns blue as the line passes it (beckn.js). The editor never scrolls, so
+   the line would sit at zero height and every dot would stay grey. Paint the
+   finished state instead, so the section reads the way it will on the page. */
+html.is-editing .bk-spine-fill { height: 100% !important; }
+html.is-editing .bk-step-node {
+  background: var(--bk-blue, #2151f5) !important;
+  box-shadow: 0 0 0 6px rgba(33, 81, 245, .14) !important;
+}
+
+/* Only the first expandable section and the first FAQ answer are open on the
+   page; the rest are closed, so their text could never be clicked to edit.
+   Open them all while editing — the same trade as the RFP tabs. */
+html.is-editing .bk-seat:not([open]) > .bk-seat-jd { display: block !important; }
+
+/* Buyer App cards are <details> too, and paging hides all but the current
+   page. Show every card, opened, so each one is reachable. The cards are not
+   editable content — they come from the directory data file — but a hidden
+   card cannot be inspected, and the search and paging controls do nothing
+   useful in a frame that never scrolls. */
+html.is-editing .bk-ba-card[hidden] { display: block !important; }
+html.is-editing .bk-ba-card > .bk-ba-detail { display: block !important; }
+html.is-editing .bk-ba-pagination { display: none !important; }
+
 /* ── Shared chrome in the editor ─────────────────────────────────────── */
 /* The navbar is position:sticky at z-index 300/100 on the live site. Inside the
    editor frame it then floats over the FIRST section and swallows that

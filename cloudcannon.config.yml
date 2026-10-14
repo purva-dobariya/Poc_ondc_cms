@@ -22,6 +22,13 @@ timezone: Asia/Calcutta
 data_config:
   site:
     path: src/_data/site.json               # ← exposes it to live rendering
+  # The Buyer App directory behind the Complaints page. It is a snapshot of the
+  # published ONDC directory, not page copy, so it lives here rather than in a
+  # section's fields: 143 entries would be unworkable in the sidebar. Listed
+  # here for the same reason as site.json — it is what makes the data reach
+  # Bookshop's live rendering, so the directory still shows while editing.
+  buyer_apps:
+    path: src/_data/buyer_apps.json
 markdown:
   engine: commonmark
   options: {}

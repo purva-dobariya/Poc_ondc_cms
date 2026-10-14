@@ -137,6 +137,11 @@ is published.
 | RFP / RFQ ledger | Tabs and a search box over the live tender table. |
 | Page title band | A plain heading at the top of a page, with one line under it. |
 | Contact form | The message form, office details and map, side by side. |
+| Numbered journey (spine) | Numbered steps down a line that fills as you scroll, with optional expandable detail. One per page. |
+| Escalation panel | A dark call-out: conditions, buttons, and key facts down the side. |
+| Buyer App directory | The searchable, paged list of Buyer Apps and their contacts. |
+| FAQ | Questions that open one at a time. |
+| Key numbers | Big figures that count up, in labelled rows, with an optional legend. |
 
 **Closing call to action** has a **Layout** choice: *Plain* is the wide band used at
 the foot of the About page, *Panel* is the white rounded card used at the foot of the
@@ -312,6 +317,76 @@ the same place, not the embed address.
 
 Clear the office details, the map and the directions link and the whole
 right-hand column disappears, letting the form run the full width of the page.
+
+---
+
+## 3c. Editing the Complaints page
+
+Six sections: the hero, **How to get help**, **Escalate to ONDC**, the **Buyer
+App directory**, the **FAQ** and **Status of complaints**.
+
+### The numbered steps
+
+Open **Numbered journey (spine)**. Each entry under **Steps** is a title and a
+short description; the numbers and the left/right alternation are automatic, so
+adding, deleting or dragging a step renumbers everything.
+
+One setting to leave alone: **Link anchor** must stay `bk-mech`. It is the id
+the animation script looks for — change it and the line stops filling and the
+dots stop lighting up. For the same reason there can only be **one** of these
+sections on a page.
+
+Under **Expandable detail below the steps** are the longer answers. Each has a
+title and a list of bullet points. Only one is open at a time and the first one
+starts open, so the order matters.
+
+### Escalate to ONDC
+
+**Conditions** are the bulleted situations. **Key facts on the right** are the
+bold figures ("48 hours") with a line explaining each. **Document link** is the
+PDF at the bottom of that panel — leave it empty to hide the link.
+
+### The Buyer App directory
+
+The wording is editable here: the heading, the line under it, the search box
+hint, the button labels, and the message shown when a search finds nothing.
+
+**The 143 apps themselves are not edited in this section.** They are a copy of
+the published ONDC Buyer App directory and live in a separate data file,
+`buyer_apps.json`, which you will find under the site's data in CloudCannon.
+Each entry has a name, the organisation, a logo and its contact rows. If an
+app's logo is missing or fails to load, the card falls back to the app's
+initials rather than showing a broken image.
+
+**Cards per page to start with** must be one of the **Per-page choices** —
+if you add a new choice, that is the only place it needs adding.
+
+### Status of complaints
+
+These are the complaint figures, and they are **typed in here**, not pulled from
+the complaints team's spreadsheet. Updating them is:
+
+1. open **Key numbers**;
+2. change the figures in each row;
+3. update **Small note beside the heading** to the new "Last updated on…" date.
+
+Each figure counts up from zero when it scrolls into view. Type digits only —
+no commas. If you ever need to show something that is not a plain whole number,
+turn **Count up when it scrolls into view** off for that tile and it will be
+shown exactly as typed.
+
+**Rows of numbers** are the two bands — one per year, one for where this year's
+complaints stand. Turn **Size tiles to their content** on for a row of years so
+they sit together, off for a row that should share the width equally. The
+**Legend** underneath explains what each status means.
+
+### While you are editing
+
+The steps appear fully lit rather than filling in as you scroll, every
+expandable section and FAQ answer is open so you can click into the text, and
+all 143 directory cards are shown with their contacts visible. On the live page
+only the first answer in each group is open, and the directory shows one page at
+a time.
 
 ---
 

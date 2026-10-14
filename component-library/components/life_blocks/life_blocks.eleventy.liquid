@@ -8,7 +8,7 @@
             <p>{{ block.text }}</p>
           </div>
 {% endfor %}        </div>
-{% if images %}        <div class="bk-life-media">
+{% if images.size > 0 %}        <div class="bk-life-media">
 {% for image in images %}{% assign d = forloop.index0 %}{% if d > 2 %}{% assign d = 2 %}{% endif %}          <img class="bk-fade-b bk-rv{% if d > 0 %} bk-rv-d{{ d }}{% endif %}" src="{{ image.image }}" alt="{{ image.alt }}">
 {% endfor %}        </div>
 {% endif %}      </div>

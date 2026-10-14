@@ -101,6 +101,7 @@ editor layer and must stay last.
 | RFPs/RFQs | category-chrome, fx, scale, type-boost, beckn, mobile |
 | Careers | category-chrome, fx, scale, type-boost, beckn, mobile |
 | Contact | category-chrome, fx, scale, type-boost, beckn, **legal**, mobile |
+| Complaints | category-chrome, fx, scale, type-boost, beckn, mobile |
 
 RFPs/RFQs and Careers both needed **no new CSS at all** — every rule they use
 was already in `beckn.css` and `mobile.css`. Expect that for most of the
@@ -166,7 +167,7 @@ Keep writing `#find-your-place` in `site.json` — the prefixing is automatic.
 
 ## The component library
 
-24 components, each a folder under `component-library/components/<name>/` with a
+29 components, each a folder under `component-library/components/<name>/` with a
 template and a `.bookshop.yml` spec. All are page content; none is chrome.
 
 **Added for the About page**, all reusable:
@@ -201,6 +202,23 @@ template and a `.bookshop.yml` spec. All are page content; none is chrome.
 | `page_title_band` | A plain heading band at the top of a page, no photo | Contact; the legal pages next |
 | `contact_form` | The two-column block: message form, office details, map | Contact |
 
+**Added for the Complaints page — five, and four of them pay for themselves
+immediately:**
+
+| Component | What it is | Where it is used again |
+| --- | --- | --- |
+| `journey_spine` | Numbered steps down an animated line, with expandable detail | **11 pages** — Complaints and the ten sector pages |
+| `stat_grid` | Rows of figures that count up, with a legend | **11 pages** — the same set |
+| `faq_accordion` | Questions that open one at a time | 3 pages — Complaints, Careers, Payment Assurance |
+| `buyer_directory` | Searchable, paged directory of apps and their contacts | Complaints (the directory shape itself recurs on 6 pages) |
+| `escalate_panel` | Dark call-out with conditions, actions and key facts | Complaints |
+
+Counting class usage across the reference repo before building is what showed
+this: `.bk-mech`/`.bk-step-*` and `.bk-statgrid`/`.bk-stat-*` each appear on
+eleven pages, so the ten sector pages are now mostly a matter of filling these
+two in. Complaints' hero needed no new component at all — it is `page_hero`
+with no photo.
+
 Careers' other three sections were variants of things that already existed:
 
 | Section on ondc.org | Handled by | How |
@@ -220,7 +238,7 @@ field on `closing_cta`** rather than a tenth component:
 | *(empty)* — "Plain" | `section.bk-about-close` | — |
 | `role` — "Panel" | `section.bk-role-close` | `body`, one paragraph |
 
-This is the rule that keeps the library at 24 instead of 45: **a new visual
+This is the rule that keeps the library at 29 instead of 45: **a new visual
 treatment of the same content is a variant field; only a new content shape is a
 new component.**
 
@@ -376,6 +394,54 @@ In the editor, Submit does **not** open a Gmail tab (the script checks for
 tabs. The map iframe gets `pointer-events: none` there, or it swallows the
 clicks meant for the panel around it.
 
+### The Complaints page: three decisions
+
+**Global data reaches a component, and that is how the directory works.** The
+Buyer App directory is 143 entries. Those are not fields on the section: they
+live in `src/_data/buyer_apps.json` and are listed in `cloudcannon.config.yml`
+under `data_config`, beside `site`. Two things make that safe, and both were
+checked rather than assumed:
+
+- a Bookshop component *can* read Eleventy global data. A throwaway component
+  printing `{{ buyer_apps.size }}` rendered `143` at build time. No component
+  had needed this before, so it was worth proving before building on it;
+- `data_config` is what carries the file into Bookshop's **browser** re-render,
+  which is why `site.json` is already listed there. Without it the directory
+  would render empty while editing.
+
+This is the escalation `ADDING_PAGES.md` already predicted for the RFP ledger:
+*"if the list ever outgrows this, a shared data file under `data_config` is the
+next step, not a collection."* 143 entries nested in a page's front matter
+would be unusable in the sidebar, and the list is a copy of an upstream
+directory — refreshed wholesale, not edited line by line.
+
+Every card is rendered at build time and the script only toggles `hidden`.
+Searching and paging never move, create or delete a node, so a Bookshop
+re-render costs nothing but a re-run — the same rule the ledger follows.
+
+**The spine is driven by two fixed ids, so there can be only one per page.**
+`beckn.js` calls `getElementById('bk-mech')` for the section and
+`getElementById('bk-spine-fill')` for the line that grows. Both are singletons.
+A second `journey_spine` on the same page would render correctly and never
+animate, and renaming the section's anchor away from `bk-mech` turns the whole
+effect off. The field comment in `journey_spine.bookshop.yml` says so where an
+editor will actually see it.
+
+**The complaint figures are CMS fields, not a live Google Sheet.** ondc.org
+fetches them from the complaints team's sheet through the gviz CSV endpoint on
+every page load. This build does not, for the same reasons the RFP ledger
+stopped doing it: requirement 1 asks for numbers and statistics to be editable
+in the CMS, and a runtime fetch means the section is blank whenever the sheet's
+sharing changes, the endpoint is slow, or the reader is offline. That is not
+hypothetical — rendering the reference page in a sandbox without network access
+produces an **empty** stats section, which is exactly what the side-by-side
+check showed.
+
+The trade is real and worth stating: someone now has to copy the figures across
+when the sheet changes, instead of it happening by itself. The seed values came
+from the live sheet (`13-10-2026`: 1254 + 1584 + 236 = 3074, which reconciles),
+and `as_of_note` is the field that carries the "Last updated on…" line.
+
 ### CloudCannon rewrites page front matter when an editor saves
 
 Comparing the Careers page before and after it had been opened and saved in
@@ -406,7 +472,7 @@ The same applies to the note in `contact-us.liquid` explaining why `legal.css`
 is in its stylesheet list — expect it to disappear on first save. That reasoning
 is recorded under **Stylesheets** above, which is why it is safe to lose there.
 
-### Seven rules that are not optional
+### Eight rules that are not optional
 
 **1. A component reads the data it needs itself.** It must not receive data
 through a helper or the layout — Bookshop re-renders components in the browser,
@@ -535,6 +601,26 @@ the photo column"). It was found while building Contact and fixed in all seven
 components that had it: `closing_cta`, `contact_form`, `cta_banner`,
 `life_blocks`, `page_hero`, `rich_text` and `role_hero`.
 
+**8. Check which property the CSS actually animates before writing the JS.**
+`category-chrome.css` paints the scroll-progress bar as a full-width span held
+at `transform: scaleX(0)`, with a comment saying it scales rather than
+animating `width` deliberately, to stay off the layout path. `scroll-progress.js`
+set `style.width`. Both looked right in isolation; together the bar sat at
+`scaleX(0)` and **never appeared on any page**. Measured, not guessed: painted
+width was 0px on About, Careers, RFPs and Contact alike.
+
+`legal.css` muddies it further by redefining the same span as width-driven, so
+the correct fix sets both and lets whichever rule won do the painting:
+
+```js
+bar.style.width = '100%';
+bar.style.transform = 'scaleX(' + p + ')';
+```
+
+The general lesson: when a script drives an animation the stylesheet owns, read
+the rule first. A second stylesheet later in the cascade can redefine the
+mechanism without touching the selector you were looking at.
+
 ---
 
 ## Adding the next page
@@ -586,8 +672,12 @@ carry 20 KB+ of inline script.
 | Contact page height vs ondc.org at 1440px | **2656px both** |
 | Contact form input styling | boxed: `#F5F7FA`, 8px radius, 14px — i.e. `legal.css` is live, as intended |
 | Home, About, RFP, Careers output, before vs after adding Contact | **byte-identical (4 of 4)** |
+| Complaints text vs ondc.org, rendered in a browser | **identical** — 5 step titles, 5 step descriptions, 8 accordion titles, 10 bullets, 6 FAQ answers, 3 escalation conditions, 2 key facts, all matching exactly |
+| Complaints section geometry vs ondc.org at 1440px | hero, spine, escalate panel, directory and FAQ **pixel-identical**; stats differ only because the reference's section renders **empty** without network |
+| Complaints Buyer App directory | 143 cards, 140 logos, **0 broken images**, 3 monogram fallbacks |
+| Home, About, RFP, Careers, Contact output, before vs after adding Complaints | **byte-identical (5 of 5)** |
 | Nested `<main>` elements | none |
-| Components loaded by Bookshop | 24, one Bookshop |
+| Components loaded by Bookshop | 29, one Bookshop |
 | Live editing applied | 3 of 3 pages |
 
 ### Editor geometry, measured
@@ -605,6 +695,8 @@ the same class CloudCannon's frame triggers — and the real boxes measured:
 | `careers.html` | editor | static, `0 → 88` | starts at `88` | none |
 | `contact-us.html` | live | sticky, `0 → 88` | starts at `88` | none |
 | `contact-us.html` | editor | static, `0 → 88` | starts at `88` | none |
+| `complaint.html` | live | sticky, `0 → 88` | starts at `88` | none |
+| `complaint.html` | editor | static, `0 → 88` | starts at `88` | none |
 
 Also checked on `rfp.html`: no section left at `opacity: 0`, no
 `[data-bk-intro]` still hidden, and **1 of 3 tab panels visible live vs 3 of 3
@@ -629,6 +721,22 @@ revealed the send panel, opened the Gmail popup, and produced the right
 recipient, subject (`ONDC Contact Form Request — General Enquiries`) and body.
 Submitting it empty, and with a 3-digit phone against the `^\d{10}$` pattern,
 was blocked both times. No console errors in any run.
+
+On `complaint.html` in editor mode, 25 editable targets across all six sections
+were checked for `display:none`, low opacity, zero size, sitting under the
+navbar, and being covered by another element. **Zero issues.** The editor rules
+were confirmed to be doing real work rather than passing by accident: the spine
+fill measured `878px` instead of `0`, the first step dot was
+`rgb(33, 81, 245)` instead of grey, and **0 of 143** directory cards were left
+hidden.
+
+The directory was then driven in a real browser: paging forward and to the last
+page (`Showing 121–143 of 143`, 23 cards), switching to 96 per page, searching
+`paytm` (1 result, and the count line correctly reads the singular "Buyer App"),
+searching for something absent (the no-match panel appears, pagination hides),
+and clearing the search. The two accordion groups were confirmed independent —
+opening the second detail closes the first without touching the open FAQ answer.
+No console errors in any run.
 
 Before the earlier fix, About's first section measured `top: -812` — exactly
 `88 − 900`, one viewport — which is how the cancelling pair was found.
