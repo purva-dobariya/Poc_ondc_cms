@@ -8,9 +8,9 @@
  *   2. filters rows as you type in the search box
  *   3. counts the open tenders into the hero counter
  *
- * Why the date check is here and not at build time: a tender has to move to
- * Closed the day after its closing date, and nobody is going to rebuild the
- * site at midnight to make that happen. The dates are baked into the page; the
+ * Why the deadline check is here and not at build time: a tender has to move
+ * to Closed the moment its deadline passes, and nobody is going to rebuild the
+ * site at 17:30 to make that happen. The deadlines are baked into the page; the
  * comparison is live.
  *
  * Every feed panel is rendered with ALL tenders in it and this script hides the
@@ -29,58 +29,50 @@
     });
   };
 
-  /* The deadline is carried as epoch SECONDS in data-rfp-due, written by the
-   * template from the datetime the editor picked. Seconds, not a formatted
-   * date, on purpose: an instant has no timezone ambiguity, so the comparison
-   * below means the same thing in Mumbai and in New York. The old dd.mm.yyyy
-   * string could not express a time of day and had to be parsed by hand to
-   * avoid Date.parse treating it as UTC. */
+  /* The deadline is written by the editor as plain text:
+   *     dd.mm.yyyy              -> the end of that day
+   *     dd.mm.yyyy HH:MM        -> that minute
+   *     dd.mm.yyyy HH:MM:SS     -> that second
+   *
+   * It is INDIA STANDARD TIME, always, for every reader — a tender closes at a
+   * moment in India, not at each reader's local midnight. So the parts are
+   * turned into an instant with Date.UTC and IST's fixed +5:30 subtracted,
+   * rather than `new Date(y, m, d, ...)`, which would silently mean something
+   * different in every timezone. India has no daylight saving, so the offset
+   * is a constant and this needs no timezone database. */
+  var IST_OFFSET_MS = 5.5 * 60 * 60 * 1000;
+
   function dueTime(row) {
-    var raw = row.getAttribute('data-rfp-due');
+    var raw = (row.getAttribute('data-rfp-due') || '').trim();
     if (!raw) return NaN;
-    var secs = Number(raw);
-    return isFinite(secs) && secs > 0 ? secs * 1000 : NaN;
-  }
-
-  /* Deadlines are quoted in one timezone for everybody — a tender closes at a
-   * moment in India, not at each reader's local midnight — so the visible text
-   * is always formatted in Asia/Kolkata whoever is looking. */
-  var FMT_TZ = 'Asia/Kolkata';
-  var dateFmt, timeFmt, timeFmtSec;
-  function formatters() {
-    if (dateFmt) return;
-    var base = { timeZone: FMT_TZ };
-    try {
-      dateFmt = new Intl.DateTimeFormat('en-GB', Object.assign({
-        day: '2-digit', month: '2-digit', year: 'numeric' }, base));
-      timeFmt = new Intl.DateTimeFormat('en-GB', Object.assign({
-        hour: '2-digit', minute: '2-digit', hour12: false }, base));
-      timeFmtSec = new Intl.DateTimeFormat('en-GB', Object.assign({
-        hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }, base));
-    } catch (e) {
-      dateFmt = timeFmt = timeFmtSec = null;   // ancient browser: keep the server text
-    }
-  }
-
-  /* dd.mm.yyyy, then the time of day — with seconds only when they are set, so
-   * an ordinary 5:30pm deadline reads "17:30" rather than "17:30:00". */
-  function deadlineText(ms, tzLabel) {
-    formatters();
-    if (!dateFmt) return null;
-    var d = new Date(ms);
-    var day = dateFmt.format(d).replace(/\//g, '.');
-    var time = (d.getSeconds() === 0 ? timeFmt : timeFmtSec).format(d);
-    return day + ', ' + time + (tzLabel ? ' ' + tzLabel : '');
+    var m = raw.match(/^(\d{2})\.(\d{2})\.(\d{4})(?:\s+(\d{1,2}):(\d{2})(?::(\d{2}))?)?$/);
+    if (!m) return NaN;
+    var d = +m[1], mo = +m[2], y = +m[3];
+    if (!d || !mo || !y || mo > 12 || d > 31) return NaN;
+    var hasTime = m[4] !== undefined;
+    // No time given means the deadline is the end of that day.
+    var hh = hasTime ? +m[4] : 23;
+    var mi = hasTime ? +m[5] : 59;
+    var ss = hasTime ? (m[6] !== undefined ? +m[6] : 0) : 59;
+    if (hh > 23 || mi > 59 || ss > 59) return NaN;
+    return Date.UTC(y, mo - 1, d, hh, mi, ss, hasTime ? 0 : 999) - IST_OFFSET_MS;
   }
 
   /* A row whose deadline cannot be read falls back to the tab the editor chose,
    * so a bad value never makes a live tender disappear. The warning names it. */
   function warnBadDate(row) {
     if (row._rfpWarned) return;
+    var raw = (row.getAttribute('data-rfp-due') || '').trim();
+    // No deadline at all is a normal state — an empanelled agency never has
+    // one, and a tender may not have been given one yet. Only a value that is
+    // present but unreadable is worth saying anything about.
+    if (!raw) return;
     row._rfpWarned = true;
     var name = (row.querySelector('.bk-rfp-name') || {}).textContent || '(unnamed)';
-    console.warn('RFP ledger: no usable deadline on "' + name +
-      '". Set one in the CMS. Leaving it in the tab it was given.');
+    console.warn('RFP ledger: could not read the deadline ' +
+      (raw ? '"' + raw + '" ' : '') + 'on "' + name +
+      '". Expected dd.mm.yyyy, optionally followed by HH:MM. ' +
+      'Leaving it in the tab it was given.');
   }
 
   /* The hero counter counts up, matching the easing beckn.js uses for every
@@ -132,24 +124,11 @@
     return chosen === 'closed' ? 'closed' : 'open';
   }
 
-  /* Rewrite the server-rendered date with the full deadline in IST. The server
-   * only writes the date part, as a no-JavaScript fallback. Idempotent: it
-   * stops once the text already matches. */
-  function paintDeadline(row, tzLabel) {
-    var el = row.querySelector('[data-rfp-due-text]');
-    if (!el) return;
-    var ms = dueTime(row);
-    if (isNaN(ms)) return;
-    var text = deadlineText(ms, tzLabel);
-    if (text && el.textContent !== text) el.textContent = text;
-  }
-
   /* Decide what is visible. Called on load, on every keystroke in the search
    * box, and again after the editor re-renders the section. */
   function apply(section) {
     var now = Date.now();
     var auto = section.getAttribute('data-rfp-auto') !== 'off';
-    var tzLabel = section.getAttribute('data-rfp-tz') || '';
     var input = section.querySelector('.bk-rfp-search');
     var q = input ? input.value.trim().toLowerCase() : '';
     var openCount = 0;
@@ -160,7 +139,6 @@
 
       box.querySelectorAll('.bk-rfp-row').forEach(function (row) {
         var place = placeOf(row, now, auto);
-        paintDeadline(row, tzLabel);
         // Closed tenders are greyed down; the class is the one beckn.css styles.
         row.classList.toggle('bk-rfp-row-closed', place === 'closed');
         var matches = !q || row.textContent.toLowerCase().indexOf(q) !== -1;

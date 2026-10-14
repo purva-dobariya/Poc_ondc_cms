@@ -124,14 +124,26 @@ _inputs:
                 label: Name
                 comment: The title applicants will read.
               rfp_deadline:
-                type: datetime
+                type: text
                 label: Deadline — last date and time to apply
                 comment: >-
-                  Pick the day on the left, then set the time on the right:
-                  click the hour, type it, and carry on through the minutes and
-                  AM/PM — or use the up and down arrow keys. Times are India
-                  Standard Time. The tender stays under Open until this exact
-                  moment. Leave empty for an empanelled agency.
+                  Day.Month.Year, then the time on a 24-hour clock — for
+                  example 30.11.2026 17:30, or 30.11.2026 23:59:59. Times are
+                  India Standard Time. The tender stays under Open until this
+                  exact moment. The time is optional; without one the deadline
+                  is the end of that day. Leave the whole field empty for an
+                  empanelled agency.
+                options:
+                  # Plain text on purpose. A `datetime` input was tried here and
+                  # silently blanked every stored value on save — including ones
+                  # that had been entered correctly — so real deadlines were
+                  # lost. Text cannot be reset by an input's own state, and this
+                  # is the format ONDC already writes. The pattern catches a
+                  # typo in the CMS rather than at render time.
+                  pattern: '^\s*$|^\d{2}\.\d{2}\.\d{4}(\s+\d{1,2}:\d{2}(:\d{2})?)?\s*$'
+                  pattern_message: >-
+                    Use Day.Month.Year, optionally followed by a time — for
+                    example 30.11.2026 or 30.11.2026 17:30
               rfp_documents:
                 type: array
                 label: Documents
