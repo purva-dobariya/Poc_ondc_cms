@@ -123,6 +123,129 @@ _structures:
           value: '0'
           label: ''
           word_style: false
+  # One tender in the RFP / RFQ ledger.
+  rfp_tenders:
+    style: select
+    values:
+      - label: Tender
+        icon: gavel
+        value:
+          rfp_no: ''
+          name: ''
+          last_date: ''
+          documents:
+            - doc_type: RFP document
+              file: ''
+              url: ''
+        _inputs:
+          rfp_no:
+            type: text
+            label: RFP / RFQ number
+            comment: The reference number exactly as it should appear, for example ONDC/RFP/2026/001.
+          name:
+            type: text
+            label: Tender name
+          last_date:
+            type: text
+            label: Last date to apply
+            comment: >-
+              Day.Month.Year, for example 30.11.2026. The tender shows under
+              "Open" until the end of that day and moves itself to "Closed"
+              the next day — there is nothing to switch over by hand.
+          documents:
+            type: array
+            label: Documents
+            comment: >-
+              The files applicants download — the RFP itself, any corrigendum,
+              annexures. Use + to add one and drag to reorder.
+            options:
+              structures: _structures.rfp_documents
+  # One downloadable file attached to a tender. Either uploaded here, or a link
+  # to a file that already lives somewhere else (ONDC's S3, for instance).
+  rfp_documents:
+    style: select
+    values:
+      - label: Document
+        icon: description
+        value:
+          doc_type: RFP document
+          file: ''
+          url: ''
+        _inputs:
+          doc_type:
+            type: text
+            label: What this document is
+            comment: The wording shown as the download link, for example "RFP document" or "Corrigendum 1".
+          file:
+            type: file
+            label: Upload the document
+            comment: >-
+              A PDF is normal. Leave this empty if the file is already online
+              and you want to link to it instead.
+            options:
+              path: files/rfp
+          url:
+            type: url
+            label: …or link to a file already online
+            comment: >-
+              Used only when nothing is uploaded above. Paste the full address,
+              for example an existing link on ONDC's S3.
+  # Tabs inside the RFP / RFQ ledger. Two kinds: a tab listing tenders, and a
+  # tab that just shows a message.
+  rfp_tabs:
+    style: select
+    values:
+      - label: Tab — open tenders
+        icon: folder_open
+        value:
+          key: ''
+          label: Open
+          source: open
+          message_heading: ''
+          message_body: ''
+        _inputs: &rfp_tab_feed
+          label:
+            type: text
+            label: Tab name
+          key:
+            type: hidden
+          source:
+            type: hidden
+          message_heading:
+            type: hidden
+          message_body:
+            type: hidden
+      - label: Tab — closed tenders
+        icon: folder
+        value:
+          key: ''
+          label: Closed
+          source: closed
+          message_heading: ''
+          message_body: ''
+        _inputs: *rfp_tab_feed
+      - label: Tab — a message
+        icon: info
+        value:
+          key: ''
+          label: New tab
+          source: message
+          message_heading: Nothing here yet
+          message_body: Check back later.
+        _inputs:
+          label:
+            type: text
+            label: Tab name
+          key:
+            type: hidden
+          source:
+            type: hidden
+          message_heading:
+            type: text
+            label: Message heading
+          message_body:
+            type: textarea
+            label: Message
 
 _inputs:
   sections:
@@ -476,6 +599,13 @@ _inputs:
   logo_alt:
     type: text
     label: Logo description
+  home_url:
+    type: text
+    label: Address of the home page
+    comment: >-
+      Where the logo links to, and what menu items that point at a spot on the
+      home page (those starting with #) are prefixed with when viewed from any
+      other page. Change this only if the home page moves.
 
   # --- fields used by the page-archetype components (About and later pages) ---
   heading_accent:
@@ -573,6 +703,40 @@ _inputs:
   sectors:
     type: object
     label: Sector links
+
+  # --- fields used by the role / directory pages (RFPs, Gateway, Buyer NP …) ---
+  variant:
+    type: select
+    label: Layout
+    comment: >-
+      "Plain" is the wide band used at the bottom of the About page. "Panel" is
+      the white rounded card used at the bottom of the role pages — it is the
+      one that can also carry a paragraph.
+    options:
+      values:
+        - value: ''
+          label: Plain
+        - value: role
+          label: Panel
+  heading_suffix:
+    type: text
+    label: Text after the highlighted part
+    comment: >-
+      Usually just a full stop. The heading reads "Unlock business
+      opportunities." — "opportunities" is the highlighted part and "." is this.
+  copy:
+    type: textarea
+    label: Intro paragraph
+  tally:
+    type: object
+    label: Counter on the right
+  source_note:
+    type: text
+    label: Where the number comes from
+    comment: The small grey line under the counter, for example "Refreshed from the live tender feed".
+  aria_label:
+    type: text
+    label: Section description for screen readers
 
 # Toolbar for the click-to-edit regions in the visual editor.
 _editables:

@@ -1,0 +1,83 @@
+spec:
+  structures: [sections]
+  label: RFP / RFQ ledger
+  description: >-
+    The tender table. Add a tender, type its number, name and closing date, then
+    attach its documents — upload a PDF or link to one already online. A tender
+    moves from Open to Closed on its own the day after its closing date.
+  icon: table_rows
+
+blueprint:
+  screen_label: The ledger
+  anchor_id: rfp-ledger
+  heading_id: ''
+  eyebrow: The ledger
+  heading: Every opportunity,
+  heading_accent: on the record
+  heading_suffix: '.'
+  tally_id: ''
+  show_search: true
+  search_placeholder: Search by RFP name or number
+  search_label: ''
+  tabs_label: Categories
+  due_label: Last date to apply
+  empty_heading: No records found
+  empty_body: Nothing matches this filter right now.
+  tabs:
+    - key: open
+      label: Open
+      source: open
+      message_heading: ''
+      message_body: ''
+    - key: closed
+      label: Closed
+      source: closed
+      message_heading: ''
+      message_body: ''
+  tenders: []
+
+_inputs:
+  tenders:
+    type: array
+    label: Tenders
+    comment: >-
+      Every RFP and RFQ, open and closed, in one list. Use + to add one, the
+      item menu to duplicate or delete, and drag to reorder — the order here is
+      the order on the page.
+    options:
+      structures: _structures.rfp_tenders
+  tally_id:
+    type: hidden
+  heading_id:
+    type: hidden
+  show_search:
+    type: checkbox
+    label: Show the search box
+  search_placeholder:
+    type: text
+    label: Search box placeholder
+  search_label:
+    type: text
+    label: Search box description for screen readers
+    comment: Optional. Falls back to the placeholder text.
+  tabs_label:
+    type: text
+    label: Name of the tab row for screen readers
+  due_label:
+    type: text
+    label: Wording under each closing date
+  empty_heading:
+    type: text
+    label: '"Nothing here" heading'
+    comment: Shown in a tab that has no tenders in it.
+  empty_body:
+    type: textarea
+    label: '"Nothing here" message'
+  tabs:
+    type: array
+    label: Tabs
+    comment: >-
+      Use + to add a tab, the item menu to duplicate or delete, and drag to
+      reorder. The first tab is the one open when the page loads.
+    options:
+      structures: _structures.rfp_tabs

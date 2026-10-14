@@ -78,7 +78,19 @@ html.is-editing .block-card { opacity: 1 !important; transform: none !important;
 html.is-editing .bk-rv { opacity: 1 !important; transform: none !important; transition: none !important; }
 
 /* The timeline and board-of-directors canvases are decorative and never paint
-   in the editor; hide them so they cannot cover the editable content. */
+   in the editor; hide them so they cannot cover the editable content.
+
+   CAREFUL — these stages are half of a cancelling pair. A sticky stage is
+   100vh tall and the content that follows pulls itself back up over it with a
+   matching negative margin, so the pair nets to zero on the live page:
+
+       .bk-tl-stage     { height: 100vh }            <- hidden below
+       .bk-tl-content   { margin-top: -100vh }       <- must be zeroed too
+
+   Hide the stage on its own and the negative margin survives with nothing to
+   cancel it, dragging the whole first section a full viewport upward and
+   underneath the navbar. .bk-people-stage carries BOTH halves on itself, so it
+   needs no partner rule. Any future stage of this shape needs the same care. */
 html.is-editing .bk-tl-stage,
 html.is-editing .bk-people-stage { display: none !important; }
 html.is-editing .bk-tl-content   { margin-top: 0 !important; }
@@ -93,6 +105,21 @@ html.is-editing .bk-hero-about { min-height: 0 !important; padding: 120px 0 64px
 
 /* The award lightbox is a dialog, closed until a card is clicked. */
 html.is-editing .bk-lightbox { display: none !important; }
+
+/* ── Role / directory pages (RFPs, Gateway, Buyer NP …) ──────────────── */
+/* beckn.js sets opacity:0 as an INLINE style on every [data-bk-intro] and then
+   animates it back. An inline style outranks a stylesheet, so this needs
+   !important — without it the whole hero is invisible if the animation does
+   not finish, which is exactly what beckn.css itself does under
+   prefers-reduced-motion. */
+html.is-editing [data-bk-intro] { animation: none !important; opacity: 1 !important; }
+
+/* Tabbed panels: only the selected tab is visible on the live page, so the text
+   inside the other tabs could never be clicked to edit. Show them all while
+   editing — the tab buttons stop switching anything, which is the intended
+   trade: everything on the page is reachable. */
+html.is-editing .bk-rfp-panel[hidden] { display: block !important; }
+html.is-editing .bk-rfp-panel + .bk-rfp-panel { border-top: 1px dashed var(--bk-line, #e3e5e8); }
 
 /* ── Shared chrome in the editor ─────────────────────────────────────── */
 /* The navbar is position:sticky at z-index 300/100 on the live site. Inside the

@@ -1,13 +1,21 @@
 spec:
   structures: [sections]
   label: Closing call to action
-  description: A short closing heading with buttons. Sits at the end of a page, above the footer.
+  description: >-
+    A short closing heading with buttons, at the end of a page above the footer.
+    Two layouts: "Plain" is the wide band used on the About page, "Panel" is the
+    white rounded card used on the role pages — Panel can also carry a paragraph.
   icon: flag
 
 blueprint:
   screen_label: ''
+  variant: ''
+  anchor_id: ''
+  heading_id: ''
   heading: A closing line for this page
   heading_accent: ''
+  heading_suffix: ''
+  body: ''
   buttons:
     - label: Get started
       url: 'https://portal.ondc.org/'
@@ -15,4 +23,10 @@ blueprint:
       new_tab: true
       action: link
 
-_inputs: {}
+_inputs:
+  heading_id:
+    type: hidden
+  body:
+    type: textarea
+    label: Paragraph
+    comment: Only shown by the "Panel" layout. Leave empty for just a heading and buttons.
