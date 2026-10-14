@@ -183,7 +183,8 @@ _inputs:
                               10 MB is better hosted on S3 and linked below;
                               uploads are refused above 20 MB.
                             options:
-                              path: files/rfp
+                              paths:
+                                uploads: files/rfp
                               # kB. CloudCannon applies NO limit unless you set
                               # one, and every upload is committed to Git — so
                               # without this a large file sails through the CMS
