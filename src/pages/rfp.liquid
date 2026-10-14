@@ -1,145 +1,143 @@
 ---
 title: RFPs/RFQs · ONDC Network
-description: ONDC runs open tenders for the work of building the network — technology, research,
-  communications and more. Review what's open, read the documents, and submit a proposal before
-  the deadline.
+description: ONDC runs open tenders for the work of building the network —
+  technology, research, communications and more. Review what's open, read the
+  documents, and submit a proposal before the deadline.
 permalink: /rfp.html
 wrapper_tag: main
 wrapper_class: bk bk-role-page bk-rfp-page
 wrapper_id: ''
 show_progress: true
 override:styles:
-- fx
-- scale
-- type-boost
-- beckn
-- mobile
+  - fx
+  - scale
+  - type-boost
+  - beckn
+  - mobile
 override:scripts:
-- /js/ondc/fx.js
-- /js/ondc/beckn.js
-- /js/ondc/signup.js
-- /js/ondc/scroll-progress.js
-- /js/ondc/rfp-ledger.js
+  - /js/ondc/fx.js
+  - /js/ondc/beckn.js
+  - /js/ondc/signup.js
+  - /js/ondc/scroll-progress.js
+  - /js/ondc/rfp-ledger.js
 sections:
-- _bookshop_name: role_hero
-  screen_label: Hero
-  anchor_id: ''
-  heading_id: rfp-hero-title
-  heading: Unlock business
-  heading_accent: opportunities
-  heading_suffix: .
-  copy: ONDC runs open tenders for the work of building the network — technology, research,
-    communications and more. Review what's open, read the documents, and submit a proposal
-    before the deadline.
-  buttons:
-  - label: View open RFPs
-    url: '#rfp-ledger'
-    style: solid
-    new_tab: false
-    action: link
-  - label: Sign up
-    url: ''
-    style: ghost
-    new_tab: false
-    action: signup
-  tally:
-    show: true
-    value_id: rfpTallyValue
-    aria_label: Open RFP count
-    placeholder: —
-    label: RFPs and RFQs currently accepting proposals.
-    source_note: Refreshed from the live tender feed
-- _bookshop_name: rfp_ledger
-  screen_label: The ledger
-  anchor_id: rfp-ledger
-  heading_id: rfp-ledger-title
-  eyebrow: The ledger
-  heading: Every opportunity,
-  heading_accent: on the record
-  heading_suffix: .
-  tally_id: rfpTallyValue
-  show_search: true
-  search_placeholder: Search by RFP name or number
-  search_label: Search RFPs and RFQs
-  tabs_label: RFP categories
-  due_label: Last date to apply
-  timezone_label: IST
-  auto_by_date: true
-  # ──────────────────────────────────────────────────────────────────────
-  # FOUR EXAMPLE ENTRIES — replace these with the real ones.
-  # Two tenders are still open, one has closed and one is an empanelled
-  # agency, so every tab has something in it and the Open/Closed split can
-  # be seen without waiting for a deadline to pass.
-  # Deadlines are full instants. The +05:30 is India Standard Time, which is
-  # what the CMS date picker writes for you.
-  # Delete all four once the real list is in, and delete the sample PDFs in
-  # files/rfp/ with them.
-  # ──────────────────────────────────────────────────────────────────────
-  tenders:
-  - rfp_tab: open
-    rfp_no: ONDC/RFP/2026/001
-    rfp_name: Selection of an agency for brand and creative services
-    rfp_deadline: 2026-11-30T17:30:00+05:30
-    rfp_documents:
-    - doc_type: RFP document
-      doc_file: ''
-      doc_url: https://ondc-static-website-media.s3.ap-south-1.amazonaws.com/ondc-website-media/downloads/rfp/sample-rfp-2026-001.pdf
-    - doc_type: Corrigendum 1
-      doc_file: ''
-      doc_url: https://ondc-static-website-media.s3.ap-south-1.amazonaws.com/ondc-website-media/downloads/rfp/sample-rfp-2026-001-corrigendum-1.pdf
-  - rfp_tab: open
-    rfp_no: ONDC/RFQ/2026/014
-    rfp_name: Supply and support of network monitoring tooling
-    rfp_deadline: 2026-12-15T23:59:59+05:30
-    rfp_documents:
-    - doc_type: RFQ document
-      doc_file: /files/rfp/sample-rfq-2026-014.pdf
-      doc_url: ''
-  - rfp_tab: closed
-    rfp_no: ONDC/RFP/2026/009
-    rfp_name: Research partner for seller adoption study
-    rfp_deadline: 2026-08-20T18:00:00+05:30
-    rfp_documents:
-    - doc_type: RFP document
-      doc_file: /files/rfp/sample-rfp-2026-009.pdf
-      doc_url: ''
-  - rfp_tab: empanelled
-    rfp_no: ONDC/EMP/2026/002
-    rfp_name: Example Communications Pvt Ltd
-    rfp_deadline: ''
-    rfp_documents:
-    - doc_type: Empanelment letter
-      doc_file: /files/rfp/sample-rfp-2026-009.pdf
-      doc_url: ''
-  tabs:
-  - tab_key: open
-    tab_label: Open
-    tab_source: open
-    tab_empty_heading: No records found
-    tab_empty_body: Nothing matches this filter right now.
-  - tab_key: closed
-    tab_label: Closed
-    tab_source: closed
-    tab_empty_heading: No records found
-    tab_empty_body: Nothing matches this filter right now.
-  - tab_key: empanelled
-    tab_label: Empanelled agencies
-    tab_source: empanelled
-    tab_empty_heading: No empanelled agencies yet
-    tab_empty_body: This list is empty for now. Check back after the next empanelment cycle.
-- _bookshop_name: closing_cta
-  variant: role
-  screen_label: Participant portal
-  anchor_id: ''
-  heading_id: rfp-close-title
-  heading: ONDC Participant
-  heading_accent: Portal
-  heading_suffix: .
-  body: Begin and efficiently manage your journey on the ONDC Network.
-  buttons:
-  - label: Sign up
-    url: ''
-    style: solid
-    new_tab: false
-    action: signup
+  - _bookshop_name: role_hero
+    screen_label: Hero
+    anchor_id: ''
+    heading_id: rfp-hero-title
+    heading: Unlock business
+    heading_accent: opportunities
+    heading_suffix: .
+    copy: ONDC runs open tenders for the work of building the network — technology,
+      research, communications and more. Review what's open, read the documents,
+      and submit a proposal before the deadline.
+    buttons:
+      - label: View open RFPs
+        url: '#rfp-ledger'
+        style: solid
+        new_tab: false
+        action: link
+      - label: Sign up
+        url: ''
+        style: ghost
+        new_tab: false
+        action: signup
+    tally:
+      show: true
+      value_id: rfpTallyValue
+      aria_label: Open RFP count
+      placeholder: —
+      label: RFPs and RFQs currently accepting proposals.
+      source_note: Refreshed from the live tender feed
+  - _bookshop_name: rfp_ledger
+    screen_label: The ledger
+    anchor_id: rfp-ledger
+    heading_id: rfp-ledger-title
+    eyebrow: The ledger
+    heading: Every opportunity,
+    heading_accent: on the record
+    heading_suffix: .
+    tally_id: rfpTallyValue
+    auto_by_date: true
+    show_search: true
+    search_placeholder: Search by RFP name or number
+    search_label: Search RFPs and RFQs
+    tabs_label: RFP categories
+    due_label: Last date to apply
+    timezone_label: IST
+    tabs:
+      - tab_key: open
+        tab_label: Open
+        tab_source: open
+        tab_empty_heading: No records found
+        tab_empty_body: Nothing matches this filter right now.
+      - tab_key: closed
+        tab_label: Closed
+        tab_source: closed
+        tab_empty_heading: No records found
+        tab_empty_body: Nothing matches this filter right now.
+      - tab_key: empanelled
+        tab_label: Empanelled agencies
+        tab_source: empanelled
+        tab_empty_heading: No empanelled agencies yet
+        tab_empty_body: This list is empty for now. Check back after the next
+          empanelment cycle.
+    tenders:
+      - rfp_tab: open
+        rfp_no: ONDC/RFP/2026/001
+        rfp_name: Selection of an agency for brand and creative services
+        rfp_deadline: 2026-10-14T17:30:00+05:30
+        rfp_documents:
+          - doc_type: RFP document
+            doc_file: ''
+            doc_url: https://ondc-static-website-media.s3.ap-south-1.amazonaws.com/ondc-website-media/downloads/rfp/sample-rfp-2026-001.pdf
+          - doc_type: Corrigendum 1
+            doc_file: ''
+            doc_url: https://ondc-static-website-media.s3.ap-south-1.amazonaws.com/ondc-website-media/downloads/rfp/sample-rfp-2026-001-corrigendum-1.pdf
+      - rfp_tab: open
+        rfp_no: ONDC/RFQ/2026/014
+        rfp_name: Supply and support of network monitoring tooling
+        rfp_deadline: 2026-12-15T23:59:59+05:30
+        rfp_documents:
+          - doc_type: RFQ document
+            doc_file: /files/rfp/sample-rfq-2026-014.pdf
+            doc_url: ''
+      - rfp_tab: closed
+        rfp_no: ONDC/RFP/2026/009
+        rfp_name: Research partner for seller adoption study
+        rfp_deadline: 2026-08-20T18:00:00+05:30
+        rfp_documents:
+          - doc_type: RFP document
+            doc_file: /files/rfp/sample-rfp-2026-009.pdf
+            doc_url: ''
+      - rfp_tab: empanelled
+        rfp_no: ONDC/EMP/2026/002
+        rfp_name: Example Communications Pvt Ltd
+        rfp_deadline: ''
+        rfp_documents:
+          - doc_type: Empanelment letter
+            doc_file: /files/rfp/sample-rfp-2026-009.pdf
+            doc_url: ''
+      - rfp_no: ''
+        name: ''
+        last_date: ''
+        documents:
+          - doc_type: RFP document
+            file: ''
+            url: ''
+  - _bookshop_name: closing_cta
+    screen_label: Participant portal
+    variant: role
+    anchor_id: ''
+    heading_id: rfp-close-title
+    heading: ONDC Participant
+    heading_accent: Portal
+    heading_suffix: .
+    body: Begin and efficiently manage your journey on the ONDC Network.
+    buttons:
+      - label: Sign up
+        url: ''
+        style: solid
+        new_tab: false
+        action: signup
 ---
