@@ -1,8 +1,0 @@
-/BAP WITH UI : 
-                ngrok http 8081
-/BAP WITH UI/bap-service : 
-                npm run dev
-/BAP WITH UI/beckn-onix : 
-                open -a Docker
-                docker run -d -p 6379:6379 redis:alpine
-                ./server --config=config/onix-bap/adapter.yaml | node onix-log-filter.js

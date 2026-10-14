@@ -19,7 +19,7 @@
             <span class="bk-rfp-name">{{ t.rfp_name }}</span>
 {% if t.rfp_deadline %}{% assign dl = t.rfp_deadline | strip | split: " " %}            <span class="bk-rfp-due"><b>{{ dl[0] }}{% if dl[1] %}, {{ dl[1] }}{% if timezone_label %} {{ timezone_label }}{% endif %}{% endif %}</b><i>{{ due_label | default: "Last date to apply" }}</i></span>
 {% else %}            <span class="bk-rfp-due"></span>
-{% endif %}            <span class="bk-rfp-docs">{% for d in t.rfp_documents %}{% assign doc_href = d.doc_file | default: d.doc_url %}{% if doc_href %}<a class="bk-ul" target="_blank" rel="noopener" href="{{ doc_href }}">{{ d.doc_type }}</a>{% endif %}{% endfor %}</span>
+{% endif %}            <span class="bk-rfp-docs">{% for d in t.rfp_documents %}{% assign doc_href = d.doc_url %}{% if doc_href %}<a class="bk-ul" target="_blank" rel="noopener" href="{{ doc_href }}">{{ d.doc_type }}</a>{% endif %}{% endfor %}</span>
           </div>
 {% endif %}{% endfor %}        </div>
       </div>

@@ -1,16 +1,15 @@
 # files/rfp/
 
-Where RFP and RFQ documents uploaded through the CMS land.
+Tender documents are **not uploaded through the CMS any more**. Each document on
+/rfp.html is a link an editor pastes into the "Link to the document" field, so
+the file itself lives wherever ONDC publishes it — normally S3.
 
-CloudCannon puts them here because the **Upload the document** field on each
-tender is configured with `path: files/rfp` in `cloudcannon.config.yml`.
-Everything in `files/` is copied to the site root, so a file here is served at
-`/files/rfp/<name>.pdf`.
+This folder is kept only because a few existing entries still point into it
+(`/files/rfp/<name>`), which works because everything under `files/` is copied
+to the site root and served as `/files/...`.
 
-A tender document can instead be a link to a file already online — the **…or
-link to a file already online** field. Uploading wins when both are filled in.
+Once those entries have been repointed at their real hosted addresses, this
+folder and its contents can be deleted outright.
 
-Keep an eye on size. These are committed to Git, so a 30 MB PDF slows every
-clone and every build for everyone, forever. Anything above roughly 10 MB is
-better hosted on ONDC's S3 with the link pasted in instead — the same reasoning
-as the newsletter PDFs described in `files/README.md`.
+Nothing writes here automatically. A file that appears here was put here by
+hand, and nothing removes it for you.

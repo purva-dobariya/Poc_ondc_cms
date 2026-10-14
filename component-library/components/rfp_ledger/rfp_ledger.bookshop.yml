@@ -4,7 +4,7 @@ spec:
   description: >-
     The tender table. Add an open RFP, a closed one, or an empanelled agency —
     each takes a number, a name, a deadline (date and time) and its documents,
-    which you either upload or link to. Open and Closed sort themselves out as
+    each of which is a link you paste. Open and Closed sort themselves out as
     each deadline passes.
   icon: table_rows
 
@@ -96,7 +96,6 @@ _inputs:
               rfp_deadline: ''
               rfp_documents:
                 - doc_type: RFP document
-                  doc_file: ''
                   doc_url: ''
             _inputs: &rfp_tender_inputs
               rfp_tab:
@@ -148,16 +147,17 @@ _inputs:
                 type: array
                 label: Documents
                 comment: >-
-                  The files applicants download — the RFP itself, any
-                  corrigendum, annexures. Use + to add one and drag to reorder.
+                  The documents applicants download — the RFP itself, any
+                  corrigendum, annexures. Each one is a name plus a link. Use +
+                  to add one and drag to reorder.
                 options:
                   structures:
                     values:
                       - label: Document
                         picker_preview:
                           text: Document
-                          subtext: Upload a PDF, or link to one already online
-                          icon: description
+                          subtext: A link to a document hosted elsewhere
+                          icon: link
                         # What the collapsed row shows: the link wording, then
                         # the file that is actually attached, so an editor can
                         # see at a glance which entries still have none.
@@ -166,16 +166,12 @@ _inputs:
                             - key: doc_type
                             - 'Untitled document'
                           subtext:
-                            - key: doc_file
                             - key: doc_url
-                            - 'No file attached yet'
-                          image:
-                            - key: doc_file
+                            - 'No link yet'
                           icon:
-                            - description
+                            - link
                         value:
                           doc_type: RFP document
-                          doc_file: ''
                           doc_url: ''
                         _inputs:
                           doc_type:
@@ -184,35 +180,16 @@ _inputs:
                             comment: >-
                               The wording shown as the download link, for
                               example "RFP document" or "Corrigendum 1".
-                          doc_file:
-                            type: file
-                            label: Upload the document
-                            comment: >-
-                              Click this field and choose a PDF from your
-                              computer — you never type a path here. Leave it
-                              empty if the file is already online and you want
-                              to link to it below instead. Anything over about
-                              10 MB is better hosted on S3 and linked below;
-                              uploads are refused above 20 MB.
-                            options:
-                              paths:
-                                uploads: files/rfp
-                              # kB. CloudCannon applies NO limit unless you set
-                              # one, and every upload is committed to Git — so
-                              # without this a large file sails through the CMS
-                              # and then fails at the push, where GitHub rejects
-                              # anything over 100 MB and warns over 50 MB. That
-                              # failure surfaces far away from the person who
-                              # caused it. 20 MB is generous for a tender PDF
-                              # and keeps the repo clonable.
-                              max_file_size: 20480
                           doc_url:
                             type: url
-                            label: …or link to a file already online
+                            label: Link to the document
                             comment: >-
-                              Used only when nothing is uploaded above. Paste
-                              the full address, for example an existing link on
-                              ONDC's S3.
+                              Paste the full web address of the document, for
+                              example an ONDC S3 link ending in .pdf. Documents
+                              are not uploaded here — host the file wherever
+                              ONDC publishes its tender documents and link to
+                              it. A document with no link is skipped on the
+                              page.
           - label: Closed RFP / RFQ
             picker_preview:
               text: Closed RFP / RFQ
@@ -226,7 +203,6 @@ _inputs:
               rfp_deadline: ''
               rfp_documents:
                 - doc_type: RFP document
-                  doc_file: ''
                   doc_url: ''
             _inputs: *rfp_tender_inputs
           - label: Empanelled agency
