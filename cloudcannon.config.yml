@@ -123,85 +123,11 @@ _structures:
           value: '0'
           label: ''
           word_style: false
-  # One row in the RFP / RFQ ledger. Three kinds, same fields: an open tender,
-  # a closed one, and an empanelled agency. Which one you pick sets `rfp_tab`,
-  # which decides the tab it appears under — and for the two tender kinds the
-  # deadline normally overrides it, so a tender closes itself on time.
-  #
-  # NOTE: every field here is named `rfp_*` / `doc_*` / `tab_*` and configured
-  # in the TOP-LEVEL `_inputs` below, not in an `_inputs` block nested under
-  # these values. Nested structure `_inputs` are documented but were silently
-  # ignored in this project — the symptom is auto-generated labels ("Rfp No"),
-  # a plain text box where a file upload should be, and unrelated global inputs
-  # leaking in by name. Unique global names are what actually works here.
-  rfp_tenders:
-    style: select
-    values:
-      - label: Open RFP / RFQ
-        value:
-          rfp_tab: open
-          rfp_no: ''
-          rfp_name: ''
-          rfp_deadline: ''
-          rfp_documents:
-            - doc_type: RFP document
-              doc_file: ''
-              doc_url: ''
-      - label: Closed RFP / RFQ
-        value:
-          rfp_tab: closed
-          rfp_no: ''
-          rfp_name: ''
-          rfp_deadline: ''
-          rfp_documents:
-            - doc_type: RFP document
-              doc_file: ''
-              doc_url: ''
-      - label: Empanelled agency
-        value:
-          rfp_tab: empanelled
-          rfp_no: ''
-          rfp_name: ''
-          rfp_deadline: ''
-          rfp_documents: []
-
-  # One downloadable file attached to a row. Either uploaded here, or a link to
-  # a file that already lives somewhere else (ONDC's S3, for instance).
-  rfp_documents:
-    style: select
-    values:
-      - label: Document
-        value:
-          doc_type: RFP document
-          doc_file: ''
-          doc_url: ''
-
-  # The three tabs above the table. Each lists what is assigned to it, and
-  # shows its own message when it is empty.
-  rfp_tabs:
-    style: select
-    values:
-      - label: Tab — open tenders
-        value:
-          tab_key: open
-          tab_label: Open
-          tab_source: open
-          tab_empty_heading: No records found
-          tab_empty_body: Nothing matches this filter right now.
-      - label: Tab — closed tenders
-        value:
-          tab_key: closed
-          tab_label: Closed
-          tab_source: closed
-          tab_empty_heading: No records found
-          tab_empty_body: Nothing matches this filter right now.
-      - label: Tab — empanelled agencies
-        value:
-          tab_key: empanelled
-          tab_label: Empanelled agencies
-          tab_source: empanelled
-          tab_empty_heading: No empanelled agencies yet
-          tab_empty_body: This list is empty for now. Check back after the next empanelment cycle.
+  # NOTE: the RFP ledger's structures used to live here and are now written
+  # inline in component-library/components/rfp_ledger/rfp_ledger.bookshop.yml.
+  # A `structures: _structures.<name>` reference from a Bookshop component
+  # brings the values across but drops their `_inputs`, which left every field
+  # inside a tender with an auto-generated label and the wrong input type.
 
 _inputs:
   sections:
@@ -660,81 +586,6 @@ _inputs:
   sectors:
     type: object
     label: Sector links
-
-  # --- the RFP / RFQ ledger -------------------------------------------------
-  # These are deliberately prefixed so no other component's field can collide
-  # with them, because this is the only scoping CloudCannon honoured here.
-  rfp_tab:
-    type: select
-    label: Which tab it appears under
-    comment: >-
-      With "Move tenders automatically" switched on (the normal case), the
-      deadline decides Open vs Closed and this is only the starting point.
-      Empanelled agencies always stay in their own tab.
-    options:
-      values:
-        - value: open
-          label: Open
-        - value: closed
-          label: Closed
-        - value: empanelled
-          label: Empanelled agencies
-  rfp_no:
-    type: text
-    label: RFP / RFQ number
-    comment: The reference exactly as it should appear, for example ONDC/RFP/2026/001.
-  rfp_name:
-    type: text
-    label: Name
-    comment: The title applicants will read.
-  rfp_deadline:
-    type: datetime
-    label: Deadline — last date and time to apply
-    comment: >-
-      Pick the day, then the time of day. Times are India Standard Time. The
-      tender stays under Open until this exact moment and moves to Closed
-      straight after it. Leave empty for an empanelled agency.
-  rfp_documents:
-    type: array
-    label: Documents
-    comment: >-
-      The files applicants download — the RFP itself, any corrigendum,
-      annexures. Use + to add one and drag to reorder.
-    options:
-      structures: _structures.rfp_documents
-  doc_type:
-    type: text
-    label: What this document is
-    comment: The wording shown as the download link, for example "RFP document" or "Corrigendum 1".
-  doc_file:
-    type: file
-    label: Upload the document
-    comment: >-
-      Click to choose a PDF from your computer. Leave this empty if the file is
-      already online and you want to link to it below instead.
-    options:
-      path: files/rfp
-  doc_url:
-    type: url
-    label: …or link to a file already online
-    comment: >-
-      Used only when nothing is uploaded above. Paste the full address, for
-      example an existing link on ONDC's S3.
-  tab_label:
-    type: text
-    label: Tab name
-  tab_empty_heading:
-    type: text
-    label: Heading when this tab is empty
-  tab_empty_body:
-    type: textarea
-    label: Message when this tab is empty
-  tab_key:
-    type: text
-    hidden: true
-  tab_source:
-    type: text
-    hidden: true
 
   # --- fields used by the role / directory pages (RFPs, Gateway, Buyer NP …) ---
   variant:
