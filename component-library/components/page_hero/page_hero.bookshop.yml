@@ -1,16 +1,88 @@
 spec:
   structures: [sections]
   label: Page hero
-  description: The large opening banner — background photo, heading, intro paragraphs and buttons.
+  description: >-
+    The large opening banner — background photo, heading, intro paragraphs and
+    buttons. Used at the top of About, Careers and most other inner pages.
   icon: wallpaper
 
 blueprint:
+  screen_label: ''
+  animation: reveal
   eyebrow: ''
   heading: A heading for this page
   heading_accent: ''
+  heading_suffix: ''
   background_image: ''
   paragraphs:
     - text: One or two sentences introducing the page.
   buttons: []
 
-_inputs: {}
+# Configured HERE, in the component file. `_inputs` at the top of
+# cloudcannon.config.yml does not reach a Bookshop component's fields — see
+# ADDING_PAGES.md, rule 5.
+_inputs:
+  animation:
+    type: select
+    label: How the hero appears
+    comment: >-
+      "Fade in on scroll" is the About page's behaviour. "Entrance" plays once
+      as the page loads and is what Careers uses. Purely visual — the words are
+      the same either way.
+    options:
+      values:
+        - value: reveal
+          label: Fade in on scroll
+        - value: intro
+          label: Entrance on load
+  screen_label:
+    type: text
+    label: Section name for screen readers
+    comment: Optional. Describes this section to assistive technology.
+  eyebrow:
+    type: text
+    label: Small label above the heading
+  heading:
+    type: text
+    label: Heading
+  heading_accent:
+    type: text
+    label: Highlighted tail of the heading
+    comment: Shown in the accent style at the end of the heading. Leave empty for a plain heading.
+  heading_suffix:
+    type: text
+    label: Text after the highlighted part
+    comment: Usually just a full stop or a question mark.
+  background_image:
+    type: image
+    label: Background photo
+    comment: Fills the whole banner. A wide, landscape photo works best. Use the crop tool to change the framing.
+  paragraphs:
+    type: array
+    label: Paragraphs
+    comment: Use + to add a paragraph, the item menu to duplicate or delete, and drag to reorder.
+    options:
+      structures:
+        values:
+          - label: Paragraph
+            picker_preview:
+              text: Paragraph
+              subtext: Another line of intro copy
+              icon: notes
+            preview:
+              text:
+                - key: text
+                - 'Empty paragraph'
+              icon:
+                - notes
+            value:
+              text: ''
+            _inputs:
+              text:
+                type: textarea
+                label: Paragraph
+  buttons:
+    type: array
+    label: Buttons
+    options:
+      structures: _structures.buttons

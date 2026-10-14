@@ -114,6 +114,14 @@ html.is-editing .bk-lightbox { display: none !important; }
    prefers-reduced-motion. */
 html.is-editing [data-bk-intro] { animation: none !important; opacity: 1 !important; }
 
+/* beckn.js splits a [data-bk-scrub] paragraph into one span per word, each
+   starting grey and taking its real colour as the block scrolls past. The
+   editor never scrolls, so the whole paragraph would sit there pale and barely
+   readable. This is the same rule beckn.css itself applies under
+   prefers-reduced-motion. Used by the Careers lead paragraph and ~13 other
+   ondc.org pages, so any page carrying [data-bk-scrub] is covered by this. */
+html.is-editing .bk-scrub-w { color: inherit !important; }
+
 /* Tabbed panels: only the selected tab is visible on the live page, so the text
    inside the other tabs could never be clicked to edit. Show them all while
    editing — the tab buttons stop switching anything, which is the intended

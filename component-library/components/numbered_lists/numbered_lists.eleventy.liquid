@@ -1,4 +1,17 @@
-<section class="bk-panel bk-matters" data-screen-label="{{ screen_label | default: "Why it matters" }}">
+{% if variant == "culture" %}<section class="bk-culture"{% if anchor_id %} id="{{ anchor_id }}"{% endif %} data-screen-label="{{ screen_label | default: "Our people" }}">
+      <div class="bk-culture-lead">
+{% if eyebrow %}        <div class="bk-eyebrow bk-rv">{{ eyebrow }}</div>
+{% endif %}        <h2 class="bk-h2 bk-rv">{{ heading }}{% if heading_accent %} <em>{{ heading_accent }}</em>{% endif %}</h2>
+{% if lead %}        <p data-bk-scrub>{{ lead }}</p>
+{% endif %}      </div>
+      <div class="bk-barriers bk-rv bk-rv-d1">
+{% assign n = 0 %}{% for group in groups %}{% for item in group.items %}{% assign n = n | plus: 1 %}        <div class="bk-barrier">
+          <span class="bk-barrier-n">{% if n < 10 %}0{% endif %}{{ n }}</span>
+          <span class="bk-barrier-t">{{ item.text }}</span>
+        </div>
+{% endfor %}{% endfor %}      </div>
+    </section>
+{% else %}<section class="bk-panel bk-matters"{% if anchor_id %} id="{{ anchor_id }}"{% endif %} data-screen-label="{{ screen_label | default: "Why it matters" }}">
       <div class="bk-matters-grid">
         <div class="bk-reality-lead bk-rv">
 {% if eyebrow %}          <div class="bk-eyebrow">{{ eyebrow }}</div>
@@ -16,3 +29,4 @@
 {% endfor %}        </div>
       </div>
     </section>
+{% endif %}

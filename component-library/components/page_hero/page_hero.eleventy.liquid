@@ -1,14 +1,14 @@
-<section class="bk-hero bk-hero-about" data-screen-label="Hero">
+{% assign intro = false %}{% if animation == "intro" %}{% assign intro = true %}{% endif %}<section class="bk-hero bk-hero-about" data-screen-label="{{ screen_label | default: "Hero" }}">
 {% if background_image %}      <div class="bk-hero-photo" style="background-image: url('{{ background_image }}');" aria-hidden="true"></div>
 {% endif %}      <div class="bk-hero-veil" aria-hidden="true"></div>
 
       <div class="bk-hero-body">
-{% if eyebrow %}        <div class="bk-eyebrow bk-rv">{{ eyebrow }}</div>
-{% endif %}        <h1 class="bk-rv">{{ heading }}{% if heading_accent %} <em>{{ heading_accent }}</em>{% endif %}</h1>
-{% for para in paragraphs %}        <p class="bk-hero-sub bk-rv bk-rv-d1">{{ para.text }}</p>
+{% if eyebrow %}        <div class="bk-eyebrow{% unless intro %} bk-rv{% endunless %}"{% if intro %} data-bk-intro{% endif %}>{{ eyebrow }}</div>
+{% endif %}        <h1{% unless intro %} class="bk-rv"{% endunless %}{% if intro %} data-bk-intro{% endif %}>{{ heading }}{% if heading_accent %} <em>{{ heading_accent }}</em>{% endif %}{{ heading_suffix }}</h1>
+{% for para in paragraphs %}        <p class="bk-hero-sub{% unless intro %} bk-rv bk-rv-d1{% endunless %}"{% if intro %} data-bk-intro{% endif %}>{{ para.text }}</p>
 {% endfor %}      </div>
 {% if buttons %}
-      <div class="bk-hero-actions bk-rv bk-rv-d2">
+      <div class="bk-hero-actions{% unless intro %} bk-rv bk-rv-d2{% endunless %}"{% if intro %} data-bk-intro{% endif %}>
 {% for button in buttons %}{% if button.action == "signup" %}        <button type="button" class="bk-btn {% if button.style == "solid" %}bk-btn-solid{% else %}bk-btn-ghost{% endif %}" onclick="ONDCSignup.open()">{{ button.label }}</button>
 {% else %}        <a class="bk-btn {% if button.style == "solid" %}bk-btn-solid{% else %}bk-btn-ghost{% endif %}" href="{{ button.url }}"{% if button.new_tab %} target="_blank" rel="noopener"{% endif %}>{{ button.label }}</a>
 {% endif %}{% endfor %}      </div>
