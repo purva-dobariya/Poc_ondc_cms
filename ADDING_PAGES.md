@@ -100,11 +100,28 @@ editor layer and must stay last.
 | About | category-chrome, fx, scale, type-boost, beckn, mobile |
 | RFPs/RFQs | category-chrome, fx, scale, type-boost, beckn, mobile |
 | Careers | category-chrome, fx, scale, type-boost, beckn, mobile |
+| Contact | category-chrome, fx, scale, type-boost, beckn, **legal**, mobile |
 
 RFPs/RFQs and Careers both needed **no new CSS at all** — every rule they use
-was already in `beckn.css` and `mobile.css`, and the three inner pages now share
-one identical stylesheet list. Expect that for most of the remaining pages:
-check before copying anything.
+was already in `beckn.css` and `mobile.css`. Expect that for most of the
+remaining pages: check before copying anything.
+
+Contact is the exception, and it is worth understanding before porting the
+legal pages, which load the same file. `beckn.css` styles the whole contact
+block *including* a full set of `.bk-contact-form .field` rules — so it looks
+like `legal.css` is redundant. It is not. `.field input` and
+`.bk-contact-form input` are **the same specificity** (0,1,1: one class, one
+element), so load order decides, and `legal.css` loads last. Its plain `.field`
+rules are what give the form its boxed grey inputs — 14px text, 8px radius,
+`#F5F7FA` fill, a real border. Drop the file and the form silently falls back
+to beckn's underlined fields. This was measured, not guessed: rendering the
+page with and without it moves 42 of 60 elements.
+
+`legal.css` was copied whole rather than cut down to the ~15% Contact uses.
+It is 36 KB raw but **7.9 KB gzipped**, it defines its own `--blue` / `--ink`
+token namespace that cannot collide with the `--bk-*` chrome tokens, and the
+privacy-policy, cookie-policy, terms-and-conditions and complaint pages all
+need the rest of it. A hand-cut subset would only drift from upstream.
 
 Three more per-page switches, all hidden from editors:
 
@@ -115,7 +132,8 @@ Three more per-page switches, all hidden from editors:
 | `show_progress` | the scroll-progress bar | off | on | on |
 
 Careers uses the same switches as About: `main.bk`, progress bar on, no body
-class, no sector rail.
+class, no sector rail. Contact adds two classes the CSS keys off —
+`main.bk.bk-contact-page.bk-contact` — and is otherwise identical.
 
 ---
 
@@ -148,7 +166,7 @@ Keep writing `#find-your-place` in `site.json` — the prefixing is automatic.
 
 ## The component library
 
-21 components, each a folder under `component-library/components/<name>/` with a
+24 components, each a folder under `component-library/components/<name>/` with a
 template and a `.bookshop.yml` spec. All are page content; none is chrome.
 
 **Added for the About page**, all reusable:
@@ -176,6 +194,13 @@ template and a `.bookshop.yml` spec. All are page content; none is chrome.
 | --- | --- | --- |
 | `life_blocks` | Titled text blocks beside a column of photos | Careers |
 
+**Added for the Contact page — two:**
+
+| Component | What it is | Where it is used again |
+| --- | --- | --- |
+| `page_title_band` | A plain heading band at the top of a page, no photo | Contact; the legal pages next |
+| `contact_form` | The two-column block: message form, office details, map | Contact |
+
 Careers' other three sections were variants of things that already existed:
 
 | Section on ondc.org | Handled by | How |
@@ -195,7 +220,7 @@ field on `closing_cta`** rather than a tenth component:
 | *(empty)* — "Plain" | `section.bk-about-close` | — |
 | `role` — "Panel" | `section.bk-role-close` | `body`, one paragraph |
 
-This is the rule that keeps the library at 21 instead of 45: **a new visual
+This is the rule that keeps the library at 24 instead of 45: **a new visual
 treatment of the same content is a variant field; only a new content shape is a
 new component.**
 
@@ -208,10 +233,12 @@ the page has no dependency on Google at all.
 
 Clicking **+** on the list offers three things to add — **Open RFP / RFQ**,
 **Closed RFP / RFQ**, **Empanelled agency** — and all three take the same
-fields: `tab`, `rfp_no`, `name`, `last_date` (dd.mm.yyyy) and a `documents`
-list. Each document has `doc_type` plus **either** `file` (uploaded through
-CloudCannon into `files/rfp/`) **or** `url` (a link to something already
-online, such as ONDC's S3). `file` wins when both are set.
+fields: `rfp_tab`, `rfp_no`, `rfp_name`, `rfp_deadline` and an
+`rfp_documents` list. Each document is a `doc_type` (what the document is) and
+a `doc_url` pointing at it. **Documents are linked, never uploaded** — an
+editor pastes the address of a file that is already online, typically ONDC's
+S3 bucket. There is no upload input, so nothing is ever written into the
+repository by publishing a tender, and deleting a tender cannot orphan a file.
 
 The three tabs are an array too, with one entry per tab (`source` is `open`,
 `closed` or `empanelled`) carrying its own empty-state heading and message. A
@@ -228,22 +255,39 @@ into the layout. An array is a plain component prop, so it survives. If the list
 ever outgrows this, a shared data file under `data_config` is the next step, not
 a collection.
 
-**Why the deadline is a datetime, and how the timezone trap was closed.** A
-tender closes at a moment, not on a day, so `rfp_deadline` is `type: datetime`
-and stores an ISO instant. The trap: formatting an instant is timezone-
-dependent, and on a UTC build server a deadline late in the IST evening renders
-as the previous day. Two things close it —
+**Why the deadline is plain text, not a datetime input.** A tender closes at a
+moment, not on a day, so the deadline carries a time: `30.11.2026 17:30`, or
+`30.11.2026` on its own for end-of-day.
 
-- `eleventy.config.js` pins `process.env.TZ` to `Asia/Kolkata`, so build-time
-  formatting is IST;
-- the template writes the deadline into `data-rfp-due` as **epoch seconds**
-  (`| date: "%s"`), which has no timezone at all, and the browser formats the
-  visible text in `Asia/Kolkata` through `Intl.DateTimeFormat`.
+It started as `type: datetime` and that had to be abandoned. CloudCannon's
+datetime input **blanked stored values on save** — reopening a tender showed an
+empty deadline, and re-saving wrote the blank back, so deadlines were lost a
+few at a time. `rfp_deadline` is now `type: text` guarded by a validation
+pattern:
 
-So every reader sees the same `30.11.2026, 17:30 IST` wherever they are, and
-the open/closed comparison is an integer comparison. Verified by loading the
-same built page with the viewer timezone set to `America/New_York`: identical
-output.
+```yaml
+options:
+  pattern: '^\s*$|^\d{2}\.\d{2}\.\d{4}(\s+\d{1,2}:\d{2}(:\d{2})?)?\s*$'
+```
+
+so a malformed date is rejected in the sidebar rather than at render time, and
+an empty value is allowed for an empanelled agency. The value is written into
+`data-rfp-due` verbatim and parsed in the browser by `js/ondc/rfp-ledger.js`.
+
+The timezone trap is closed in that parser rather than by a date library. It
+reads the parts and builds the instant arithmetically:
+
+```js
+return Date.UTC(y, mo - 1, d, hh, mi, ss, …) - IST_OFFSET_MS;   // 5.5h
+```
+
+India has no daylight saving, so a fixed offset is exact — no timezone
+database, nothing to keep updated. A missing time means end of day
+(`23:59:59.999`). `eleventy.config.js` also pins `process.env.TZ` to
+`Asia/Kolkata` so any build-time formatting is IST. Every reader sees the same
+`30.11.2026, 17:30 IST` wherever they are, and the open/closed comparison is an
+integer comparison. Verified by loading the same built page with the viewer
+timezone set to `America/New_York`: identical output.
 
 **Why `tab` and the date both exist.** The editor picks a tab when adding an
 entry, and that is what an empanelled agency goes by — it is never moved. For a
@@ -285,7 +329,84 @@ confirming the output does not drift.
 
 Apply the same discipline to any future component that reacts to a re-render.
 
-### Six rules that are not optional
+### The contact form: editable shape, no backend
+
+The site is static, so the form does not POST anywhere. On Submit it builds a
+subject and body from what the visitor typed, opens Gmail in a new tab with the
+message ready to send, and reveals a panel offering Outlook and the OS mail app
+as alternatives. (A bare `mailto:` would launch whatever desktop client the OS
+has registered, usually Outlook, which is why Gmail is the default route.)
+
+The point worth keeping is that **the form's shape is content, not code.**
+`js/ondc/contact-form.js` hard-codes no field names. It reads the rendered
+markup:
+
+| Attribute | Meaning |
+| --- | --- |
+| `data-contact-to` on the `<form>` | the recipient, and what marks the form |
+| `data-contact-field="Label"` | include this answer in the email, under this heading |
+| `data-contact-long` | put this one last, on its own lines (the textarea) |
+| `data-contact-send="gmail\|outlook\|default"` | the three links to fill in |
+| `data-contact-subject-prefix` / `-field` / `-fallback` | how the subject is built |
+
+So an editor can add a field, rename one, reorder them, change the dropdown
+choices or delete a field in CloudCannon, and the composed email follows with
+no code change. Verified by adding an `Organisation` field and a `Partnership`
+choice from front matter alone: both rendered, and the new answer appeared in
+the email body in the right position.
+
+Fields are grouped into **rows**: one field fills the row, two sit side by side
+in a `.field-row`. That mirrors the markup ondc.org uses and is the only reason
+the nesting is two levels deep.
+
+The right-hand column (address blocks, map, directions button) disappears
+entirely when all three of its fields are empty, letting the form run full
+width — see rule 7 below for the mistake that made that not work the first
+time.
+
+One deliberate difference from ondc.org: it writes `Name: <first> <last>` into
+the email by hard-coding those two ids. The generic version cannot merge two
+fields it knows nothing about, so it writes `First Name:` and `Last Name:` on
+their own lines, using each field's own label. Everything else about the
+message — recipient, subject, the Gmail/Outlook/mailto routes — is identical.
+
+In the editor, Submit does **not** open a Gmail tab (the script checks for
+`is-editing`), and the "other ways to send" panel is forced visible by
+`cms.css` so its wording can be clicked and edited — the same trade as the RFP
+tabs. The map iframe gets `pointer-events: none` there, or it swallows the
+clicks meant for the panel around it.
+
+### CloudCannon rewrites page front matter when an editor saves
+
+Comparing the Careers page before and after it had been opened and saved in
+CloudCannon shows the file rewritten: lines re-wrapped at a different width,
+`url: 'https://…'` unquoted to `url: https://…`, keys within a section
+reordered — and **every `#` comment deleted**. The built HTML was
+byte-identical, so none of it changes the site. But it means one thing:
+
+> **Never put an explanation in a page's front matter and expect it to
+> survive.** The first editor who opens that page in CloudCannon and saves will
+> silently delete it.
+
+Anything a future developer or editor needs to know belongs in one of two
+places that CloudCannon never rewrites:
+
+- the field's `comment:` in the component's `.bookshop.yml` — which is better
+  anyway, because it shows up in the editor sidebar next to the field it is
+  about;
+- this file.
+
+Careers is the live example. Its `anchor_id` must stay `bk-mech`, because that
+id is what makes `beckn.js` apply the word-by-word colour effect to the lead
+paragraph. The comment saying so was written into `careers.liquid` and is now
+gone. The warning that survived is the one in `numbered_lists.bookshop.yml`,
+where an editor actually sees it.
+
+The same applies to the note in `contact-us.liquid` explaining why `legal.css`
+is in its stylesheet list — expect it to disappear on first save. That reasoning
+is recorded under **Stylesheets** above, which is why it is safe to lose there.
+
+### Seven rules that are not optional
 
 **1. A component reads the data it needs itself.** It must not receive data
 through a helper or the layout — Bookshop re-renders components in the browser,
@@ -392,6 +513,28 @@ heading_id:
 misconfigured" in the sidebar for every field that uses it. A field whose name
 starts with an underscore is hidden by default and needs neither.
 
+**7. An empty list is TRUE in Liquid, so never test one with `{% if %}`.**
+Only `nil` and `false` are falsy — `[]` is truthy. So this does not do what it
+reads like:
+
+```liquid
+{% if images %}<div class="bk-life-media"> ... </div>{% endif %}
+```
+
+An editor who deletes every photo still gets the wrapper, now empty: a grid
+column stays reserved and the text beside it is squeezed into half the page.
+Test the length instead:
+
+```liquid
+{% if images.size > 0 %} ... {% endif %}
+```
+
+This bites whenever an optional block is wrapped around a list — and the
+sidebar comment usually promises the opposite ("leave the list empty to drop
+the photo column"). It was found while building Contact and fixed in all seven
+components that had it: `closing_cta`, `contact_form`, `cta_banner`,
+`life_blocks`, `page_hero`, `rich_text` and `role_hero`.
+
 ---
 
 ## Adding the next page
@@ -439,8 +582,12 @@ carry 20 KB+ of inline script.
 | RFP stylesheet order vs ondc.org | identical (6 of 6) |
 | RFP page links | 38 local, **0 missing assets**, 14 pages not built yet |
 | Home and About output, before vs after adding RFP | **byte-identical** |
+| Contact `<main>` vs ondc.org | **no content differences** — every label, placeholder, dropdown choice, consent line, address block and map URL matches; the only deltas are the Bookshop wrapper, `data-screen-label`, the `data-contact-*` JS hooks and our root-relative `/privacy-policy.html` |
+| Contact page height vs ondc.org at 1440px | **2656px both** |
+| Contact form input styling | boxed: `#F5F7FA`, 8px radius, 14px — i.e. `legal.css` is live, as intended |
+| Home, About, RFP, Careers output, before vs after adding Contact | **byte-identical (4 of 4)** |
 | Nested `<main>` elements | none |
-| Components loaded by Bookshop | 22, one Bookshop |
+| Components loaded by Bookshop | 24, one Bookshop |
 | Live editing applied | 3 of 3 pages |
 
 ### Editor geometry, measured
@@ -456,6 +603,8 @@ the same class CloudCannon's frame triggers — and the real boxes measured:
 | `rfp.html` | editor | static, `0 → 88` | starts at `88` | none |
 | `careers.html` | live | sticky, `0 → 88` | starts at `88` | none |
 | `careers.html` | editor | static, `0 → 88` | starts at `88` | none |
+| `contact-us.html` | live | sticky, `0 → 88` | starts at `88` | none |
+| `contact-us.html` | editor | static, `0 → 88` | starts at `88` | none |
 
 Also checked on `rfp.html`: no section left at `opacity: 0`, no
 `[data-bk-intro]` still hidden, and **1 of 3 tab panels visible live vs 3 of 3
@@ -467,6 +616,19 @@ counter, and three forced section re-renders with no drift and no console
 errors. A deliberately mistyped date (`20th Aug`) keeps its tender visible under
 Open and logs a warning naming it, rather than silently dropping a live
 tender.
+
+On `contact-us.html` in editor mode, all 13 editable targets — both headings,
+both intro paragraphs, a field label, the consent line, the Submit button, the
+three send-option labels and buttons, both support headings and the directions
+button — were checked for `display:none`, low opacity, zero size, sitting under
+the navbar, and being covered by another element at their own centre point.
+**Zero issues.**
+
+The form was then driven in a real browser: filled in and submitted, which
+revealed the send panel, opened the Gmail popup, and produced the right
+recipient, subject (`ONDC Contact Form Request — General Enquiries`) and body.
+Submitting it empty, and with a 3-digit phone against the `^\d{10}$` pattern,
+was blocked both times. No console errors in any run.
 
 Before the earlier fix, About's first section measured `top: -812` — exactly
 `88 − 900`, one viewport — which is how the cancelling pair was found.

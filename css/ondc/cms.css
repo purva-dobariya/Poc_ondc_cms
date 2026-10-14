@@ -129,6 +129,21 @@ html.is-editing .bk-scrub-w { color: inherit !important; }
 html.is-editing .bk-rfp-panel[hidden] { display: block !important; }
 html.is-editing .bk-rfp-panel + .bk-rfp-panel { border-top: 1px dashed var(--bk-line, #e3e5e8); }
 
+/* ── Contact page ────────────────────────────────────────────────────── */
+/* The "other ways to send" panel is hidden until the visitor presses Submit,
+   so its wording could never be clicked to edit. Show it while editing — the
+   same trade as the RFP tabs above: everything on the page stays reachable. */
+html.is-editing .bk-contact-form .send-options[hidden] { display: block !important; }
+html.is-editing .bk-contact-form .send-options {
+  border-top: 1px dashed var(--bk-line, #e3e5e8);
+}
+
+/* The map is a Google iframe. Inside the editor frame it swallows scroll and
+   clicks meant for the panel around it, so the support column cannot be
+   selected. It has nothing editable inside it anyway — the address it points
+   at is a field on the section. */
+html.is-editing .bk-contact-map { pointer-events: none; }
+
 /* ── Shared chrome in the editor ─────────────────────────────────────── */
 /* The navbar is position:sticky at z-index 300/100 on the live site. Inside the
    editor frame it then floats over the FIRST section and swallows that

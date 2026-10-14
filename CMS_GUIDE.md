@@ -135,6 +135,8 @@ is published.
 | Awards | A featured award plus awards grouped by year. |
 | Timeline | A year-by-year story with the animated India map. |
 | RFP / RFQ ledger | Tabs and a search box over the live tender table. |
+| Page title band | A plain heading at the top of a page, with one line under it. |
+| Contact form | The message form, office details and map, side by side. |
 
 **Closing call to action** has a **Layout** choice: *Plain* is the wide band used at
 the foot of the About page, *Panel* is the white rounded card used at the foot of the
@@ -178,28 +180,23 @@ Everything happens in CloudCannon — there is no spreadsheet and no S3 step.
 
 ### Attaching a document
 
-Under **Documents**, click **+**. Each document has three fields:
+Under **Documents**, click **+**. Each document has two fields:
 
 | Field | What to do |
 | --- | --- |
-| **What this document is** | Type the wording that will appear as the download link — *RFP document*, *Corrigendum 1*, *Annexure A* |
-| **Upload the document** | **Click the field and a file picker opens.** Choose the PDF from your computer. You never type a path here. |
-| **…or link to a file already online** | Only if the file is hosted elsewhere. Paste the full web address, for example an existing link on ONDC's S3. |
+| **What this document is** | The wording that will appear as the download link — *RFP document*, *Corrigendum 1*, *Annexure A* |
+| **Link to the document** | The full web address of the file, for example an existing link on ONDC's S3 bucket |
 
-Use **one** of the last two. If both are filled in, the uploaded file wins.
+**Documents are linked, not uploaded.** Put the PDF wherever ONDC already
+hosts its files, copy the address, and paste it here. There is no upload
+field — nothing is ever stored on the website itself, so there is no size
+limit to worry about and deleting a tender can never leave a stray file behind.
 
-Once a document is attached, the collapsed row shows what it is and **which
-file is on it** — the filename, or "No file attached yet" if you have not added
-one. An image shows a thumbnail; a PDF shows a document icon.
+Once a link is in, the collapsed row shows what the document is and where it
+points, so you can check a list of them at a glance without opening each one.
 
-> If **Upload the document** shows as a plain empty text box with no file
-> picker, the site is running an older version of the configuration. Nothing
-> you type into it will work.
-
-Uploaded files are stored with the website under `files/rfp/`, and the download
-link on the page points at them automatically. Keep them sensible in size — a
-few MB is normal for a tender PDF. Over roughly 10 MB, host it on S3 and paste
-the link instead.
+A document with an empty link is skipped when the page is built, so a
+half-finished row will not show a broken link to visitors.
 
 ### Deadlines have a time, not just a date
 
@@ -244,6 +241,77 @@ The page ships with four made-up entries so every tab has something in it.
 
 All three tabs are shown stacked so you can click into any of them. On the live
 page only the selected tab shows.
+
+---
+
+## 3b. Editing the Contact page
+
+The Contact page is two sections: a **Page title band** and a **Contact form**.
+
+### Where the messages go
+
+There is no database behind the form. When a visitor presses **Submit**, their
+own email program opens with the message already written and addressed — they
+still have to press send. Nothing is stored on the website.
+
+The address is the **Send messages to** field on the Contact form section.
+Change it and every message from then on goes to the new inbox.
+
+### Changing the questions
+
+The form is built from **Form rows**. Each row holds one or two fields — two
+sit side by side, one fills the width. Drag rows to reorder the form.
+
+Open a field and you can change:
+
+| Field | What it does |
+| --- | --- |
+| **Label** | The small heading above the box. Also the heading this answer gets in the email. |
+| **Kind of field** | Short text, Email, Phone, Dropdown or Long message. Email and Phone bring up the right keyboard on a mobile and check the format. |
+| **Grey hint inside the box** | The faint text shown before anything is typed. For a dropdown, the first unselected line. |
+| **Visitor must fill this in** | On by default. |
+| **Dropdown choices** | Only used by a Dropdown. Click **+** to add a choice. |
+
+Adding a question is enough on its own — the answer automatically appears in
+the email, in the same position it has on the page. Nothing else needs changing.
+
+Two fields are more technical and are best left alone unless you know you need
+them: **Autofill hint** lets the browser fill the box from the visitor's saved
+details, and **Format check** is a pattern the answer must match (the phone box
+uses one to require exactly ten digits).
+
+**Field name** is the one to be careful with. It is the internal name, never
+shown to visitors, and it must be lower-case letters, numbers and underscores.
+If you rename the one named in **Which field finishes the subject line**,
+change that setting to match.
+
+### The subject line
+
+Subjects read *ONDC Contact Form Request — General Enquiries*. The first part
+is **Subject line starts with**; the rest is whatever the visitor picked in the
+dropdown, or **Subject if that field is left empty** when they picked nothing.
+
+### After Submit
+
+Gmail opens in a new tab, and a small panel appears under the button with other
+ways to send for people who do not use Gmail. **While you are editing, that
+panel is always shown** so you can click into its wording — on the live page it
+stays hidden until someone presses Submit. Pressing Submit in the editor will
+not open a Gmail tab.
+
+### The address panel and map
+
+**Office details** are the stacked blocks on the right. Click **+** for another
+one. Inside an address, use **Shift+Enter** for a line break so it stays one
+block.
+
+To change the **Map**: open the place in Google Maps, choose **Share**, then
+**Embed a map**, then **Copy HTML**, and paste only the part between `src="`
+and the next quote. **Directions link** is the ordinary Google Maps link for
+the same place, not the embed address.
+
+Clear the office details, the map and the directions link and the whole
+right-hand column disappears, letting the form run the full width of the page.
 
 ---
 
