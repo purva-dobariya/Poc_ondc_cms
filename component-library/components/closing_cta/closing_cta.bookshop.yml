@@ -25,7 +25,8 @@ blueprint:
 
 _inputs:
   heading_id:
-    type: hidden
+    type: text
+    hidden: true
   body:
     type: textarea
     label: Paragraph

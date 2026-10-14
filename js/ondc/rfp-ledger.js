@@ -45,22 +45,18 @@
     return new Date(yyyy, mm - 1, dd, 23, 59, 59, 999).getTime();
   }
 
-  function isClosed(row, now) {
-    var t = dueTime(row.getAttribute('data-rfp-due'));
-    // An unreadable or missing date keeps the tender in Open rather than
-    // silently hiding it, so a typo stays visible instead of losing a live
-    // tender. The warning says which one.
-    if (isNaN(t)) {
-      if (!row._rfpWarned) {
-        row._rfpWarned = true;
-        console.warn('RFP ledger: could not read the closing date "' +
-          row.getAttribute('data-rfp-due') + '" on "' +
-          (row.querySelector('.bk-rfp-name') || {}).textContent +
-          '". Expected dd.mm.yyyy, for example 30.11.2026. Showing it as open.');
-      }
-      return false;
-    }
-    return t < now;
+  /* A tender whose date cannot be read falls back to the tab the editor chose,
+   * so a typo never makes a live tender disappear. The warning names it. */
+  function warnBadDate(row) {
+    if (row._rfpWarned) return;
+    row._rfpWarned = true;
+    var raw = row.getAttribute('data-rfp-due') || '';
+    var name = (row.querySelector('.bk-rfp-name') || {}).textContent || '(unnamed)';
+    console.warn('RFP ledger: ' + (raw
+      ? 'could not read the last date "' + raw + '" on "' + name +
+        '". Expected dd.mm.yyyy, for example 30.11.2026.'
+      : 'no last date on "' + name + '".') +
+      ' Leaving it in the tab it was given.');
   }
 
   /* The hero counter counts up, matching the easing beckn.js uses for every
@@ -82,52 +78,69 @@
     })(t0);
   }
 
-  function emptyState(section) {
+  function emptyState(box) {
     var d = document.createElement('div');
     d.className = 'bk-directory-state';
     d.setAttribute('data-rfp-empty', '');
     d.innerHTML = '<div class="bk-directory-state-inner"><h3>' +
-      esc(section.getAttribute('data-rfp-empty-heading') || 'No records found') +
+      esc(box.getAttribute('data-rfp-empty-heading') || 'No records found') +
       '</h3><p>' +
-      esc(section.getAttribute('data-rfp-empty-body') || 'Nothing matches this filter right now.') +
+      esc(box.getAttribute('data-rfp-empty-body') || 'Nothing matches this filter right now.') +
       '</p></div>';
     return d;
+  }
+
+  /* Which tab does this row belong under?
+   *
+   * An empanelled agency is whatever the editor said and is never moved. For a
+   * tender, the closing date normally wins — that is the whole point of
+   * "Move tenders between Open and Closed automatically". The editor's own
+   * choice is the fallback: when the switch is off, or when the date is
+   * missing or unreadable. */
+  function placeOf(row, now, auto) {
+    var chosen = row.getAttribute('data-rfp-tab') || 'open';
+    if (chosen === 'empanelled') return 'empanelled';
+    if (auto) {
+      var t = dueTime(row.getAttribute('data-rfp-due'));
+      if (!isNaN(t)) return t < now ? 'closed' : 'open';
+      warnBadDate(row);
+    }
+    return chosen === 'closed' ? 'closed' : 'open';
   }
 
   /* Decide what is visible. Called on load, on every keystroke in the search
    * box, and again after the editor re-renders the section. */
   function apply(section) {
     var now = Date.now();
+    var auto = section.getAttribute('data-rfp-auto') !== 'off';
     var input = section.querySelector('.bk-rfp-search');
     var q = input ? input.value.trim().toLowerCase() : '';
     var openCount = 0;
 
     section.querySelectorAll('[data-rfp-rows]').forEach(function (box) {
-      var wantClosed = box.getAttribute('data-rfp-rows') === 'closed';
+      var role = box.getAttribute('data-rfp-rows') || 'open';
       var shown = 0;
 
       box.querySelectorAll('.bk-rfp-row').forEach(function (row) {
-        var closed = isClosed(row, now);
+        var place = placeOf(row, now, auto);
         // Closed tenders are greyed down; the class is the one beckn.css styles.
-        row.classList.toggle('bk-rfp-row-closed', closed);
-        var belongs = closed === wantClosed;
+        row.classList.toggle('bk-rfp-row-closed', place === 'closed');
         var matches = !q || row.textContent.toLowerCase().indexOf(q) !== -1;
-        row.hidden = !(belongs && matches);
+        row.hidden = !(place === role && matches);
         if (!row.hidden) shown++;
       });
 
-      // Count the open tenders once, from the open panel, ignoring the search
-      // so the headline figure is the real total rather than whatever is
-      // currently filtered.
-      if (!wantClosed) {
+      // Count the open tenders from the open panel, ignoring the search so the
+      // headline figure is the real total rather than whatever is filtered.
+      if (role === 'open') {
         openCount = 0;
         box.querySelectorAll('.bk-rfp-row').forEach(function (row) {
-          if (!isClosed(row, now)) openCount++;
+          if (placeOf(row, now, auto) === 'open') openCount++;
         });
       }
 
       var placeholder = box.querySelector('[data-rfp-empty]');
-      if (shown === 0 && !placeholder) box.appendChild(emptyState(section));
+      if (shown === 0 && !placeholder) box.appendChild(emptyState(box));
       if (shown > 0 && placeholder) placeholder.remove();
     });
 

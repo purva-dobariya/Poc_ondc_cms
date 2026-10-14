@@ -123,13 +123,17 @@ _structures:
           value: '0'
           label: ''
           word_style: false
-  # One tender in the RFP / RFQ ledger.
+  # One row in the RFP / RFQ ledger. Three kinds, same fields: an open tender,
+  # a closed one, and an empanelled agency. Which one you pick sets `tab`,
+  # which decides the tab it appears under — and for the two tender kinds the
+  # last date normally overrides it, so a tender closes itself on time.
   rfp_tenders:
     style: select
     values:
-      - label: Tender
+      - label: Open RFP / RFQ
         icon: gavel
         value:
+          tab: open
           rfp_no: ''
           name: ''
           last_date: ''
@@ -137,21 +141,35 @@ _structures:
             - doc_type: RFP document
               file: ''
               url: ''
-        _inputs:
+        _inputs: &rfp_tender_inputs
+          tab:
+            type: select
+            label: Which tab it appears under
+            comment: >-
+              With "Move tenders automatically" on (the normal case), the last
+              date decides Open vs Closed and this is only the starting point.
+              Empanelled agencies always stay in their own tab.
+            options:
+              values:
+                - value: open
+                  label: Open
+                - value: closed
+                  label: Closed
+                - value: empanelled
+                  label: Empanelled agencies
           rfp_no:
             type: text
             label: RFP / RFQ number
-            comment: The reference number exactly as it should appear, for example ONDC/RFP/2026/001.
+            comment: The reference exactly as it should appear, for example ONDC/RFP/2026/001.
           name:
             type: text
-            label: Tender name
+            label: Name
           last_date:
             type: text
             label: Last date to apply
             comment: >-
-              Day.Month.Year, for example 30.11.2026. The tender shows under
-              "Open" until the end of that day and moves itself to "Closed"
-              the next day — there is nothing to switch over by hand.
+              Day.Month.Year, for example 30.11.2026. Leave empty for an
+              empanelled agency.
           documents:
             type: array
             label: Documents
@@ -160,8 +178,30 @@ _structures:
               annexures. Use + to add one and drag to reorder.
             options:
               structures: _structures.rfp_documents
-  # One downloadable file attached to a tender. Either uploaded here, or a link
-  # to a file that already lives somewhere else (ONDC's S3, for instance).
+      - label: Closed RFP / RFQ
+        icon: folder
+        value:
+          tab: closed
+          rfp_no: ''
+          name: ''
+          last_date: ''
+          documents:
+            - doc_type: RFP document
+              file: ''
+              url: ''
+        _inputs: *rfp_tender_inputs
+      - label: Empanelled agency
+        icon: verified
+        value:
+          tab: empanelled
+          rfp_no: ''
+          name: ''
+          last_date: ''
+          documents: []
+        _inputs: *rfp_tender_inputs
+
+  # One downloadable file attached to a row. Either uploaded here, or a link to
+  # a file that already lives somewhere else (ONDC's S3, for instance).
   rfp_documents:
     style: select
     values:
@@ -190,63 +230,54 @@ _structures:
             comment: >-
               Used only when nothing is uploaded above. Paste the full address,
               for example an existing link on ONDC's S3.
-  # Tabs inside the RFP / RFQ ledger. Two kinds: a tab listing tenders, and a
-  # tab that just shows a message.
+
+  # The three tabs above the table. Each lists what is assigned to it, and
+  # shows its own message when it is empty.
   rfp_tabs:
     style: select
     values:
       - label: Tab — open tenders
         icon: folder_open
         value:
-          key: ''
+          key: open
           label: Open
           source: open
-          message_heading: ''
-          message_body: ''
-        _inputs: &rfp_tab_feed
+          empty_heading: No records found
+          empty_body: Nothing matches this filter right now.
+        _inputs: &rfp_tab_inputs
           label:
             type: text
             label: Tab name
+          empty_heading:
+            type: text
+            label: Heading when this tab is empty
+          empty_body:
+            type: textarea
+            label: Message when this tab is empty
           key:
-            type: hidden
+            type: text
+            hidden: true
           source:
-            type: hidden
-          message_heading:
-            type: hidden
-          message_body:
-            type: hidden
+            type: text
+            hidden: true
       - label: Tab — closed tenders
         icon: folder
         value:
-          key: ''
+          key: closed
           label: Closed
           source: closed
-          message_heading: ''
-          message_body: ''
-        _inputs: *rfp_tab_feed
-      - label: Tab — a message
-        icon: info
+          empty_heading: No records found
+          empty_body: Nothing matches this filter right now.
+        _inputs: *rfp_tab_inputs
+      - label: Tab — empanelled agencies
+        icon: verified
         value:
-          key: ''
-          label: New tab
-          source: message
-          message_heading: Nothing here yet
-          message_body: Check back later.
-        _inputs:
-          label:
-            type: text
-            label: Tab name
-          key:
-            type: hidden
-          source:
-            type: hidden
-          message_heading:
-            type: text
-            label: Message heading
-          message_body:
-            type: textarea
-            label: Message
-
+          key: empanelled
+          label: Empanelled agencies
+          source: empanelled
+          empty_heading: No empanelled agencies yet
+          empty_body: This list is empty for now. Check back after the next empanelment cycle.
+        _inputs: *rfp_tab_inputs
 _inputs:
   sections:
     type: array
@@ -276,7 +307,8 @@ _inputs:
     label: First image to load
     comment: Optional. The one large image at the very top of the page, loaded early so it appears faster.
   layout:
-    type: hidden
+    type: text
+    hidden: true
 
   # --- shared text ---
   heading:

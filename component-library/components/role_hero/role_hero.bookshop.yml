@@ -34,7 +34,8 @@ _inputs:
     type: textarea
     label: Intro paragraph
   heading_id:
-    type: hidden
+    type: text
+    hidden: true
   tally:
     type: object
     label: Counter on the right
@@ -53,4 +54,5 @@ _inputs:
     label: Shown until the number loads
     comment: A dash works well. Visitors see this for a moment on a slow connection.
   value_id:
-    type: hidden
+    type: text
+    hidden: true
