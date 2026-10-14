@@ -179,9 +179,20 @@ _inputs:
                               Click this field and choose a PDF from your
                               computer — you never type a path here. Leave it
                               empty if the file is already online and you want
-                              to link to it below instead.
+                              to link to it below instead. Anything over about
+                              10 MB is better hosted on S3 and linked below;
+                              uploads are refused above 20 MB.
                             options:
                               path: files/rfp
+                              # kB. CloudCannon applies NO limit unless you set
+                              # one, and every upload is committed to Git — so
+                              # without this a large file sails through the CMS
+                              # and then fails at the push, where GitHub rejects
+                              # anything over 100 MB and warns over 50 MB. That
+                              # failure surfaces far away from the person who
+                              # caused it. 20 MB is generous for a tender PDF
+                              # and keeps the repo clonable.
+                              max_file_size: 20480
                           doc_url:
                             type: url
                             label: …or link to a file already online
