@@ -22,22 +22,23 @@ blueprint:
   search_label: ''
   tabs_label: Categories
   due_label: Last date to apply
+  timezone_label: IST
   tabs:
-    - key: open
-      label: Open
-      source: open
-      empty_heading: No records found
-      empty_body: Nothing matches this filter right now.
-    - key: closed
-      label: Closed
-      source: closed
-      empty_heading: No records found
-      empty_body: Nothing matches this filter right now.
-    - key: empanelled
-      label: Empanelled agencies
-      source: empanelled
-      empty_heading: No empanelled agencies yet
-      empty_body: This list is empty for now. Check back after the next empanelment cycle.
+    - tab_key: open
+      tab_label: Open
+      tab_source: open
+      tab_empty_heading: No records found
+      tab_empty_body: Nothing matches this filter right now.
+    - tab_key: closed
+      tab_label: Closed
+      tab_source: closed
+      tab_empty_heading: No records found
+      tab_empty_body: Nothing matches this filter right now.
+    - tab_key: empanelled
+      tab_label: Empanelled agencies
+      tab_source: empanelled
+      tab_empty_heading: No empanelled agencies yet
+      tab_empty_body: This list is empty for now. Check back after the next empanelment cycle.
   tenders: []
 
 _inputs:
@@ -53,10 +54,10 @@ _inputs:
     type: checkbox
     label: Move tenders between Open and Closed automatically
     comment: >-
-      Leave this on. A tender then sits under Open until the end of its last
-      date and appears under Closed from the next day, with no rebuild needed.
-      Turn it off only if you want to decide each tender's tab by hand.
-      Empanelled agencies are never moved either way.
+      Leave this on. A tender then sits under Open until its deadline passes
+      and appears under Closed straight after, with no rebuild needed. Turn it
+      off only if you want to decide each tender's tab by hand. Empanelled
+      agencies are never moved either way.
   tally_id:
     type: text
     hidden: true
@@ -78,7 +79,11 @@ _inputs:
     label: Name of the tab row for screen readers
   due_label:
     type: text
-    label: Wording under each last date
+    label: Wording under each deadline
+  timezone_label:
+    type: text
+    label: Timezone shown after each deadline
+    comment: Shown next to the time, for example IST. Clear it to show no timezone.
   tabs:
     type: array
     label: Tabs

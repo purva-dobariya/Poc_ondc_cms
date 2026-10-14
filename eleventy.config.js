@@ -7,6 +7,15 @@
  * Build command in CloudCannon:  npx @11ty/eleventy
  * Output folder in CloudCannon:  _site
  */
+/* Build in India Standard Time.
+ * Dates in front matter are instants (ISO8601). Anything that formats one at
+ * build time — the RFP deadlines, for instance — otherwise uses whatever
+ * timezone the build server happens to be in, and a deadline late in the IST
+ * evening renders as the previous day on a UTC builder. Pinning the build
+ * timezone makes the server-rendered text agree with what the page shows after
+ * its JavaScript formats the same instant in Asia/Kolkata. */
+process.env.TZ = process.env.TZ || 'Asia/Kolkata';
+
 const pluginBookshop = require("@bookshop/eleventy-bookshop");
 
 module.exports = function (eleventyConfig) {
