@@ -106,3 +106,12 @@ html body .block--dark .block-eyebrow,
 html body .block--dark .block-card-link { color: #8fdcff; }
 html body .block--dark .btn.btn-primary { background: #fff; background-image: none; color: var(--bkc-figure, #0d1b2e); }
 html body .block--dark .btn.btn-primary:hover { background: #e8eef7; }
+
+/* Editor-selectable spacing for the page title band (space_top / space_bottom).
+   The doubled class beats the base and mobile rules in beckn.css at every width. */
+.bk-contact-head.bk-space-top-compact    { padding-top: clamp(40px, 5vw, 72px); }
+.bk-contact-head.bk-space-top-none       { padding-top: 0; }
+.bk-contact-head.bk-space-top-roomy      { padding-top: clamp(120px, 14vw, 200px); }
+.bk-contact-head.bk-space-bottom-compact { padding-bottom: 32px; }
+.bk-contact-head.bk-space-bottom-none    { padding-bottom: 0; }
+.bk-contact-head.bk-space-bottom-roomy   { padding-bottom: 120px; }

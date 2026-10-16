@@ -1,6 +1,6 @@
 {%- assign hid = heading_id | default: "page-title" -%}
 <section
-  class="bk-contact-head"
+  class="bk-contact-head{% if space_top %} bk-space-top-{{ space_top }}{% endif %}{% if space_bottom %} bk-space-bottom-{{ space_bottom }}{% endif %}"
   aria-labelledby="{{ hid }}"
   data-screen-label="{{ screen_label | default: "Page title" }}">
   <h1 id="{{ hid }}" data-bk-intro>{{ heading }}{% if heading_accent %} <em>{{ heading_accent }}</em>{% endif %}{{ heading_suffix }}</h1>
