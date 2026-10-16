@@ -13,8 +13,6 @@ blueprint:
   heading_accent: ''
   heading_suffix: ''
   intro: ''
-  space_top: ''
-  space_bottom: ''
 
 # NOTE ON THE CSS CLASS
 # This renders `.bk-contact-head`, which is the class ondc.org uses for the
@@ -60,31 +58,3 @@ _inputs:
     type: textarea
     label: Line under the heading
     comment: Optional. One short sentence.
-  space_top:
-    type: select
-    label: Space above the heading
-    comment: Makes the band shorter or taller at the top. "Default" keeps the standard spacing.
-    options:
-      values:
-        - value: ''
-          label: Default
-        - value: compact
-          label: Compact
-        - value: none
-          label: None
-        - value: roomy
-          label: Roomy
-  space_bottom:
-    type: select
-    label: Space below the text
-    comment: Removes or adds the gap between this band and the next section.
-    options:
-      values:
-        - value: ''
-          label: Default
-        - value: compact
-          label: Compact
-        - value: none
-          label: None
-        - value: roomy
-          label: Roomy
