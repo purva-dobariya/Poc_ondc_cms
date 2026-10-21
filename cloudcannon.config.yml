@@ -29,6 +29,28 @@ data_config:
   # Bookshop's live rendering, so the directory still shows while editing.
   buyer_apps:
     path: src/_data/buyer_apps.json
+  # The Network Participant directory behind /network-participants.html. Same
+  # reasoning as the Buyer Apps above, and the same two jobs: it is what lets
+  # CloudCannon edit these files, and it is what makes the entries reach
+  # Bookshop's live rendering so the ledger still draws while editing.
+  #
+  # Deleting a participant here deletes it from the site: every row on the page
+  # is rendered from this file at build time, so the next build simply does not
+  # draw it. Adding one is the same in reverse — the list is sorted by name at
+  # build time, so a new entry lands in its alphabetical place by itself.
+  network_participants:
+    path: src/_data/network_participants.json
+  # The official ONDC category taxonomy. It draws the filter tree on the left of
+  # the directory AND fills the category picker on a participant, so a category
+  # added here is immediately offered to every entry. A category a participant
+  # carries that is missing here still shows and still filters — it is grouped
+  # under "Other".
+  np_categories:
+    path: src/_data/np_categories.json
+  # The participant roles, with the short key the table prints and the full
+  # wording behind it.
+  np_roles:
+    path: src/_data/np_roles.json
 markdown:
   engine: commonmark
   options: {}
@@ -56,6 +78,42 @@ collections_config:
         name: Landing page starter
         path: schemas/landing-page.liquid
         icon: article
+
+  network_participants:
+    path: src/_data
+    url: /network-participants.html
+    glob:
+      - 'network_participants.json'
+    name: Network Participants
+    singular_name: Network Participant list
+    icon: groups
+    description: >-
+      Every participant listed on the Network Participants page. Open it to add,
+      edit or delete an entry — deleting one here removes it from the site on the
+      next publish. The page sorts by name, so a new entry finds its own place.
+    disable_add: true
+    disable_add_folder: true
+    disable_file_actions: true
+    _enabled_editors:
+      - data
+
+  np_taxonomy:
+    path: src/_data
+    glob:
+      - 'np_categories.json'
+      - 'np_roles.json'
+    name: Participant categories & roles
+    singular_name: List
+    icon: category
+    description: >-
+      The categories and roles a participant can be given. These fill the filter
+      panel on the directory and the pickers on each participant, so add a
+      category here before tagging participants with it.
+    disable_add: true
+    disable_add_folder: true
+    disable_file_actions: true
+    _enabled_editors:
+      - data
 
   site:
     path: src/_data
@@ -130,6 +188,26 @@ _structures:
           value: '0'
           label: ''
           word_style: false
+  # One entry in the Network Participant directory. Its per-field labels come
+  # from `_inputs` below rather than from here: a data file IS reached by the
+  # top-level `_inputs`, unlike a Bookshop component's fields, so writing them
+  # once there covers both arrays in the file.
+  participants:
+    style: select
+    values:
+      - label: Participant
+        icon: storefront
+        value:
+          name: ''
+          logo: ''
+          initials: ''
+          roles: []
+          categories: []
+          enabled_by: ''
+          spoc: ''
+          email: ''
+          phone: ''
+          website: ''
   # NOTE: the RFP ledger's structures used to live here and are now written
   # inline in component-library/components/rfp_ledger/rfp_ledger.bookshop.yml.
   # A `structures: _structures.<name>` reference from a Bookshop component
@@ -627,6 +705,115 @@ _inputs:
   aria_label:
     type: text
     label: Section description for screen readers
+
+  # --- the Network Participant directory (src/_data/network_participants.json)
+  #
+  # These reach the DATA FILE, not the directory component: `_inputs` at the top
+  # of this file covers page front matter and data files, while a Bookshop
+  # component's own fields are configured in its .bookshop.yml. See
+  # ADDING_PAGES.md, rule 5.
+  #
+  # `name` and `logo` are deliberately not repeated here — the shared
+  # definitions above already give a participant the right text box and the
+  # right image picker, crop tool included.
+  key:
+    type: array
+    label: Key Network Participants
+    comment: >-
+      The participants shown on the first tab of the directory. Use + to add
+      one, the item menu to duplicate or delete. The page sorts by name, so
+      where an entry sits in this list does not matter.
+    options:
+      structures: _structures.participants
+  integrated:
+    type: array
+    label: Integrated Network Participants
+    comment: >-
+      Every participant live on the network. Use + to add one, the item menu to
+      duplicate or delete. The page sorts by name, so where an entry sits in
+      this list does not matter.
+    options:
+      structures: _structures.participants
+  initials:
+    type: text
+    label: Initials
+    comment: >-
+      The two letters shown in a grey circle when this participant has no logo,
+      or when the logo file is missing. Leave empty to use the first two
+      letters of the name.
+  roles:
+    type: multiselect
+    label: Roles
+    comment: Pick every role this participant is live in. The table prints the short key for each.
+    options:
+      values: data.np_roles
+      value_key: role_value
+      allow_create: false
+  categories:
+    type: multiselect
+    label: Live categories
+    comment: >-
+      The categories this participant is live in. These drive the filter panel.
+      A category missing from the list is added under "Participant categories
+      & roles".
+    options:
+      values: data.np_categories
+      value_key: name
+      allow_create: false
+  enabled_by:
+    type: text
+    label: Technology Service Provider
+    comment: >-
+      Optional. Printed under the participant's name as "Enabled by …" on the
+      rows that have one.
+  spoc:
+    type: text
+    label: Business contact
+    comment: The person's name. Shown above the Email / Call / Website links.
+  email:
+    type: text
+    label: Contact email
+    comment: Becomes the "Email" link on the row. Leave empty to drop it.
+  phone:
+    type: text
+    label: Contact phone
+    comment: Becomes the "Call" link on the row. Leave empty to drop it.
+  website:
+    type: url
+    label: Website
+    comment: Becomes the "Website" link on the row. Include https://
+
+  # --- the category taxonomy (src/_data/np_categories.json) ---
+  parent:
+    type: select
+    label: Sits under
+    comment: >-
+      Leave empty to make this a top-level category in the filter panel.
+      Otherwise pick the top-level category it belongs to. The panel is two
+      levels deep, so pick one that is itself top-level.
+    options:
+      values: data.np_categories
+      value_key: name
+      allow_empty: true
+
+  # --- the role list (src/_data/np_roles.json) ---
+  role_value:
+    type: text
+    label: Role
+    comment: >-
+      Exactly as it is written on a participant. Changing it here does not
+      change it on the participants that already use it.
+  role_key:
+    type: text
+    label: Short key
+    comment: What the table prints, for example BNP. Keep it to a few characters.
+  role_label:
+    type: text
+    label: Name on the filter button
+  role_full:
+    type: text
+    label: Full name
+    comment: Shown as a tooltip on the short key in the table.
 
 # Toolbar for the click-to-edit regions in the visual editor.
 _editables:

@@ -7,7 +7,7 @@
           src="{{ site.logo }}"
           style="height: 52px; width: auto; display: block;"/></a>
       <div class="nav-links">
-        {% for item in site.nav %}{% if item.children %}<details class="nav-drop"><summary class="nav-link">{{ item.label }}<svg
+        {% for item in site.nav %}{% if item.children %}{%- comment -%}A drop-down is "active" when the page we are on is one of its children — the same rule the plain links use one branch down, just applied to the whole group.{%- endcomment -%}{% assign drop_active = "" %}{% for child in item.children %}{% if child.url == page.url %}{% assign drop_active = " active" %}{% endif %}{% endfor %}<details class="nav-drop"><summary class="nav-link{{ drop_active }}">{{ item.label }}<svg
                   aria-hidden="true"
                   class="nav-drop-chev"
                   fill="none"

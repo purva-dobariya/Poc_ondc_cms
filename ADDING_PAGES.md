@@ -442,6 +442,85 @@ when the sheet changes, instead of it happening by itself. The seed values came
 from the live sheet (`13-10-2026`: 1254 + 1584 + 236 = 3074, which reconciles),
 and `as_of_note` is the field that carries the "Last updated on…" line.
 
+### The Network Participants page: four decisions
+
+**The CSVs became a database; they are not fetched any more.** ondc.org builds
+this table in the browser: `participant-csv.js` fetches two CSVs and a logo map
+(~95 KB), parses them, and writes the rows in with `innerHTML`. None of that
+can work here, for two reasons that are the whole point of this build —
+requirement 1 asks for the entries to be editable by a non-developer, and a
+CSV fetched at runtime is not something the CMS can see; and a section whose
+rows arrive from `fetch()` renders **empty** in the visual editor, because
+Bookshop re-renders components in the browser with only the data
+`data_config` carries.
+
+So the CSVs were converted once, by `scripts/import-network-participants.js`,
+into `src/_data/network_participants.json`. Everything the browser used to do
+at runtime happens there instead: canonicalising category labels, splitting the
+three-line Contact blob into `spoc` / `email` / `phone`, giving a bare domain
+like `nammayatri.in` a scheme, and working out the two-letter monogram for a
+participant with no logo. What lands in the JSON is already the shape the page
+renders and the CMS edits. Re-run the script when the participants team hands
+over a fresh CSV drop; it takes the path to an ondc.org checkout and rewrites
+the three data files, copying any new brand logos into `images/np-logos/`.
+
+**Deleting an entry in the CMS deletes it from the site.** That was a stated
+requirement, and it falls out of rendering at build time: every row on the page
+comes from the data file, so a build after a deletion simply does not draw it.
+Verified rather than assumed — removing `Paytm` and rebuilding left no trace of
+it in the HTML. Adding works the same way in reverse: the component sorts by
+name at build time, so an entry appended to the **end** of the file lands in its
+alphabetical place (`Mango Commerce Pvt Ltd` appended last came out at position
+166 of 344, between `Mahawanti…` and `Mango Fox`).
+
+Alphabetical is the default for both lists, per the requirement. The order is a
+per-list field, so the Key list can be put back to its volume ranking with one
+click — see the note in the CMS guide.
+
+**The taxonomy is read back off the DOM, not duplicated in the script.** The
+left-hand tree is drawn from `src/_data/np_categories.json`, which is a flat
+list of `{ name, parent }`. `network-participants.js` rebuilds the parent/child
+map by reading the `data-parent` attributes the template just wrote. That is
+what lets an editor add a category in the CMS without a code change — and what
+stops the taxonomy existing in two places that can drift, which is exactly what
+`participant-csv.js` does today with a 60-line `TAXONOMY` constant.
+
+A category a participant carries that the taxonomy has no row for still shows
+and still filters; it is grouped under **Other**.
+
+**Three field names are longer than they look like they should be.** `_inputs`
+at the top of `cloudcannon.config.yml` is keyed by field *name* across every
+data file and page at once. A role written as `{ value, short, pill, full }`
+picks up the labels the home page's figures and hero pills already claim for
+`value` ("Number") and `pill` ("Tab name"), in a sidebar where the editor has
+no way to tell why. Hence `role_value` / `role_key` / `role_label` /
+`role_full`. The same rule bit once more inside the component itself: `_inputs`
+there is one flat map, so `labels.directory_tabs` could not sit under the
+`directory_tabs` array, and is `labels.tabs_aria`.
+
+This is rule 5's cousin and worth stating on its own: **a global `_inputs` key
+is global.** Before naming a field on a data file, grep
+`cloudcannon.config.yml` for it.
+
+#### Rendering 494 rows
+
+Both lists are rendered in full, into two `<tbody>` elements of one table:
+859 KB of HTML, 72 KB over the wire. That is the cost of the no-new-nodes rule
+and it was taken deliberately — the alternative is the runtime fetch above.
+Two things keep it from being felt:
+
+- rows past the first page ship with `hidden` on them. Without that the browser
+  paints 494 rows and the script collapses them to 20 a moment later, which is
+  a layout shift the length of the page;
+- a `<noscript>` block hands every row back and hides the controls that would
+  then be lying — search, the role toggles, the category panel and the pager.
+  With no script the page is still the whole directory, just not a filterable
+  one.
+
+The filter chips and the page numbers are drawn by the template too, all of
+them, hidden. A chip the script had to create is a chip that disappears on the
+next keystroke in the editor.
+
 ### CloudCannon rewrites page front matter when an editor saves
 
 Comparing the Careers page before and after it had been opened and saved in

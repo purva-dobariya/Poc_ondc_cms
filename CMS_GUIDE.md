@@ -140,6 +140,7 @@ is published.
 | Numbered journey (spine) | Numbered steps down a line that fills as you scroll, with optional expandable detail. One per page. |
 | Escalation panel | A dark call-out: conditions, buttons, and key facts down the side. |
 | Buyer App directory | The searchable, paged list of Buyer Apps and their contacts. |
+| Participant directory | The filterable, paged participant ledger — category tree, role toggles, search and CSV export. |
 | FAQ | Questions that open one at a time. |
 | Key numbers | Big figures that count up, in labelled rows, with an optional legend. |
 
@@ -387,6 +388,99 @@ expandable section and FAQ answer is open so you can click into the text, and
 all 143 directory cards are shown with their contacts visible. On the live page
 only the first answer in each group is open, and the directory shows one page at
 a time.
+
+---
+
+## 3d. Editing the Network Participants page
+
+Three sections: the hero, the **Participant directory**, and the closing
+**Participant Portal** panel. The hero and the closing panel are ordinary
+sections — heading, paragraph, buttons.
+
+### What is edited on the section, and what is not
+
+Open **Participant directory** and you can change everything *around* the
+table: the tabs across the top, the names and descriptions of the two lists,
+the search hint, how many rows a page starts with, whether the **Export CSV**
+button shows, and the disclaimer underneath. Column headings and the small
+wording inside the table ("Email", "Call", "Website", "Enabled by", the
+"nothing matches" message) are grouped under **Wording inside the directory**
+— open that only when you need to reword something specific.
+
+**The participants themselves are not edited here.** They are in their own
+place in the sidebar.
+
+### Adding, changing and deleting a participant
+
+In the CloudCannon sidebar, open **Network Participants**. You will find two
+lists — **Key Network Participants** and **Integrated Network Participants** —
+matching the two tabs on the page.
+
+- **Add one** with the **+** button. Fill in the name, upload or pick a logo,
+  tick its roles and its live categories, and fill in the contact details.
+- **Change one** by clicking it open.
+- **Delete one** with the item menu (**⋮**) → Delete. It is gone from the
+  website on the next publish. The same goes for duplicating: **⋮** →
+  Duplicate gives you a copy to edit.
+
+Two things you do not have to think about:
+
+- **Order.** The page sorts by name every time it builds, so it does not matter
+  where in the list a new entry ends up — it will appear in its alphabetical
+  place on the site.
+- **A missing logo.** Leave the logo empty and the row shows a grey circle with
+  the participant's initials rather than a broken image. The same happens if a
+  logo file goes missing later. You can set the two letters yourself in
+  **Initials**, or leave that empty and the first two letters of the name are
+  used.
+
+Only **Name** really matters. Every other field can be empty, and the row
+simply does not draw that part.
+
+### Adding a new category or role
+
+Open **Participant categories & roles** in the sidebar.
+
+**Categories** is the list behind the filter panel on the left of the directory
+*and* behind the category picker on each participant. Add the category here
+first, then tag participants with it. **Sits under** decides where it appears
+in the panel: leave it empty for a top-level category, or pick a top-level one
+to nest it underneath.
+
+A category only shows in the filter panel when the list you are looking at
+actually has participants in it — an option nobody can tick is left out rather
+than greyed, and the two tabs genuinely carry different sets. The number beside
+each one is how many participants are in it.
+
+**Roles** carries the short key the table prints (BNP, SNP) and the full
+wording behind it. **Role** must match exactly what is written on the
+participants; changing it here does not change it on them.
+
+### Changing the order of a list
+
+Each list has an **Order** setting:
+
+- **Alphabetical by name** — the default for both lists, and what keeps a newly
+  added participant in the right place by itself.
+- **As listed in the data file** — keeps the order of the entries exactly as
+  they sit in **Network Participants**.
+
+The Key list is a volume ranking on ondc.org. It is set to alphabetical here;
+switch it to **As listed in the data file** to restore the ranking, and reword
+the list's **Line under the switcher** to match.
+
+### The tabs across the top
+
+**Tabs above the directory** is the row of links for moving between this
+directory and the other participant directories. Tick **This is the current
+page** on exactly one — that is the one drawn as selected.
+
+### While you are editing
+
+The list switcher is shown open, so both list names can be clicked and
+reworded. The table itself pages the same way it does on the live site, twenty
+rows at a time — the rows are not editable here anyway, and everything on the
+section that *is* editable is visible without paging.
 
 ---
 
