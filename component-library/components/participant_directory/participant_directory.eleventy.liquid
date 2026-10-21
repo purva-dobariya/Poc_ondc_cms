@@ -160,7 +160,16 @@
           </div>
         </details>
       {% endif %}
-      <p class="bk-np-tabnote" data-np-tabnote>{{ lists[0].note }}</p>
+      {%- comment -%}
+        Kept whenever there is more than one list, even if THIS list's note is
+        empty, because switching lists writes the next one's note into it. A
+        single-list directory with nothing to say drops the element rather than
+        leaving an empty paragraph holding its margin open.
+      {%- endcomment -%}
+      {%- assign show_note = false -%}
+      {%- if lists.size > 1 -%}{%- assign show_note = true -%}{%- endif -%}
+      {%- if lists[0].note != blank -%}{%- assign show_note = true -%}{%- endif -%}
+      {% if show_note %}<p class="bk-np-tabnote" data-np-tabnote>{{ lists[0].note }}</p>{% endif %}
 
       <div class="bk-np-filterbar">
         <div class="bk-np-rolebar" data-np-rolebar role="group" aria-label="{{ labels.roles | default: "Filter by role" }}">
@@ -223,8 +232,19 @@
             script to do the paging.
           {%- endcomment -%}
           {% assign page_size = per_page | default: 20 | plus: 0 %}
+          {%- comment -%}
+            Which data file each option in the "Which participants" dropdown
+            reads. Written out rather than looked up dynamically because Liquid
+            cannot resolve a global by a name held in a variable — and because
+            being explicit is what makes a fourth directory two lines here plus
+            one option in the .bookshop.yml, instead of a puzzle.
+          {%- endcomment -%}
           {% for list in lists %}
-            {% assign rows = network_participants[list.source] %}
+            {% case list.source %}
+              {% when "ecosystem" %}{% assign rows = ecosystem_participants.participants %}
+              {% when "integrated" %}{% assign rows = network_participants.integrated %}
+              {% else %}{% assign rows = network_participants.key %}
+            {% endcase %}
             {% if list.sort != "as_listed" %}{% assign rows = rows | sort_natural: "name" %}{% endif %}
             <tbody data-np-body data-np-index="{{ forloop.index0 }}"{% unless forloop.first %} hidden{% endunless %}>
               {%- for p in rows %}

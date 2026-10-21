@@ -230,13 +230,21 @@ function logoFor(brand) {
   return '/images/np-logos/' + file;
 }
 
-/* ── row -> participant ──────────────────────────────────────────────────── */
-function toParticipant(row) {
+/* ── row -> participant ────────────────────────────────────────────────────
+ *
+ * The three sheets agree on Brand Name, Role, Contact and Link, and disagree
+ * on the other two: the network files write "Live Categories" and "Technology
+ * Service Provider", the ecosystem file writes "Category" and "Live NP
+ * supported". Both of those land in the SAME two fields here — `categories`
+ * and `enabled_by` — so every directory renders from one row shape and the
+ * wording that differs ("Enabled by" vs "Live NPs supported") is a label on
+ * the section, edited in the CMS, rather than a second code path. */
+function toParticipant(row, columns) {
   const name = String(row['Brand Name'] || '').trim();
   const contact = parseContact(row.Contact);
   const categories = [];
   const seen = new Set();
-  splitList(row['Live Categories']).forEach((raw) => {
+  splitList(row[columns.category]).forEach((raw) => {
     if (IGNORED.has(raw.trim())) return;
     const c = canon(raw);
     if (seen.has(c)) return;
@@ -250,7 +258,7 @@ function toParticipant(row) {
     initials: initialsOf(name),
     roles: splitList(row.Role),
     categories,
-    enabled_by: String(row['Technology Service Provider'] || '').trim(),
+    enabled_by: String(row[columns.enabled_by] || '').trim(),
     spoc: contact.spoc,
     email: contact.email,
     phone: contact.phone,
@@ -258,13 +266,17 @@ function toParticipant(row) {
   };
 }
 
-function loadList(file) {
+const NETWORK_COLUMNS = { category: 'Live Categories', enabled_by: 'Technology Service Provider' };
+const ECOSYSTEM_COLUMNS = { category: 'Category', enabled_by: 'Live NP supported' };
+
+function loadList(file, columns) {
   const text = fs.readFileSync(path.join(SRC, 'public/assets/ondc-participants', file), 'utf8');
-  return toObjects(parseCsv(text)).map(toParticipant).filter((p) => p.name);
+  return toObjects(parseCsv(text)).map((row) => toParticipant(row, columns)).filter((p) => p.name);
 }
 
-const key = loadList('Key_network_participants.csv');
-const integrated = loadList('integrated_network_particpants.csv');
+const key = loadList('Key_network_participants.csv', NETWORK_COLUMNS);
+const integrated = loadList('integrated_network_particpants.csv', NETWORK_COLUMNS);
+const ecosystem = loadList('ecosystem_participants.csv', ECOSYSTEM_COLUMNS);
 
 /* Alphabetical on the way in as well as at build time. The build is what
    guarantees it — a row added in the CMS lands in its right place without
@@ -293,6 +305,13 @@ write('network_participants.json', {
   key: key.slice().sort(byName),
   integrated: integrated.slice().sort(byName),
 });
+/* Its own file, not a third list inside the one above: the two directories are
+   maintained by different people, and keeping them apart means deleting an
+   ecosystem participant never rewrites the network file — smaller diffs, and
+   no merge conflict when both are edited the same afternoon. Wrapped in an
+   object rather than written as a bare array so the CMS has a key to hang the
+   "Ecosystem Participants" label and the add/delete controls on. */
+write('ecosystem_participants.json', { participants: ecosystem.slice().sort(byName) });
 write('np_categories.json', categories);
 write('np_roles.json', ROLES);
 
@@ -307,7 +326,7 @@ let copied = 0, absent = [];
   fs.copyFileSync(source, target);
   copied++;
 });
-console.log('\nparticipants: %d key, %d integrated', key.length, integrated.length);
+console.log('\nparticipants: %d key, %d integrated, %d ecosystem', key.length, integrated.length, ecosystem.length);
 console.log('logo files referenced: %d, copied in: %d', neededLogos.size, copied);
 if (absent.length) console.log('\nlogo files the checkout does not have (these brands fall back to an initials monogram):\n  ' + absent.sort().join('\n  '));
 
@@ -317,5 +336,5 @@ if (absent.length) console.log('\nlogo files the checkout does not have (these b
    np_categories.json. */
 const known = new Set(categories.map((c) => c.name));
 const unknown = new Set();
-[...key, ...integrated].forEach((p) => p.categories.forEach((c) => { if (!known.has(c)) unknown.add(c); }));
+[...key, ...integrated, ...ecosystem].forEach((p) => p.categories.forEach((c) => { if (!known.has(c)) unknown.add(c); }));
 if (unknown.size) console.log('\ncategories not in the taxonomy (they fall under "Other"):\n  ' + [...unknown].sort().join('\n  '));

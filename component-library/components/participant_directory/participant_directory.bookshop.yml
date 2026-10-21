@@ -181,6 +181,8 @@ _inputs:
                       label: Key Network Participants
                     - value: integrated
                       label: Integrated Network Participants
+                    - value: ecosystem
+                      label: Ecosystem Participants
               sort:
                 type: select
                 label: Order

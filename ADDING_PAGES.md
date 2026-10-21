@@ -521,6 +521,58 @@ The filter chips and the page numbers are drawn by the template too, all of
 them, hidden. A chip the script had to create is a chip that disappears on the
 next keystroke in the editor.
 
+### Ecosystem Participants: the component paying for itself
+
+This page cost no new component, no new JavaScript and no new CSS. It is the
+same `participant_directory` section with different fields, which is the whole
+reason that section was built generic rather than as `network_participants`.
+
+ondc.org's two pages are near-identical files — the diff between their inline
+scripts is four constants and the tab switcher. What actually differs:
+
+| | Network Participants | Ecosystem Participants |
+| --- | --- | --- |
+| Lists | two, with a switcher | one |
+| Category column | `Live Categories` | `Category` |
+| Sub-line under the name | `Technology Service Provider`, "Enabled by" | `Live NP supported`, "Live NPs supported" |
+| Roles present | Buyer NP, Seller NP | the four TSP roles |
+
+Only the first of those needed any code. The other three are handled without a
+branch anywhere:
+
+- **the two differently-named columns land in the same two fields.** The
+  importer takes the column names as an argument, so `Live Categories` and
+  `Category` both become `categories`, and `Technology Service Provider` and
+  `Live NP supported` both become `enabled_by`. One row shape, three sheets.
+- **the wording that differs is a label on the section**, not a second code
+  path: `labels.enabled_by` is "Enabled by" on one page and "Live NPs
+  supported" on the other, set in the CMS.
+- **the roles narrow themselves.** The script hides any role toggle or category
+  branch the visible list has no rows for, so the ecosystem page offers the
+  four TSP roles and the network page offers Buyer/Seller NP, from one shared
+  `np_roles.json`. Nothing declares which page gets which.
+
+The one real change was the list switcher. It already rendered only when
+`lists.size > 1`; the page just needed the empty tab-note paragraph dropped
+too, or a one-list directory holds a margin open for a line of text that will
+never arrive.
+
+**A fourth directory is now two lines of Liquid plus one dropdown option.** The
+`{% case list.source %}` in the component maps each option to its data file.
+Liquid cannot resolve a global by a name held in a variable, so this stays
+written out — which is also what makes it obvious where to add the next one.
+
+**Its data is a file of its own**, `src/_data/ecosystem_participants.json`, not
+a third list inside `network_participants.json`. The two directories are
+maintained by different people, so deleting an ecosystem participant should
+never rewrite the network file: smaller diffs, and no merge conflict when both
+are edited the same afternoon.
+
+**This page closed the last dead link on the site that was ours.** The tab
+above the network directory, and the entries in the navbar and footer, all
+pointed at `/ecosystem-participants.html` and 404'd. Everything still dead is a
+page nobody has migrated yet.
+
 ### CloudCannon rewrites page front matter when an editor saves
 
 Comparing the Careers page before and after it had been opened and saved in

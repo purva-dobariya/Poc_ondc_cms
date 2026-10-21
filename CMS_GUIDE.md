@@ -484,6 +484,46 @@ section that *is* editable is visible without paging.
 
 ---
 
+## 3e. Editing the Ecosystem Participants page
+
+The same three sections as Network Participants — hero, **Participant
+directory**, closing **Participant Portal** panel — and the directory is the
+same section type, so §3d applies to it word for word. Two differences:
+
+- **One list, so no switcher.** The directory shows a single list and the
+  "Participant list" dropdown is not drawn. Add a second list under **Lists in
+  this directory** and the switcher appears by itself.
+- **The sub-line under a participant's name says "Live NPs supported"** rather
+  than "Enabled by". That is **Wording inside the directory → Label before the
+  technology service provider**. Nothing on the page uses it today — the sheet
+  carries no values — but fill the field on a participant and the line appears.
+
+### Adding, changing and deleting an ecosystem participant
+
+Sidebar → **Ecosystem Participants** (hub icon). It works exactly like
+**Network Participants**: **+** to add, **⋮ → Delete** to remove, **⋮ →
+Duplicate** to copy, click a row to edit. Deleting removes it from the site on
+the next publish, and the page sorts by name, so a new entry lands in its
+alphabetical place by itself.
+
+It is a **separate file** from Network Participants on purpose — editing one
+directory never touches the other, so two people can work on them at the same
+time without colliding.
+
+### Moving a participant between the two directories
+
+There is no "move" button. Open the entry, copy its fields into a new entry in
+the other list, then delete the original. An organisation that genuinely
+belongs in both — a TSP that is also a Buyer NP — should be listed in both.
+
+### The tabs at the top
+
+Both pages carry the same two tabs, and each page ticks **This is the current
+page** on its own one. If you rename a tab, rename it on *both* pages or the
+pair will disagree.
+
+---
+
 ## 4. How it fits together (for developers)
 
 ```

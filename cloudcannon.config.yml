@@ -40,6 +40,12 @@ data_config:
   # build time, so a new entry lands in its alphabetical place by itself.
   network_participants:
     path: src/_data/network_participants.json
+  # The Ecosystem Participant directory behind /ecosystem-participants.html.
+  # A file of its own rather than a third list inside the one above: the two
+  # directories are maintained by different people, so deleting an ecosystem
+  # participant never rewrites the network file.
+  ecosystem_participants:
+    path: src/_data/ecosystem_participants.json
   # The official ONDC category taxonomy. It draws the filter tree on the left of
   # the directory AND fills the category picker on a participant, so a category
   # added here is immediately offered to every entry. A category a participant
@@ -91,6 +97,26 @@ collections_config:
       Every participant listed on the Network Participants page. Open it to add,
       edit or delete an entry — deleting one here removes it from the site on the
       next publish. The page sorts by name, so a new entry finds its own place.
+    disable_add: true
+    disable_add_folder: true
+    disable_file_actions: true
+    _enabled_editors:
+      - data
+
+  ecosystem_participants:
+    path: src/_data
+    url: /ecosystem-participants.html
+    glob:
+      - 'ecosystem_participants.json'
+    name: Ecosystem Participants
+    singular_name: Ecosystem Participant list
+    icon: hub
+    description: >-
+      Every participant listed on the Ecosystem Participants page — the
+      technology service providers the buyer and seller apps are built on. Open
+      it to add, edit or delete an entry; deleting one here removes it from the
+      site on the next publish. The page sorts by name, so a new entry finds
+      its own place.
     disable_add: true
     disable_add_folder: true
     disable_file_actions: true
@@ -745,6 +771,15 @@ _inputs:
       Every participant live on the network. Use + to add one, the item menu to
       duplicate or delete. The page sorts by name, so where an entry sits in
       this list does not matter.
+    options:
+      structures: _structures.participants
+  participants:
+    type: array
+    label: Ecosystem Participants
+    comment: >-
+      Every participant on the Ecosystem Participants page. Use + to add one,
+      the item menu to duplicate or delete. The page sorts by name, so where an
+      entry sits in this list does not matter.
     options:
       structures: _structures.participants
   initials:
