@@ -160,7 +160,12 @@ _inputs:
                           html: ''
                         _inputs:
                           part_kind:
-                            type: hidden
+                            # Which kind of part this is. The component switches
+                            # on it, so it is set by the structure and never by
+                            # hand — `hidden: true` beside a real type, because
+                            # CloudCannon has no `hidden` TYPE and rejects one.
+                            type: text
+                            hidden: true
                           html:
                             type: html
                             label: Text
@@ -185,7 +190,12 @@ _inputs:
                           barriers: []
                         _inputs:
                           part_kind:
-                            type: hidden
+                            # Which kind of part this is. The component switches
+                            # on it, so it is set by the structure and never by
+                            # hand — `hidden: true` beside a real type, because
+                            # CloudCannon has no `hidden` TYPE and rejects one.
+                            type: text
+                            hidden: true
                           barriers:
                             type: array
                             label: The points
@@ -237,7 +247,12 @@ _inputs:
                           caps_text: ''
                         _inputs:
                           part_kind:
-                            type: hidden
+                            # Which kind of part this is. The component switches
+                            # on it, so it is set by the structure and never by
+                            # hand — `hidden: true` beside a real type, because
+                            # CloudCannon has no `hidden` TYPE and rejects one.
+                            type: text
+                            hidden: true
                           caps_text:
                             type: textarea
                             label: The paragraph
@@ -256,7 +271,12 @@ _inputs:
                           caps_items: []
                         _inputs:
                           part_kind:
-                            type: hidden
+                            # Which kind of part this is. The component switches
+                            # on it, so it is set by the structure and never by
+                            # hand — `hidden: true` beside a real type, because
+                            # CloudCannon has no `hidden` TYPE and rejects one.
+                            type: text
+                            hidden: true
                           caps_items:
                             type: array
                             label: The points
@@ -301,7 +321,12 @@ _inputs:
                           nav_label: ''
                         _inputs:
                           part_kind:
-                            type: hidden
+                            # Which kind of part this is. The component switches
+                            # on it, so it is set by the structure and never by
+                            # hand — `hidden: true` beside a real type, because
+                            # CloudCannon has no `hidden` TYPE and rejects one.
+                            type: text
+                            hidden: true
                           nav_label:
                             type: text
                             label: Name of the ledger, for screen readers
@@ -321,7 +346,12 @@ _inputs:
                           subheading: ''
                         _inputs:
                           part_kind:
-                            type: hidden
+                            # Which kind of part this is. The component switches
+                            # on it, so it is set by the structure and never by
+                            # hand — `hidden: true` beside a real type, because
+                            # CloudCannon has no `hidden` TYPE and rejects one.
+                            type: text
+                            hidden: true
                           subheading:
                             type: text
                             label: Sub-heading
@@ -337,7 +367,12 @@ _inputs:
                           note_html: ''
                         _inputs:
                           part_kind:
-                            type: hidden
+                            # Which kind of part this is. The component switches
+                            # on it, so it is set by the structure and never by
+                            # hand — `hidden: true` beside a real type, because
+                            # CloudCannon has no `hidden` TYPE and rejects one.
+                            type: text
+                            hidden: true
                           note_title:
                             type: text
                             label: Heading of the box
