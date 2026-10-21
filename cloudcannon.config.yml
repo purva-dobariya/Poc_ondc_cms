@@ -90,7 +90,10 @@ collections_config:
     name: Home page
     singular_name: Home page
     icon: home
-    description: The front page, served at the site root.
+    description: >-
+      The front page, served at the site root. It is here rather than in Pages
+      because it is the one page whose address is "/" instead of a file name —
+      see the note in Pages below.
     disable_add: true
     disable_add_folder: true
 
@@ -103,7 +106,10 @@ collections_config:
     name: Pages
     singular_name: Page
     icon: wysiwyg
-    description: Every page on the site. Open one to edit its text and images, or to add, duplicate, reorder and remove whole sections.
+    description: >-
+      Every page except the home page, which has its own item above. Open one
+      to edit its text and images, or to add, duplicate, reorder and remove
+      whole sections.
     create:
       path: '[relative_base_path]/{title|slugify}.liquid'
     # Schema files must NOT live in src/pages: CloudCannon treats a file used as a
