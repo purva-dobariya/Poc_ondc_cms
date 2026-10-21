@@ -224,9 +224,22 @@ html.is-editing .reveal {
 html.is-editing .res-nav-details { display: block; }
 html.is-editing .res-nav-details > div { display: block !important; }
 
+/* Disclosures folds its five groups into <details> bars that open one at a
+   time. Closed, the editor shows five grey bars and nothing else, which reads
+   as a page that failed to load. Everything inside them comes from the
+   Resources library data file and is not click-to-edit anyway, so unfold them
+   all. The second rule is for Chrome's ::details-content, which the first one
+   alone no longer beats; browsers that do not know the selector drop that
+   rule and keep the first. */
+html.is-editing .res-sec.is-collapsible > .res-sec-body { display: block !important; }
+html.is-editing .res-sec.is-collapsible::details-content {
+  content-visibility: visible !important;
+  block-size: auto !important;
+}
+
 /* The search results box is empty until somebody types, and every row in it
    is a copy of a document edited under "Resources library" — nothing here is
-   click-to-edit, and 503 rows unhidden would bury the page. Left alone
+   click-to-edit, and 500 rows unhidden would bury the page. Left alone
    deliberately. */
 
 /* ── Shared chrome in the editor ─────────────────────────────────────── */

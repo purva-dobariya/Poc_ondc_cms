@@ -47,3 +47,11 @@
 .res-results[hidden] {
   display: none !important;
 }
+
+/* A folded group is a <details> the filter hides when nothing in it matches.
+   `hidden` is enough today — nothing sets `display` on `.res-sec` — but the
+   guard is written anyway, because the rule that caught this build twice is
+   that the NEXT author rule is the one that breaks it. */
+.res-sec[hidden] {
+  display: none !important;
+}

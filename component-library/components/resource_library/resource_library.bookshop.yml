@@ -14,6 +14,7 @@ blueprint:
   hub_url: /resources.html
   intro: ''
   show_videos: false
+  collapsible: false
   buttons: []
   labels:
     breadcrumb: Breadcrumb
@@ -81,6 +82,15 @@ _inputs:
     comment: >-
       Tick on an area whose documents include videos — the ONDC Academy page.
       The videos are the items of type "Video" in that area.
+  collapsible:
+    type: checkbox
+    label: Fold each group of documents
+    comment: >-
+      Tick on an area with so many documents that the group headings are what
+      you scan rather than the rows — Disclosures, with a hundred of them. Each
+      group becomes a bar you click to open, one at a time, and carries the
+      number of documents it holds. Filtering opens every group that has a
+      match and puts them back as they were when the box is cleared.
   buttons:
     type: array
     label: Buttons above the documents

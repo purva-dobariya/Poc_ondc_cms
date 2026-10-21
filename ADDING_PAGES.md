@@ -738,6 +738,38 @@ the documents**, with everything else an editor might reword.
 > refresh deletes the patch. Page-specific additions go in a file of our own,
 > the way `resources-search.css` already does.
 
+#### Disclosures folds its groups, and nothing else does
+
+A hundred and two documents under five headings is a page you scroll past, not
+one you read, so ondc.org marks that one list `data-collapsible` and renders
+each group as a `<details>` bar carrying its own count. Every other sub-page
+keeps the plain headings.
+
+Here it is a checkbox on the section — **Fold each group of documents** — and
+both shapes hold the *same* documents: the rows are captured once into
+`group_body` and emitted into whichever wrapper the flag chooses, so the two
+shapes cannot drift apart. A folded list also carries the area eyebrow once,
+above the stack, instead of repeating it on every bar.
+
+The accordion is still inside the no-new-nodes rule. It sets `open` on an
+element that is already in the page and animates the height of a `<div>` that
+is already in the page; it creates nothing. Three details are worth knowing
+before touching it:
+
+- **`<details>` cannot transition its own height.** The body is animated by
+  hand, and `open` is not cleared until a collapse has *finished* — so
+  mid-flight the element still reports `open: true`. What a click reverses is
+  therefore where the section is *heading* (`headingOpen`), not where it is.
+- **A closed `<details>` still reports its content's full height.** The
+  collapsed end of the travel is a literal `0`, never a measurement.
+- **The filter has to reach inside a folded group.** While a query is active
+  every group with a hit is opened without animating, and the state the reader
+  left behind is restored when the box is cleared.
+
+In the editor all five unfold, via `cms.css`. Closed, the page is five grey
+bars and reads as content that failed to load — and nothing inside them is
+click-to-edit anyway, since it all comes from the Resources library data file.
+
 #### nav_active
 
 Eighteen sub-pages need the "Resources" menu item lit, and none of them *is*

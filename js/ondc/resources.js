@@ -22,7 +22,9 @@
        [data-res-filter]          the filter box
        [data-res-filter-count]    "3 matching resources"
        [data-res-filter-empty]    the nothing-matched line
-       [data-res-sec]             one section of documents
+       [data-res-sec]             one section of documents — a <div>, or a
+                                  <details class="is-collapsible"> on a page
+                                  that folds its groups
        [data-res-row]             one document row
        [data-res-nav-details]     the sidebar disclosure
 
@@ -136,6 +138,77 @@
   }
 
   /* ── sub-page: filter the documents on this page ──────────────────── */
+  /* ── the accordion ────────────────────────────────────────────────
+     A page that folds its groups renders each one as a <details>. Nothing
+     here breaks the no-new-nodes rule: it sets `open` on an element that is
+     already in the page and animates the height of a <div> that is too.
+
+     <details> cannot transition its own height, so the body is animated by
+     hand and `open` is not cleared until the collapse has actually finished
+     — which is why "is it open?" and "where is it heading?" are two
+     different questions below. */
+  var REDUCED = window.matchMedia
+    ? window.matchMedia('(prefers-reduced-motion: reduce)')
+    : { matches: false };
+
+  function panelBody(d) { return d.querySelector('.res-sec-body'); }
+
+  /* no animation — what the filter and a hash jump want, where the travel is
+     something to get past rather than something to sit and watch */
+  function setOpenNow(d, open) {
+    if (d._anim) { d._anim.cancel(); d._anim = null; }
+    d._targetOpen = open;
+    d.open = open;
+  }
+
+  /* mid-collapse `open` still reads true, and what a click should reverse is
+     where the section is heading, not where it currently is */
+  function headingOpen(d) {
+    return (d._anim && d._anim.playState === 'running') ? d._targetOpen : d.open;
+  }
+
+  function slidePanel(d, opening) {
+    var b = panelBody(d);
+    if (!b || !b.animate) { setOpenNow(d, opening); return; }
+    /* A closed <details> still reports its content's full height, so the
+       collapsed end of the travel is a literal 0 and never a measurement.
+       Mid-flight the live height is what a reversal has to start from —
+       measured BEFORE cancelling, or it has already snapped back to rest. */
+    var running = d._anim && d._anim.playState === 'running';
+    var from = (opening && !running) ? 0 : b.getBoundingClientRect().height;
+    if (d._anim) { d._anim.cancel(); d._anim = null; }
+    d._targetOpen = opening;
+    if (REDUCED.matches) { d.open = opening; return; }
+    if (opening) d.open = true;
+    var to = opening ? b.scrollHeight : 0;
+    if (from === to) { if (!opening) d.open = false; return; }
+    // longer lists get a little longer to travel, but never enough to drag
+    var dur = Math.min(420, 200 + Math.abs(to - from) * 0.06);
+    var anim = b.animate(
+      { height: [from + 'px', to + 'px'], opacity: opening ? [0, 1] : [1, 0] },
+      { duration: dur, easing: 'cubic-bezier(.22,.61,.36,1)' }
+    );
+    d._anim = anim;
+    anim.onfinish = function () {
+      d._anim = null;
+      if (!opening) d.open = false;
+    };
+  }
+
+  /* The sidebar links to #sec-N. A folded section has to open itself, or the
+     link lands on a heading with nothing under it. Registered once on the
+     window rather than per section, so a Bookshop re-render cannot stack
+     listeners or leave one pointing at a node that is gone. */
+  function openFromHash(scroll) {
+    var id = location.hash ? location.hash.slice(1) : '';
+    var target = id ? document.getElementById(id) : null;
+    if (!target || !target.classList || !target.classList.contains('is-collapsible')) return;
+    var panels = [].slice.call(target.parentNode.querySelectorAll('details.res-sec'));
+    panels.forEach(function (o) { if (o !== target) setOpenNow(o, false); });
+    setOpenNow(target, true);
+    if (scroll && target.scrollIntoView) target.scrollIntoView();
+  }
+
   function setupLibrary(root) {
     if (root._resReady) return;
     root._resReady = true;
@@ -156,12 +229,37 @@
       };
     });
 
+    /* One group open at a time. A <summary>'s own default toggle is not what
+       we want — it would open this one without closing the last — so the
+       click is taken over entirely. */
+    var panels = sections
+      .map(function (sec) { return sec.el; })
+      .filter(function (el) { return el.tagName === 'DETAILS'; });
+
+    panels.forEach(function (d) {
+      var summary = d.querySelector('summary');
+      if (!summary) return;
+      summary.addEventListener('click', function (e) {
+        e.preventDefault();
+        var opening = !headingOpen(d);
+        if (opening) {
+          panels.forEach(function (o) { if (o !== d && headingOpen(o)) slidePanel(o, false); });
+        }
+        slidePanel(d, opening);
+      });
+    });
+    if (panels.length) openFromHash(true);
+
     /* The sidebar ships open because the desktop layout shows it flat. On a
        phone it is a disclosure, and open by default it would push the
        documents a screen and a half down. */
     if (window.matchMedia && window.matchMedia('(max-width: 1000px)').matches) {
       [].forEach.call(root.querySelectorAll('[data-res-nav-details]'), function (d) { d.open = false; });
     }
+
+    /* which groups the reader had open before they started typing, so the
+       accordion can be put back that way once the box is cleared */
+    var openBeforeFilter = null;
 
     function apply() {
       var q = input.value.trim().toLowerCase();
@@ -183,6 +281,20 @@
         sec.el.hidden = sec.rows.length === 0 ? !!q : visible === 0;
         shown += visible;
       });
+
+      /* A folded group hides its own matches. While a query is active every
+         group still showing a hit is opened — without animating, because five
+         of them unfolding at once is noise, not feedback. */
+      if (panels.length) {
+        if (q && !openBeforeFilter) {
+          openBeforeFilter = panels.map(function (d) { return d.open; });
+        }
+        panels.forEach(function (d, i) {
+          if (q) setOpenNow(d, !d.hidden);
+          else if (openBeforeFilter) setOpenNow(d, openBeforeFilter[i]);
+        });
+        if (!q) openBeforeFilter = null;
+      }
 
       text(countEl, q ? shown + ' matching resource' + (shown === 1 ? '' : 's') : '');
       if (emptyEl) emptyEl.hidden = !(q && shown === 0);
@@ -207,6 +319,8 @@
   } else {
     scan();
   }
+
+  window.addEventListener('hashchange', function () { openFromHash(true); });
 
   // Bookshop swaps a section's DOM while editing, which drops the listeners
   // and the _resReady flag with it. Re-running setup on the new nodes is all
