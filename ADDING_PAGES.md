@@ -653,6 +653,49 @@ the heading, and the icon set is a `case` block inlined at each of its three
 call sites rather than a shared partial. Both are uglier than the obvious
 version and both work in the editor, which the obvious version does not.
 
+#### A wrapper class is an API, and loading a stylesheet is a choice
+
+The Resources sub-pages first shipped with `wrapper_class: bk bk-resources-page`
+and the same stylesheet list as the hub. Both were wrong, and together they
+broke every document row on all eighteen pages: the icon, the text and the
+arrow stacked instead of sitting on one line.
+
+`beckn.css` carries
+
+```css
+.bk-resources-page .res-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; }
+```
+
+at specificity `0,2,0`, which beats `resources.css`'s `.res-row { display: flex }`
+at `0,1,0` **whatever order they load in**. That rule is written for the HUB,
+where a search result has two children (body, arrow) and two columns are
+exactly right. A sub-page's document row has three (icon, body, arrow), so the
+arrow fell to a second grid row.
+
+On ondc.org `bk-resources-page` appears on the hub and nowhere else, and the
+sub-pages do not load `beckn.css` at all — they load `legal.css`,
+`resources.css`, `fx.css`, `scale.css`, `mobile.css`. Checking every class the
+sub-pages render against every stylesheet showed none of them needs `beckn` or
+`type-boost`, so both are gone from those pages: the bug cannot come back, and
+each sub-page fetches 135 KB less CSS.
+
+Two general lessons, both cheap to apply and expensive to miss:
+
+- **A class on the page wrapper is an API other stylesheets hang rules off.**
+  Before copying one onto a new page, grep for `.that-class ` with a
+  descendant after it.
+- **Copy the original page's stylesheet list, not the neighbouring page's.**
+  Two pages in the same section can legitimately load different sets, and this
+  section is exactly that case — the hub is a `.bk-*` page, the sub-pages are
+  `.legal`-family pages that happen to share a data file.
+
+The button on those pages was wrong for a related reason. `.btn-primary` is a
+blue gradient and the closing band is a blue gradient, so the call to action
+all but vanished; ondc.org uses `.btn-light` (white) there. The `band` variant
+now maps "Solid" to `.btn-light` and the secondary to `.btn-ghost`, the
+translucent outline built for dark surfaces — so on a dark band the editor's
+"main button" is still the one that reads as the main button.
+
 #### What pre-rendering costs here
 
 The hub carries all 503 search rows — 485 documents plus one per area — at
