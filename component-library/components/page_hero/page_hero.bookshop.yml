@@ -16,6 +16,7 @@ blueprint:
   heading_accent: ''
   heading_suffix: ''
   background_image: ''
+  status_label: ''
   paragraphs:
     - text: One or two sentences introducing the page.
   buttons: []
@@ -30,13 +31,17 @@ _inputs:
     comment: >-
       "Full banner" is the tall hero with a background photo, used on About and
       Careers. "Compact" is the short banner at the top of each Resources
-      sub-page — a small tag, a heading and one line, no photo.
+      sub-page — a small tag, a heading and one line, no photo. "Not live yet"
+      is the holding page: the heading runs a slow blue wave through its
+      letters and a status line sits under it.
     options:
       values:
         - value: ''
           label: Full banner
         - value: compact
           label: Compact
+        - value: holding
+          label: Not live yet
 
   animation:
     type: select
@@ -51,6 +56,13 @@ _inputs:
           label: Fade in on scroll
         - value: intro
           label: Entrance on load
+  status_label:
+    type: text
+    label: Status line
+    comment: >-
+      Only used by the "Not live yet" layout — the short line under the
+      heading, beside the hairline and its dot. For example "Not live yet".
+      Leave empty for no status line.
   heading_id:
     type: text
     label: Heading anchor

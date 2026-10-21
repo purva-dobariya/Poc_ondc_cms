@@ -6,7 +6,35 @@
   component"). Its elements ship with `in` already on them: they are above the
   fold, and a hero that fades in after the observer runs reads as a flash.
 {%- endcomment -%}
-{% if variant == "compact" %}<section class="hero hero-compact"{% if heading_id %} aria-labelledby="{{ heading_id }}"{% endif %} data-screen-label="{{ screen_label | default: "Hero" }}">
+{% if variant == "holding" %}{% assign intro = false %}{% if animation == "intro" %}{% assign intro = true %}{% endif %}<section class="bk-hero bk-hero-about"{% if heading_id %} aria-labelledby="{{ heading_id }}"{% endif %} data-screen-label="{{ screen_label | default: "Hero" }}">
+  {%- comment -%}
+    A page that is not live yet. The headline is set one LETTER per <span>,
+    because beckn.css runs the blue wave off `:nth-child` — ten written-out
+    delays, no inline style and no script. Split on spaces first so the gap
+    between words stays a text node and the span count keeps matching the
+    delays; the whole word is on `aria-label`, and every span is hidden, so a
+    screen reader reads "Coming soon" and not ten letters.
+  {%- endcomment -%}
+  <div class="bk-hero-body">
+    {% if eyebrow %}
+      <div class="bk-eyebrow{% unless intro %} bk-rv{% endunless %}"{% if intro %} data-bk-intro{% endif %}>{{ eyebrow }}</div>
+    {% endif %}
+    <h1 class="bk-soon-word{% unless intro %} bk-rv{% endunless %}"{% if heading_id %} id="{{ heading_id }}"{% endif %} aria-label="{{ heading }}"{% if intro %} data-bk-intro{% endif %}>{%- assign soon_words = heading | split: " " -%}{%- for soon_word in soon_words -%}{%- unless forloop.first %} {% endunless -%}{%- assign soon_letters = soon_word | split: "" -%}{%- for soon_letter in soon_letters -%}<span aria-hidden="true">{{ soon_letter }}</span>{%- endfor -%}{%- endfor -%}</h1>
+    {% if status_label %}
+      <p class="bk-hold-status bk-soon-status{% unless intro %} bk-rv{% endunless %}"{% if intro %} data-bk-intro{% endif %}>
+        <svg class="bk-hold-node" width="180" height="20" viewBox="0 0 180 20" aria-hidden="true">
+          <line x1="0" y1="10" x2="180" y2="10"></line>
+          <circle class="bk-hold-node-dot" cx="90" cy="10" r="6"></circle>
+        </svg>
+        <span>{{ status_label }}</span>
+      </p>
+    {% endif %}
+    {% for para in paragraphs %}
+      <p class="bk-hero-sub{% unless intro %} bk-rv bk-rv-d1{% endunless %}"{% if intro %} data-bk-intro{% endif %}>{{ para.text }}</p>
+    {% endfor %}
+  </div>
+</section>
+{% elsif variant == "compact" %}<section class="hero hero-compact"{% if heading_id %} aria-labelledby="{{ heading_id }}"{% endif %} data-screen-label="{{ screen_label | default: "Hero" }}">
     <div class="hero-inner">
       <div class="container">
         {% if eyebrow %}<div class="hero-tag reveal in"><span class="dot"></span>{{ eyebrow }}</div>{% endif %}

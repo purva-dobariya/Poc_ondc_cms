@@ -1010,6 +1010,40 @@ mechanism without touching the selector you were looking at.
 
 ---
 
+### The holding page, and a wave made of markup
+
+`payment-assurance-program.html` is a page that is not live yet: an eyebrow, a
+headline, a status line, one paragraph. No sector rail, no buttons. It is a
+third layout on `page_hero` — the content model is the hero's own — and the
+only thing in it worth explaining is the headline.
+
+**The blue wave through "Coming soon" is CSS running off `:nth-child`.**
+`beckn.css` writes out ten delays, one per letterform, deliberately rather than
+computing them, so the markup carries no inline style and no script. That puts
+a requirement on the template: the headline must arrive as **one `<span>` per
+letter**, and the gap between the words must stay a **text node**. A span
+there would shift every delay by one and the stagger would come apart — which
+is why there is a test asserting the space is not a span.
+
+```liquid
+{%- assign soon_words = heading | split: " " -%}
+{%- for soon_word in soon_words -%}
+  {%- unless forloop.first %} {% endunless -%}
+  {%- assign soon_letters = soon_word | split: "" -%}
+  {%- for soon_letter in soon_letters -%}<span aria-hidden="true">{{ soon_letter }}</span>{%- endfor -%}
+{%- endfor -%}
+```
+
+Splitting a string on `""` gives its characters in LiquidJS, so an editor types
+"Coming soon" into an ordinary text field and the wave follows. Every span is
+`aria-hidden` and the whole word sits on the heading's `aria-label`, so a
+screen reader reads the phrase rather than ten letters. The wave stands itself
+down under `prefers-reduced-motion`, in `beckn.css`, not here.
+
+`coming-soon.html` is the same family and still 404: status line **above** the
+heading rather than under it, no letter wave, plus a `bk-hold-return` row and a
+closing coda. A fourth layout, not a new component.
+
 ### The role pages, and a counter that cannot go stale
 
 `buyer-network-participants.html`, `seller-network-participants.html`,
