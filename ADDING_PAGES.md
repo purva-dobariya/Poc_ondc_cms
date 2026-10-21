@@ -573,6 +573,108 @@ above the network directory, and the entries in the navbar and footer, all
 pointed at `/ecosystem-participants.html` and 404'd. Everything still dead is a
 page nobody has migrated yet.
 
+### Resources: nineteen pages, one data file
+
+The Resources section is the hub plus eighteen sub-pages. On ondc.org those
+eighteen files are the same ~203-line template; the diff between any two of
+them is the hero copy, the intro paragraph and one `data-category` attribute.
+Everything else — the sidebar tree, the breadcrumbs, the document lists, the
+hub cards, the global search — is built in the browser from
+`public/data/resources.json`.
+
+That shape ports almost unchanged. `src/_data/resources.json` carries 20 areas,
+105 groups and 485 documents, and **one file drives all nineteen pages**: the
+hub cards and their counts, the search index, every sidebar, every breadcrumb
+trail and every document list. Delete a document in the CMS and it leaves all
+of them on the next publish.
+
+Four new components, three new variants, no new page archetype:
+
+| | |
+| --- | --- |
+| `resource_index` | the hub's card grid, from the areas marked "Show on the hub" |
+| `resource_search` | the hub's search, with all 503 result rows pre-rendered |
+| `resource_library` | a sub-page's whole body — breadcrumbs, sidebar, documents, sub-area cards, video grid |
+| `newsletter_rows` | the two download rows at the foot of the hub |
+| `page_hero` → **Compact** | the short banner each sub-page opens with |
+| `closing_cta` → **Band** | the wide call to action each sub-page closes with |
+| `page_title_band` → **Knowledge base** | the hub masthead |
+
+The three variants are the convention this repo already states — *a new visual
+treatment of an existing content model is a variant field, not a new
+component*. `page_title_band.bookshop.yml` had even left a note predicting the
+third one; the Resources hub was the page that triggered it.
+
+**A second reveal system now exists, deliberately.** `.bk-rv` (beckn.js) stages
+the ONDC-page sections; `.reveal` (legal.css) stages the legal and resources
+pages, and the two stylesheets position their elements differently. ondc.org
+ships the `.reveal` observer inline at the bottom of every one of those pages;
+here it is `js/ondc/reveal.js`, listed once per page. Without it `.reveal`
+holds every element at `opacity: 0` and the pages render blank — so it needs
+its editor rule in `cms.css` exactly the way `.bk-rv` does (rule 2).
+
+#### Three traps worth naming
+
+**1. A global `_inputs` key is global — and this data file collided six ways.**
+Upstream's field names are `categories`, `sections`, `items`, `parent`, `note`
+and `source`. Every one of those already means something else on this site:
+`sections` is the list of blocks on a page, `categories` is the participant
+multiselect, `note` is labelled "Note for editors, never shown on the live
+site" — the exact opposite of what a group note does. So the importer renames
+them on the way in to `areas`, `doc_groups`, `documents`, `parent_area`,
+`group_note`/`doc_note` and `provenance`, and `type` becomes `doc_type`
+because a bare `type` as a global input name is a trap for whoever comes next.
+
+This is rule 9's companion and the second time it has cost real time. **Before
+naming a field on a data file, grep `cloudcannon.config.yml` for it.**
+
+**2. Liquid's `where` returns EVERYTHING when its value is undefined.** Not
+nothing — everything. So
+
+```liquid
+{% assign parent = areas | where: "id", cat.parent_area | first %}
+```
+
+on a top-level area does not yield nil; it yields the whole list, and `first`
+hands back whichever area happens to sit first in the file. A typo in that one
+line (`parent_area_area`) silently put "Governance and Policy" into the
+breadcrumb of **every page on the site** and raised no error at all. Ask
+whether there is a parent before looking one up:
+
+```liquid
+{% if cat.parent_area != blank %}{% assign up1 = … %}{% endif %}
+```
+
+**3. Two things Eleventy gives you are not there in the editor.** Bookshop
+re-renders a component in the BROWSER with plain LiquidJS: Eleventy's custom
+filters and `slugify` do not exist, and neither does `{% render %}`. So the
+section anchors are `sec-1`, `sec-2` … by position rather than slugified from
+the heading, and the icon set is a `case` block inlined at each of its three
+call sites rather than a shared partial. Both are uglier than the obvious
+version and both work in the editor, which the obvious version does not.
+
+#### What pre-rendering costs here
+
+The hub carries all 503 search rows — 485 documents plus one per area — at
+358 KB. That is not a saving forgone: the index has to be in the page either
+way, and as HTML it is barely larger than the JSON blob the create-on-the-fly
+alternative would need, while keeping the no-new-nodes rule intact.
+
+Relevance ordering survives without moving a node. The results box is a flex
+column and the script sets `order` — 1 for a title match, 2 for one found only
+in the blurb — which is what ondc.org achieves by rebuilding the list. The
+guard for that, and the `[hidden]` guard rule 9 demands for `.res-row`
+(`display: flex`, so `hidden` alone does nothing), live in
+`css/ondc/resources-search.css` rather than `resources.css`, because that file
+is a byte-copy of upstream's and a refresh would silently delete them.
+
+#### nav_active
+
+Eighteen sub-pages need the "Resources" menu item lit, and none of them *is*
+`/resources.html`. A page can now set `nav_active` in its front matter to the
+menu address it belongs under; the header falls back to the page's own URL,
+which is what every other page wants.
+
 ### CloudCannon rewrites page front matter when an editor saves
 
 Comparing the Careers page before and after it had been opened and saved in

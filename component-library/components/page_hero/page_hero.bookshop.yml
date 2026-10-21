@@ -7,6 +7,7 @@ spec:
   icon: wallpaper
 
 blueprint:
+  variant: ''
   screen_label: ''
   heading_id: ''
   animation: reveal
@@ -23,6 +24,20 @@ blueprint:
 # cloudcannon.config.yml does not reach a Bookshop component's fields — see
 # ADDING_PAGES.md, rule 5.
 _inputs:
+  variant:
+    type: select
+    label: Layout
+    comment: >-
+      "Full banner" is the tall hero with a background photo, used on About and
+      Careers. "Compact" is the short banner at the top of each Resources
+      sub-page — a small tag, a heading and one line, no photo.
+    options:
+      values:
+        - value: ''
+          label: Full banner
+        - value: compact
+          label: Compact
+
   animation:
     type: select
     label: How the hero appears

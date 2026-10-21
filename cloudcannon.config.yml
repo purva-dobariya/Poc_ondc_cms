@@ -57,6 +57,13 @@ data_config:
   # wording behind it.
   np_roles:
     path: src/_data/np_roles.json
+  # The Resources knowledge base — every area, group and document behind
+  # /resources.html and its eighteen sub-pages. One file drives all nineteen:
+  # the hub cards and their counts, the global search, the sidebar tree, the
+  # breadcrumbs and each page's document list. Delete a document here and it
+  # leaves all of them on the next publish.
+  resources:
+    path: src/_data/resources.json
 markdown:
   engine: commonmark
   options: {}
@@ -117,6 +124,25 @@ collections_config:
       it to add, edit or delete an entry; deleting one here removes it from the
       site on the next publish. The page sorts by name, so a new entry finds
       its own place.
+    disable_add: true
+    disable_add_folder: true
+    disable_file_actions: true
+    _enabled_editors:
+      - data
+
+  resources:
+    path: src/_data
+    url: /resources.html
+    glob:
+      - 'resources.json'
+    name: Resources library
+    singular_name: Knowledge base
+    icon: menu_book
+    description: >-
+      Every document in the Resources knowledge base, grouped into areas. One
+      file drives the hub, the search and all eighteen sub-pages — add a
+      document to an area and it appears on that area's page, in the search and
+      in the hub's count.
     disable_add: true
     disable_add_folder: true
     disable_file_actions: true
@@ -214,6 +240,66 @@ _structures:
           value: '0'
           label: ''
           word_style: false
+  # The Resources knowledge base, three levels deep. Per-field labels are in
+  # `_inputs` below, which a data file DOES reach — unlike a Bookshop
+  # component's fields. The field names are deliberately unlike upstream's
+  # (areas/doc_groups/documents rather than categories/sections/items) because
+  # a global `_inputs` key is global: see ADDING_PAGES.md, rule 9.
+  resource_documents:
+    style: select
+    values:
+      - label: Document
+        icon: description
+        preview:
+          text:
+            - key: title
+          subtext:
+            - key: type
+            - key: href
+          icon: description
+        value:
+          title: ''
+          doc_type: pdf
+          href: ''
+          lang: ''
+          doc_note: ''
+          updated: ''
+  resource_groups:
+    style: select
+    values:
+      - label: Group of documents
+        icon: folder
+        preview:
+          text:
+            - key: title
+          icon: folder
+        value:
+          title: New group
+          group_note: ''
+          prose: ''
+          documents: []
+  resource_areas:
+    style: select
+    values:
+      - label: Area
+        icon: topic
+        preview:
+          text:
+            - key: title
+          subtext:
+            - key: summary
+          icon: topic
+        value:
+          id: ''
+          title: New area
+          summary: ''
+          icon: book-open
+          page: ''
+          parent_area: ''
+          hub: false
+          external: false
+          doc_groups: []
+
   # One entry in the Network Participant directory. Its per-field labels come
   # from `_inputs` below rather than from here: a data file IS reached by the
   # top-level `_inputs`, unlike a Bookshop component's fields, so writing them
@@ -284,6 +370,14 @@ _inputs:
   layout:
     type: text
     hidden: true
+  nav_active:
+    type: text
+    label: Menu item to highlight
+    comment: >-
+      Optional. The address of the menu item that should look selected while
+      this page is open — used by the Resources sub-pages so the "Resources"
+      menu item stays lit. Leave empty and the page highlights its own menu
+      item, which is what almost every page wants.
 
   # --- shared text ---
   heading:
@@ -830,6 +924,149 @@ _inputs:
     type: url
     label: Website
     comment: Becomes the "Website" link on the row. Include https://
+
+  # --- the Resources knowledge base (src/_data/resources.json) ---
+  areas:
+    type: array
+    label: Areas of the knowledge base
+    comment: >-
+      Each area is one page of the Resources section. Use + to add one, the
+      item menu to duplicate or delete, and drag to reorder — the order here is
+      the order of the hub cards and the sidebar.
+    options:
+      structures: _structures.resource_areas
+  doc_groups:
+    type: array
+    label: Groups of documents
+    comment: >-
+      Each group is one headed block on the area's page. Use + to add one, the
+      item menu to duplicate or delete, and drag to reorder.
+    options:
+      structures: _structures.resource_groups
+  documents:
+    type: array
+    label: Documents
+    comment: >-
+      Use + to add one, the item menu to duplicate or delete, and drag to
+      reorder. Deleting one here removes it from the page, from the search and
+      from the count on the hub card.
+    options:
+      structures: _structures.resource_documents
+  doc_type:
+    type: select
+    label: Kind of document
+    comment: >-
+      Picks the icon and the tag on the row, and whether the link downloads or
+      opens in a new tab. "Page on this site" is the one that opens in the same
+      tab and shows no tag.
+    options:
+      values:
+        - value: pdf
+          label: PDF
+        - value: doc
+          label: Word document
+        - value: xlsx
+          label: Spreadsheet
+        - value: zip
+          label: ZIP archive
+        - value: video
+          label: Video
+        - value: link
+          label: Link to another site
+        - value: page
+          label: Page on this site
+  summary:
+    type: textarea
+    label: Short description
+    comment: The line under the title on the hub card and the sub-area cards.
+  parent_area:
+    type: text
+    label: Sits under
+    comment: >-
+      The id of the area this one belongs to — for example "governance". Leave
+      empty for a top-level area. This drives the sidebar tree, the breadcrumbs
+      and the sub-area cards all at once.
+  hub:
+    type: checkbox
+    label: Show a card on the Resources hub
+  external:
+    type: checkbox
+    label: This area lives on another site
+    comment: >-
+      Tick for an area whose "Page address" is a full web address. Its card
+      opens in a new tab and shows "External" instead of a count.
+  page:
+    type: text
+    label: Page address
+    comment: >-
+      Where this area's card and sidebar entry link to, for example
+      /resources-tech.html — or a full web address for an external area. There
+      must be a page at that address.
+  provenance:
+    type: text
+    label: Where this area's list came from
+    comment: Only shown inside the CMS. A note for whoever refreshes it next.
+  group_note:
+    type: textarea
+    label: Note under the group heading
+    comment: Shown on the live page, under the heading of this group.
+  prose:
+    type: html
+    label: Explanatory text
+    comment: Shown above the documents in this group. Leave empty for none.
+    options:
+      bold: true
+      italic: true
+      link: true
+      bulletedlist: true
+      numberedlist: true
+      removeformat: true
+      undo: true
+      redo: true
+  doc_note:
+    type: text
+    label: Note beside the title
+    comment: A short line shown after the tags on this document's row.
+  href:
+    type: text
+    label: Link address
+    comment: >-
+      A web address, a page of this site such as /resources-tech.html, or a
+      mailto: address. Leave empty for a document that is announced but not
+      published yet — the row shows without a link.
+  lang:
+    type: text
+    label: Language
+    comment: Shown as a tag, for example Hindi. Leave empty for English.
+  updated:
+    type: text
+    label: Date tag
+    comment: Shown as a tag on the row, for example "Jan 2026". Free text.
+  icon:
+    type: select
+    label: Icon
+    comment: Shown on this area's card.
+    options:
+      values:
+        - award
+        - bell
+        - book
+        - book-open
+        - check-circle
+        - check-square
+        - code
+        - compass
+        - dollar
+        - eye
+        - file-text
+        - grid
+        - monitor
+        - navigation
+        - pen
+        - percent
+        - shield
+        - trending-up
+        - volume
 
   # --- the category taxonomy (src/_data/np_categories.json) ---
   parent:

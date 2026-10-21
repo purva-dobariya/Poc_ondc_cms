@@ -141,6 +141,10 @@ is published.
 | Escalation panel | A dark call-out: conditions, buttons, and key facts down the side. |
 | Buyer App directory | The searchable, paged list of Buyer Apps and their contacts. |
 | Participant directory | The filterable, paged participant ledger — category tree, role toggles, search and CSV export. |
+| Knowledge base index | The grid of cards on the Resources hub, one per area of the library. |
+| Resources search | The search box that searches every document in the knowledge base at once. |
+| Knowledge base area | The body of a Resources sub-page — sidebar, breadcrumbs and that area's documents. |
+| Newsletter rows | A heading and a stack of wide rows, each linking to a newsletter to download. |
 | FAQ | Questions that open one at a time. |
 | Key numbers | Big figures that count up, in labelled rows, with an optional legend. |
 
@@ -521,6 +525,91 @@ belongs in both — a TSP that is also a Buyer NP — should be listed in both.
 Both pages carry the same two tabs, and each page ticks **This is the current
 page** on its own one. If you rename a tab, rename it on *both* pages or the
 pair will disagree.
+
+---
+
+## 3f. Editing the Resources section
+
+Resources is **nineteen pages** — the hub at `/resources.html` and eighteen
+sub-pages, one per area of the knowledge base. All nineteen are drawn from a
+single place in the sidebar: **Resources library**.
+
+### The one rule that explains everything here
+
+Add a document to an area and it appears **in four places at once**: on that
+area's page, in the hub's search, in the count on the hub card, and in the
+count on any parent area's sub-area card. Delete it and it leaves all four.
+You never update a number by hand.
+
+### Adding, changing and deleting a document
+
+Sidebar → **Resources library** → open the file → you get the list of
+**Areas**. Each area opens to **Groups of documents**, and each group opens to
+its **Documents**.
+
+- **Add** with **+** at whichever level you need — a document, a whole group,
+  or a new area.
+- **Delete** with the item menu (**⋮**) → Delete.
+- **Reorder** by dragging. Order matters here and is exactly what the page
+  shows: the order of areas is the order of the hub cards and the sidebar, and
+  the order of groups is the order they appear down the page.
+
+A document has a **Title**, a **Kind of document** (PDF, Video, Link, Page on
+this site…) which picks its icon and tag, a **Link address**, and three
+optional tags: **Language**, **Date tag** and a short **Note beside the
+title**. Leave the link empty for something announced but not published yet —
+the row shows without a link, which is how "coming soon" is done.
+
+### Adding a whole new area (a new page)
+
+Two steps, in this order:
+
+1. **In Resources library**, add the area. Give it an **id** (lower-case, no
+   spaces — for example `payments`), a title, a short description, an icon,
+   and a **Page address** such as `/resources-payments.html`. Tick **Show a
+   card on the Resources hub** if it should appear on the hub. To nest it
+   under an existing area, put that area's id in **Sits under** — that one
+   field drives the sidebar tree, the breadcrumbs and the parent's sub-area
+   cards together.
+2. **In Pages**, duplicate any existing `resources-…` page and change three
+   things: the **Page address** to match what you just typed, the hero wording,
+   and — on the **Knowledge base area** section — **Which part of the library**
+   to the new id.
+
+Until step 2 is done the hub card points at a page that does not exist.
+
+### What is edited on the page, and what is not
+
+Open a Resources sub-page and you can edit the hero, the intro paragraph, the
+closing call to action, and the wording around the documents (the sidebar
+heading, the breadcrumb, the filter hint, the "nothing matched" message, under
+**Wording around the documents**). **The documents themselves are not edited
+there** — they are in Resources library.
+
+On the hub the same split applies: the masthead, the search wording, the index
+heading and the newsletter rows are page content; the cards are the areas.
+
+### The newsletters
+
+The only list on these pages that *is* edited on the page. Open **Newsletter
+rows** on the hub: each row has a small label, a title, a description, the link
+text (put the file size in it — "Download PDF · 17 MB") and the address.
+
+### Two settings not to change by accident
+
+- **Which part of the library** on a sub-page is the area's id. Change it and
+  the page shows a different area's documents — or nothing, if no area has
+  that id.
+- **Menu item to highlight** in Page settings is `/resources.html` on every
+  sub-page. That is what keeps "Resources" lit in the top menu while a reader
+  is on one of them.
+
+### While you are editing
+
+Everything that normally fades in as you scroll is shown already faded in, and
+the sidebar is held open so you can see which area the page is. The search
+results box stays empty — it fills only when somebody types, and nothing in it
+is editable anyway.
 
 ---
 

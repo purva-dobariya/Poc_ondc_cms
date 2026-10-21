@@ -24,6 +24,23 @@ blueprint:
       action: link
 
 _inputs:
+  variant:
+    type: select
+    label: Layout
+    comment: >-
+      "Plain" is the wide band at the foot of the About page. "Panel" is the
+      white rounded card on the role pages — it can also carry a paragraph.
+      "Band" is the full-width call to action at the foot of the Resources and
+      legal pages.
+    options:
+      values:
+        - value: ''
+          label: Plain
+        - value: role
+          label: Panel
+        - value: band
+          label: Band
+
   heading_id:
     type: text
     hidden: true

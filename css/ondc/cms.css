@@ -202,6 +202,33 @@ html.is-editing .bk-np-listdrop-menu .np-tab { cursor: text; }
    the visible list has no rows for. Both are data, not copy, so neither is
    forced open here; the panel stays the height it is on the page. */
 
+/* ── Resources ───────────────────────────────────────────────────────── */
+/* legal.css holds `.reveal` at opacity 0 until js/ondc/reveal.js adds `in` on
+   scroll. The editor frame never scrolls, so without this the intro, the
+   document list, the hub cards and the closing band all render INVISIBLE —
+   the same trap `.bk-rv` sets, and the same fix. (Two reveal systems is not
+   an accident: `.bk-rv`/beckn.js stages the ONDC-page sections, `.reveal`
+   stages the legal and resources pages, and the two stylesheets position
+   their elements differently.) */
+html.is-editing .reveal {
+  opacity: 1 !important;
+  transform: none !important;
+  transition: none !important;
+}
+
+/* The sidebar is a <details> that this build closes below 1000px, because a
+   tree that tall would push the documents a screen and a half down on a
+   phone. An editor frame is often narrower than that, and a closed sidebar
+   hides the area's own name — the one thing that says which page you are on.
+   Keep it open while editing. */
+html.is-editing .res-nav-details { display: block; }
+html.is-editing .res-nav-details > div { display: block !important; }
+
+/* The search results box is empty until somebody types, and every row in it
+   is a copy of a document edited under "Resources library" — nothing here is
+   click-to-edit, and 503 rows unhidden would bury the page. Left alone
+   deliberately. */
+
 /* ── Shared chrome in the editor ─────────────────────────────────────── */
 /* The navbar is position:sticky at z-index 300/100 on the live site. Inside the
    editor frame it then floats over the FIRST section and swallows that
