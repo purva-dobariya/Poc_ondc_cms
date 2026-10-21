@@ -197,6 +197,19 @@ _structures:
     values:
       - label: Participant
         icon: storefront
+        # Without this, CloudCannon labels every collapsed row of a 344-entry
+        # array with an auto-generated title, and finding the one to edit or
+        # delete means opening them. Previewing the logo and the name makes the
+        # list scannable at the speed the page itself is.
+        preview:
+          text:
+            - key: name
+          subtext:
+            - key: spoc
+            - key: email
+          image:
+            - key: logo
+          icon: storefront
         value:
           name: ''
           logo: ''
