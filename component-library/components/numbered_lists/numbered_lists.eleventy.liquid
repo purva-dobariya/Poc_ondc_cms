@@ -6,6 +6,7 @@
     Panel / Our people  the original two, points are plain text
     Requirements        role pages, each point is a card with its own heading
     Relay               the Gateway's scroll-driven SEARCH / MULTICAST / DISCOVER
+    Service lanes       the TSP continuum, the same band with counted numbers
     Outcomes            a plain stack of headed rows
 
   A field one layout ignores is normal here and not a sign of the wrong
@@ -24,6 +25,23 @@
     </div>
     <div class="bk-relay-steps">
       {% for group in groups %}{% for item in group.items %}        <article class="bk-relay-step bk-rv">{% if item.code != blank %}<strong>{{ item.code }}</strong>{% endif %}{% if item.point_title != blank %}<h3>{{ item.point_title }}</h3>{% endif %}<p>{{ item.text }}</p></article>
+      {% endfor %}{% endfor %}    </div>
+  </section>
+{% elsif variant == "service" %}<section class="bk-service-plane"{% if anchor_id %} id="{{ anchor_id }}"{% endif %} data-screen-label="{{ screen_label | default: "How it works" }}"{% if heading_id %} aria-labelledby="{{ heading_id }}"{% endif %}>
+    {%- comment -%}
+      The same band as Relay, drawn as lanes: the marker here is a COUNTED
+      number in a span rather than a typed code in a strong, so dragging a
+      lane renumbers the rest. Written out rather than folded into Relay with
+      a pile of assigns — the markup is the thing a reader comes here for.
+    {%- endcomment -%}
+    <div class="bk-service-plane-head bk-rv">
+      <h2{% if heading_id %} id="{{ heading_id }}"{% endif %} class="bk-h2">{{ heading }}{% if heading_accent %} <em>{{ heading_accent }}</em>{% endif %}{{ heading_suffix }}</h2>
+      {% for paragraph in paragraphs %}<p>{{ paragraph.text }}</p>
+      {% endfor %}
+    </div>
+    <div class="bk-service-lanes">
+      {% assign n = 0 %}
+      {% for group in groups %}{% for item in group.items %}{% assign n = n | plus: 1 %}        <article class="bk-service-lane bk-rv"><span>{% if n < 10 %}0{% endif %}{{ n }}</span>{% if item.point_title != blank %}<h3>{{ item.point_title }}</h3>{% endif %}<p>{{ item.text }}</p></article>
       {% endfor %}{% endfor %}    </div>
   </section>
 {% elsif variant == "outcomes" %}<section class="bk-role-outcomes"{% if anchor_id %} id="{{ anchor_id }}"{% endif %} data-screen-label="{{ screen_label | default: "What it gives you" }}"{% if heading_id %} aria-labelledby="{{ heading_id }}"{% endif %}>

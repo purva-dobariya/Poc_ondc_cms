@@ -1012,9 +1012,9 @@ mechanism without touching the selector you were looking at.
 
 ### The role pages, and a counter that cannot go stale
 
-`buyer-network-participants.html`, `seller-network-participants.html` and
-`gateway.html` are three of the four role pages the footer links to
-(**technology-service-provider is still 404**). None needed a new component:
+`buyer-network-participants.html`, `seller-network-participants.html`,
+`gateway.html` and `technology-service-provider.html` are **all four** role
+pages the footer links to. None needed a new component:
 `role_hero` and `closing_cta`'s "role" variant were already built for them, and
 the only missing piece — the list in the middle — is a third layout on
 `numbered_lists` rather than a 36th component, because it is the same content
@@ -1041,15 +1041,33 @@ number to count, three more section shapes, and it still needed nothing new:
 
 | what it shows | where it lives |
 |---|---|
-| `DISCOVER` beside the heading | `role_hero`, a **wordmark** instead of the counter |
+| `DISCOVER` / `ENABLE` beside the heading | `role_hero`, a **wordmark** instead of the counter |
 | the mid-page context band | `tagline_strip`, "Network page" layout |
 | SEARCH → MULTICAST → DISCOVER | `numbered_lists`, **Relay** layout |
+| the TSP service continuum | `numbered_lists`, **Service lanes** layout |
 | the three outcome rows | `numbered_lists`, **Outcome rows** layout |
 
-`numbered_lists` now carries five layouts, and that is the point rather than a
+TSP is Gateway's shape with one band swapped: `.bk-service-plane` instead of
+`.bk-relay`. Identical structure — a head block of h2 + paragraph, then a list
+of marked items — with two differences that are exactly the ones this codebase
+keeps meeting. The marker is a **counted number in a `<span>`** rather than a
+**typed code in a `<strong>`**, and there is no `data-bk-relay`, because only
+the Gateway's line draws itself on scroll. The two are written out as separate
+branches rather than folded together behind a pile of `assign`s: the markup is
+what a reader opens this file for.
+
+`numbered_lists` now carries six layouts, and that is the point rather than a
 smell: every one of them is a heading and an intro above a list of points, and
 what changes is the wrapper and whether a point draws a counted number, a typed
 code, or neither. A field a layout ignores is normal here.
+
+Across the four pages the marker rule has held every time, and it is worth
+stating plainly: **a marker that is a position is counted; a marker that is a
+name is typed.** `01…07` on buyer requirements and `01…03` on TSP lanes
+renumber themselves when a point is dragged. `MSN`, `ISN`, `SEARCH`,
+`MULTICAST`, `DISCOVER` do not, because they are not positions. The legal
+pages draw the same line between a clause number and a numbered point's
+marker.
 
 > **`data-bk-relay` is not decoration.** beckn.js writes
 > `--bk-relay-progress` onto that element as the page scrolls, which is what
@@ -1069,10 +1087,11 @@ and can appear in both the key and the integrated list. 213 organisations, 345
 rows. Liquid has no set, hence `push` into an array and `uniq`.
 
 One divergence, consistently applied: upstream puts the reveal class on the
-closing section itself on Gateway (`section.bk-role-close.bk-rv`) but on an
-inner `<div>` on Buyer and Seller. `closing_cta` uses the inner div on all
-three — its own pages disagree, the two render the same, and one shape across
-our three role pages is worth more than matching a one-off.
+closing section itself on Gateway and TSP (`section.bk-role-close.bk-rv`) but
+on an inner `<div>` on Buyer and Seller. `closing_cta` uses the inner div on
+all four — upstream's own pages disagree two against two, the two shapes
+render the same, and one shape across our four role pages is worth more than
+reproducing the split.
 
 > **A shared component is a shared blast radius.** Adding `data-bk-intro` to
 > the tally — which the buyer page has — silently changed the RFPs/RFQs page,

@@ -55,6 +55,8 @@ _inputs:
           label: Requirements
         - value: relay
           label: Relay
+        - value: service
+          label: Service lanes
         - value: outcomes
           label: Outcome rows
   screen_label:
@@ -113,8 +115,8 @@ _inputs:
     type: array
     label: Intro paragraphs
     comment: >-
-      Used by the "Requirements" and "Relay" layouts, which need more than the
-      one lead paragraph the others take.
+      Used by the "Requirements", "Relay" and "Service lanes" layouts, which
+      need more than the one lead paragraph the others take.
     options:
       structures:
         values:
