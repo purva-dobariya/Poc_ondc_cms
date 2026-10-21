@@ -20,7 +20,6 @@ blueprint:
       url: ''
       style: ghost
       new_tab: false
-      action: signup
   mark:
     show: false
     word: ''

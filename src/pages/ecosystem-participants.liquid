@@ -20,7 +20,6 @@ override:scripts:
   - /js/ondc/fx.js
   - /js/ondc/beckn.js
   - /js/ondc/logo-fallback.js
-  - /js/ondc/signup.js
   - /js/ondc/scroll-progress.js
   - /js/ondc/network-participants.js
 sections:
@@ -35,15 +34,13 @@ sections:
       seller apps sit on. Find the one that fits your role and category below.
     buttons:
       - label: Join the Network
-        url: ''
+        url: https://portal.ondc.org/
         style: solid
-        new_tab: false
-        action: signup
+        new_tab: true
       - label: Browse participants
         url: '#participant-roles'
         style: ghost
         new_tab: false
-        action: link
     tally:
       show: false
       value_id: ''
@@ -120,5 +117,4 @@ sections:
         url: https://portal.ondc.org/
         style: solid
         new_tab: true
-        action: link
 ---

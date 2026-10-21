@@ -505,6 +505,11 @@ _inputs:
   url:
     type: url
     label: Link address
+    comment: >-
+      Where this link or button goes. Every button on the site has one — a page
+      of this site such as /careers.html, a spot on the current page such as
+      #buyer-role, or a full web address. The sign-up buttons go to
+      https://portal.ondc.org/.
   link:
     type: url
     label: Link address
@@ -827,15 +832,6 @@ _inputs:
   suffix:
     type: text
     label: Suffix
-  action:
-    type: select
-    label: What this button does
-    options:
-      values:
-        - value: link
-          label: Go to a link
-        - value: signup
-          label: Open the ONDC sign-up portal
   sectors:
     type: object
     label: Sector links

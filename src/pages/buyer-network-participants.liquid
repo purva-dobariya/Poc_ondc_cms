@@ -19,7 +19,6 @@ override:styles:
 override:scripts:
   - /js/ondc/fx.js
   - /js/ondc/beckn.js
-  - /js/ondc/signup.js
   - /js/ondc/scroll-progress.js
 sections:
   - _bookshop_name: role_hero
@@ -38,12 +37,10 @@ sections:
         url: '#buyer-role'
         style: solid
         new_tab: false
-        action: link
       - label: Join as a Buyer NP
-        url: ''
+        url: https://portal.ondc.org/
         style: ghost
-        new_tab: false
-        action: signup
+        new_tab: true
     tally:
       show: true
       value_id: ''
@@ -119,8 +116,7 @@ sections:
       open network.
     buttons:
       - label: Join as a Buyer NP
-        url: ''
+        url: https://portal.ondc.org/
         style: solid
-        new_tab: false
-        action: signup
+        new_tab: true
 ---

@@ -1182,6 +1182,39 @@ One difference worth knowing: our sector rail is **one shared list** in
 shows 13, its directory page 12, and they are not the same 13. Ours shows the
 same 12 everywhere, missing "About ONDC" against the buyer page.
 
+### Every button's address is in the CMS, including the sign-up ones
+
+A button is a label, an address, a style and a new-tab tick. That is the whole
+model, and there is no second kind.
+
+There used to be one: a **What this button does** select, where choosing "Open
+the ONDC sign-up portal" made the component render a `<button
+onclick="ONDCSignup.open()">` instead of a link, with the real address sitting
+in `js/ondc/signup.js`. It was tidy — the portal URL was written once, so a
+change to it was a one-line edit — but it failed the test that matters here:
+**an editor looking at that button in CloudCannon saw an empty Link address
+field and no way to find out where it went.** Worse, typing an address into
+that field did nothing at all, silently.
+
+So the select is gone, `signup.js` is deleted, and all 33 of those buttons now
+carry `https://portal.ondc.org/` in the field, with **Open in a new tab**
+ticked. If the portal moves, an editor changes 33 fields instead of a developer
+changing one line — that is the trade, and it was made deliberately in favour
+of the person without a code editor.
+
+The rule this leaves behind: **if a component renders something an editor can
+click, the destination belongs in a field, not in a script.** The only
+`<button>` elements left in a page body are real controls — a lightbox close,
+pagination, Clear search, Submit, Export CSV. Those have no destination to
+show, so they have no field.
+
+One thing stayed as it was: the **Sign Up** button in the navbar is still a
+`<button onclick>`, but its address is `site.cta_url`, edited under *Header &
+Footer*. It is already on screen and already changeable, so it did not have the
+problem. Making it an anchor as well would need a CSS rule — `.nav-cta` sets a
+height with no `display`, which an inline `<a>` ignores — and that file is a
+byte-copy of ondc.org's.
+
 ## The legal documents
 
 `privacy-policy.html`, `cookie-policy.html` and `terms-and-conditions.html`

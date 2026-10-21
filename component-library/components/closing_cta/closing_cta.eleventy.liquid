@@ -17,14 +17,10 @@
       {%- endcomment -%}
       {% if buttons.size > 0 %}
         <div class="cta-actions reveal d2">
-          {% for button in buttons %}{% if button.action == "signup" %}<button
-                type="button"
-                class="btn {% if button.style == "solid" %}btn-light{% else %}btn-ghost{% endif %}"
-                onclick="ONDCSignup.open()">{{ button.label }}</button>
-            {% else %}<a
+          {% for button in buttons %}<a
                 class="btn {% if button.style == "solid" %}btn-light{% else %}btn-ghost{% endif %}"
                 href="{{ button.url }}"{% if button.new_tab %} target="_blank" rel="noopener"{% endif %}>{{ button.label }}</a>
-            {% endif %}{% endfor %}
+            {% endfor %}
         </div>
       {% endif %}
     </div>
@@ -35,30 +31,22 @@
       {% if body %}
         <p>{{ body }}</p>
       {% endif %}
-      {% for button in buttons %}{% if button.action == "signup" %}        <button
-            type="button"
-            class="bk-btn {% if button.style == "solid" %}bk-btn-solid{% else %}bk-btn-ghost{% endif %}"
-            onclick="ONDCSignup.open()">{{ button.label }}</button>
-        {% else %}        <a
+      {% for button in buttons %}        <a
             class="bk-btn {% if button.style == "solid" %}bk-btn-solid{% else %}bk-btn-ghost{% endif %}"
             href="{{ button.url }}"{% if button.new_tab %} target="_blank"
             rel="noopener"{% endif %}>{{ button.label }}</a>
-        {% endif %}{% endfor %}
+        {% endfor %}
     </div>
   </section>
 {% else %}<section class="bk-about-close" data-screen-label="{{ screen_label | default: "Closing" }}">
     <h2 class="bk-h2 bk-rv">{{ heading }}{% if heading_accent %} <em>{{ heading_accent }}</em>{% endif %}{{ heading_suffix }}</h2>
     {% if buttons.size > 0 %}
       <div class="bk-hero-actions bk-rv bk-rv-d1">
-        {% for button in buttons %}{% if button.action == "signup" %}        <button
-              type="button"
-              class="bk-btn {% if button.style == "solid" %}bk-btn-solid{% else %}bk-btn-ghost{% endif %}"
-              onclick="ONDCSignup.open()">{{ button.label }}</button>
-          {% else %}        <a
+        {% for button in buttons %}        <a
               class="bk-btn {% if button.style == "solid" %}bk-btn-solid{% else %}bk-btn-ghost{% endif %}"
               href="{{ button.url }}"{% if button.new_tab %} target="_blank"
               rel="noopener"{% endif %}>{{ button.label }}</a>
-          {% endif %}{% endfor %}
+          {% endfor %}
       </div>
     {% endif %}
   </section>

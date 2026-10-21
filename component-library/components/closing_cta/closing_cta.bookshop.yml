@@ -21,7 +21,6 @@ blueprint:
       url: 'https://portal.ondc.org/'
       style: solid
       new_tab: true
-      action: link
 
 _inputs:
   variant:

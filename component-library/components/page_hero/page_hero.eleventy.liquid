@@ -61,15 +61,11 @@
   </div>
   {% if buttons.size > 0 %}
     <div class="bk-hero-actions{% unless intro %} bk-rv bk-rv-d2{% endunless %}"{% if intro %} data-bk-intro{% endif %}>
-      {% for button in buttons %}{% if button.action == "signup" %}        <button
-            type="button"
-            class="bk-btn {% if button.style == "solid" %}bk-btn-solid{% else %}bk-btn-ghost{% endif %}"
-            onclick="ONDCSignup.open()">{{ button.label }}</button>
-        {% else %}        <a
+      {% for button in buttons %}        <a
             class="bk-btn {% if button.style == "solid" %}bk-btn-solid{% else %}bk-btn-ghost{% endif %}"
             href="{{ button.url }}"{% if button.new_tab %} target="_blank"
             rel="noopener"{% endif %}>{{ button.label }}</a>
-        {% endif %}{% endfor %}
+        {% endfor %}
     </div>
   {% endif %}
 </section>
