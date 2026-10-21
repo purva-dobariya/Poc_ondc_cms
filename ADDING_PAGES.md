@@ -1143,33 +1143,37 @@ same 12 everywhere, missing "About ONDC" against the buyer page.
 
 ## The legal documents
 
-`privacy-policy.html` and `cookie-policy.html` are two of the three pages the
-footer has always linked to and none of which existed. **`terms-and-conditions`
-is still 404**, and both of these pages link to it from their own "Read
-alongside" line. It is the same shape and the same component, but it carries
-two things nothing renders yet: a `bk-clause-toc` ledger standing in for the
-side index, and `bk-caps` statutory blocks.
+`privacy-policy.html`, `cookie-policy.html` and `terms-and-conditions.html`
+are **all three** of the legal pages the footer has always linked to and none
+of which existed. One component renders them all.
 
 One component covers both pages because the differences between them are
 fields, not code:
 
-| | privacy | cookie |
-|---|---|---|
-| **Show the index down the left** | on — 12 clauses, sticky rail | off |
-| body | two columns | `bk-legal-body-solo`, centred |
-| **Width of the text column** | — | `.58fr` (upstream's default is `.62fr`) |
-| parts used | text, sub-heading, boxed aside | text, numbered points |
+| | privacy | cookie | terms |
+|---|---|---|---|
+| **Show the index down the left** | on — 12 clauses, sticky rail | off | off |
+| body | two columns | solo | solo |
+| **Width of the text column** | — | `.58fr` | — (`.62fr` default) |
+| parts used | text, sub-heading, boxed aside | text, numbered points | text, statutory blocks, ledger |
+| clause numbers | 01–12 | 01–07 | preamble unnumbered, then 01–11 |
 
 That is the "a variant, not a new component" rule paying off again: the cookie
 policy needed one new part type and one width field, not a second template.
 
 Three decisions worth keeping:
 
-**The clause number is not stored.** It is `forloop.index`, zero-padded. Delete
+**The clause number is not stored.** It is a running count, zero-padded. Delete
 clause 3 and 4..12 renumber themselves — the one thing a hand-numbered legal
-document always gets wrong. The same goes for the index down the side: it is
-generated from the clause list, so a clause cannot exist without a link to it
-and a link cannot point at a clause that has been deleted.
+document always gets wrong. The same goes for the index down the side and for
+the ledger Terms of Use prints inside its own preamble: both are generated from
+the clause list, so a clause cannot exist without a link to it and a link
+cannot point at a clause that has been deleted.
+
+It counts **numbered clauses**, not loop positions. Terms of Use opens with an
+unnumbered preamble and then runs 01–11, so a clause that opts out of a number
+must not consume one either — otherwise its ledger of the other eleven would
+point one clause out of step with their own headings.
 
 **`index_label` is a separate field from the heading**, because the rail is
 narrow and upstream shortens "Collection of Personal Information and its use"
@@ -1189,6 +1193,24 @@ A numbered point's marker is **typed, not counted**: the cookie policy runs
 `01, 02, 03, 04` in one list and `a, b, c, d` in the next. That is the opposite
 of the clause number, which is counted precisely because it must never disagree
 with the position.
+
+Terms of Use adds the statutory blocks — the all-caps disclaimer and indemnity.
+`.bk-caps` has to sit on the `<p>` or the `<ul>` **itself**: `.bk-clause p`
+sets an explicit font-size, so a wrapper would not win by inheritance, and no
+rich-text editor will put a class there. Hence two more part kinds rather than
+a tick-box on Text.
+
+> **A non-greedy `<li>(.*?)</li>` cannot read a nested list.** One statutory
+> point is a sentence, then a sub-list, then a closing sentence. Split that way
+> it stopped at the first `</li>`: the sub-list's opening tag landed inside its
+> parent's text, its items were promoted to siblings, and the closing sentence
+> was dropped. **The rendered page still looked right** — the HTML parser
+> re-nests it — so neither the word count nor the structure diff caught it.
+> Only the stored data was wrong, which is what an editor would have opened.
+> Top-level `<li>`s are found by counting depth now, and each is kept as HTML
+> rather than split into text-plus-children, because no structured shape holds
+> "sentence, list, sentence" in fields an editor could be told the meaning of.
+> The test that catches it counts `:scope > li`, not `li`.
 
 The content was imported once from the page on ondc.org and is CMS copy from
 here on. The rendered text is character-for-character identical to upstream on

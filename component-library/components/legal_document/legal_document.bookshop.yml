@@ -110,6 +110,7 @@ _inputs:
               clause_anchor: ''
               index_label: ''
               clause_title: ''
+              unnumbered: false
               parts: []
             _inputs:
               clause_anchor:
@@ -131,6 +132,14 @@ _inputs:
               clause_title:
                 type: text
                 label: Heading
+              unnumbered:
+                type: checkbox
+                label: No number on this clause
+                comment: >-
+                  Tick on an opening preamble. It also stops the clause taking
+                  a number from the ones after it, so they still run 01, 02,
+                  03 — and the ledger a clause can print of the others agrees
+                  with them.
               parts:
                 type: array
                 label: What the clause says
@@ -217,6 +226,90 @@ _inputs:
                                           removeformat: true
                                           undo: true
                                           redo: true
+                      - label: Statutory paragraph
+                        icon: gavel
+                        preview:
+                          text:
+                            - key: caps_text
+                          icon: gavel
+                        value:
+                          part_kind: caps_p
+                          caps_text: ''
+                        _inputs:
+                          part_kind:
+                            type: hidden
+                          caps_text:
+                            type: textarea
+                            label: The paragraph
+                            comment: >-
+                              Set in the smaller all-capitals style the law
+                              requires for disclaimers. Type it in capitals —
+                              the style does not capitalise it for you.
+                      - label: Statutory list
+                        icon: gavel
+                        preview:
+                          text:
+                            - 'Statutory list'
+                          icon: gavel
+                        value:
+                          part_kind: caps_ul
+                          caps_items: []
+                        _inputs:
+                          part_kind:
+                            type: hidden
+                          caps_items:
+                            type: array
+                            label: The points
+                            comment: >-
+                              One point can itself hold a sub-list and a
+                              closing sentence, which is why each is rich text
+                              rather than a plain line.
+                            options:
+                              structures:
+                                values:
+                                  - label: Point
+                                    icon: gavel
+                                    preview:
+                                      text:
+                                        - key: html
+                                      icon: gavel
+                                    value:
+                                      html: ''
+                                    _inputs:
+                                      html:
+                                        type: html
+                                        label: The point
+                                        comment: >-
+                                          Type it in capitals — the style does
+                                          not capitalise it for you.
+                                        options:
+                                          bold: true
+                                          italic: true
+                                          link: true
+                                          bulletedlist: true
+                                          removeformat: true
+                                          undo: true
+                                          redo: true
+                      - label: Ledger of the other clauses
+                        icon: format_list_numbered
+                        preview:
+                          text:
+                            - 'Ledger of the other clauses'
+                          icon: format_list_numbered
+                        value:
+                          part_kind: clause_index
+                          nav_label: ''
+                        _inputs:
+                          part_kind:
+                            type: hidden
+                          nav_label:
+                            type: text
+                            label: Name of the ledger, for screen readers
+                            comment: >-
+                              A numbered list of every numbered clause in this
+                              document, built from the clauses themselves —
+                              add or delete one and this follows. Used by
+                              Terms of Use in place of a side index.
                       - label: Sub-heading
                         icon: title
                         preview:
