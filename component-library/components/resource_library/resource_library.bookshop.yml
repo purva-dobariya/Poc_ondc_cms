@@ -13,6 +13,7 @@ blueprint:
   category: policies
   hub_url: /resources.html
   intro: ''
+  notice: ''
   show_videos: false
   collapsible: false
   buttons: []
@@ -73,6 +74,20 @@ _inputs:
       link: true
       bulletedlist: true
       numberedlist: true
+      removeformat: true
+      undo: true
+      redo: true
+  notice:
+    type: html
+    label: Notice above the documents
+    comment: >-
+      A boxed caution shown between the intro and the filter — "Use as
+      published" on Marketing, the password warning on Investor Corner. Leave
+      empty for no box.
+    options:
+      bold: true
+      italic: true
+      link: true
       removeformat: true
       undo: true
       redo: true

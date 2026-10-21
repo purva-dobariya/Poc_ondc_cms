@@ -738,6 +738,20 @@ the documents**, with everything else an editor might reword.
 > refresh deletes the patch. Page-specific additions go in a file of our own,
 > the way `resources-search.css` already does.
 
+#### The notice box
+
+Two areas carry a standing caution above the filter, where it is read before
+anything is downloaded: Marketing ("ONDC's communication collaterals and brand
+assets must not be modified") and Investor Corner ("some of these are
+password-protected"). It is the **Notice above the documents** field, empty on
+the other sixteen.
+
+It is rich text, so CloudCannon wraps whatever an editor types in a `<p>`.
+Upstream writes the sentence straight into the div and therefore has no rule
+for a child paragraph — a browser-default `margin: 1em 0` would push the text
+out of the box's own padding. The guard for that is in
+`css/ondc/resources-search.css`, not `resources.css`, for the usual reason.
+
 #### Disclosures folds its groups, and nothing else does
 
 A hundred and two documents under five headings is a page you scroll past, not

@@ -55,3 +55,15 @@
 .res-sec[hidden] {
   display: none !important;
 }
+
+/* The notice box is rich text, so CloudCannon wraps whatever an editor types
+   in a <p>. ondc.org writes the sentence straight into the div and has no
+   rule for a child paragraph, so the browser default of `margin: 1em 0` would
+   push the text out of the box's own padding. */
+.res-note > p {
+  margin: 0;
+}
+
+.res-note > p + p {
+  margin-top: .75em;
+}

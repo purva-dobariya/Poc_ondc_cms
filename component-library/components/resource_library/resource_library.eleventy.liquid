@@ -107,6 +107,16 @@
         {% endif %}
 
         {%- comment -%}
+          A standing caution about the documents themselves, above the filter
+          where it is read before anything is downloaded. Two areas use it:
+          Marketing ("must not be modified") and Investor Corner ("some of
+          these are password-protected"). Empty everywhere else.
+        {%- endcomment -%}
+        {% if notice != blank %}
+          <div class="res-note reveal d1">{{ notice }}</div>
+        {% endif %}
+
+        {%- comment -%}
           Sub-area cards, on the two pages that have sub-areas. Drawn from the
           data, so a new sub-area appears without touching this page.
         {%- endcomment -%}
