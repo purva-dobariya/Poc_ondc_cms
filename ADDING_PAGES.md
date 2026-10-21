@@ -1108,17 +1108,20 @@ marker.
 > draws the line through the three steps. Rename the attribute and the relay
 > goes static with nothing in the console.
 
-**The counter is counted at build time, not fetched.** ondc.org asks the
-registry for it in the browser and ships `—` with a "Loading registry" note —
-which is what both of its pages still show, so the number never arrives. We already
-hold that registry as `src/_data/network_participants.json`, the file the
-directory page lists and an editor edits, so the component counts it instead.
-Delete a participant in the CMS and this figure moves with the directory; there
-is no second place holding a hand-typed total that quietly goes stale.
+**The counter shows no number, and that was a decision, not an oversight.**
+ondc.org asks the registry for it in the browser and ships `—` with a "Loading
+registry" note; the request never completes, so its pages show the dash. This
+build *can* fill it: we already hold that registry as
+`src/_data/network_participants.json`, and "What the number counts" in the CMS
+counts distinct names from it — 213 buyer-side organisations across 345 rows,
+since one organisation can hold several roles and appear in both lists.
 
-It counts **distinct names, not rows**: one organisation can hold several roles
-and can appear in both the key and the integrated list. 213 organisations, 345
-rows. Liquid has no set, hence `push` into an array and `uniq`.
+Both pages shipped that way and were then **turned off, deliberately: the site
+is not to carry figures the original does not.** The field stays, off by
+default, so the choice is a dropdown rather than a code change. The cost of
+leaving it is that the counting branch is no longer exercised by any page, and
+so is no longer covered by a test — read it again before trusting it if it is
+ever wanted back.
 
 One divergence, consistently applied: upstream puts the reveal class on the
 closing section itself on Gateway and TSP (`section.bk-role-close.bk-rv`) but
