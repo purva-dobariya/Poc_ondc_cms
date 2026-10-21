@@ -551,7 +551,7 @@ The same applies to the note in `contact-us.liquid` explaining why `legal.css`
 is in its stylesheet list — expect it to disappear on first save. That reasoning
 is recorded under **Stylesheets** above, which is why it is safe to lose there.
 
-### Eight rules that are not optional
+### Nine rules that are not optional
 
 **1. A component reads the data it needs itself.** It must not receive data
 through a helper or the layout — Bookshop re-renders components in the browser,
@@ -679,6 +679,44 @@ sidebar comment usually promises the opposite ("leave the list empty to drop
 the photo column"). It was found while building Contact and fixed in all seven
 components that had it: `closing_cta`, `contact_form`, `cta_banner`,
 `life_blocks`, `page_hero`, `rich_text` and `role_hero`.
+
+**9. `hidden` loses to any author `display` rule, so guard it.** The `hidden`
+attribute is nothing but a UA-stylesheet `display: none`. An author rule
+setting `display` on the same element outranks it, and the element stays on
+screen with `hidden` set and no visible effect — `el.hidden = true` returns
+`true` when you read it back, and DevTools shows the attribute, so this reads
+as a JavaScript bug for as long as you look at the JavaScript.
+
+It bit the participant directory in three places at once. `.bk-np-chip`,
+`.bk-np-role` and `.bk-np-chk` all carry `display: inline-flex` or `flex`, so
+ticking one role filter revealed **every chip in the taxonomy** and left the
+four zero-count TSP toggles sitting there reading `0`.
+
+`beckn.css` already guards the two elements ondc.org itself hides:
+
+```css
+.bk-np-chips[hidden]    { display: none; }
+.bk-np-cat-kids[hidden] { display: none; }
+```
+
+It has no guard for the singular chip, toggle or checkbox row because the
+original **creates** those with `innerHTML` instead of hiding them — which is
+the one thing this build cannot do (see rule 1 and the no-new-nodes rule).
+Pre-rendering and hiding is the right architecture here; it just moves the
+weight onto `hidden`, so every element a script hides needs checking.
+
+The guards live in `css/ondc/np-directory.css`, **not** in `beckn.css`, and
+that placement is deliberate: `beckn.css` is byte-identical with the copy on
+ondc.org, so refreshing it from upstream would silently delete anything added
+to it and bring the bug back.
+
+Before shipping a section that hides pre-rendered nodes, check every class it
+hides:
+
+```bash
+# does this element carry its own display?
+awk '/^\.bk-np-chip \{/{f=1} f{print; if(/^}/)exit}' css/ondc/beckn.css
+```
 
 **8. Check which property the CSS actually animates before writing the JS.**
 `category-chrome.css` paints the scroll-progress bar as a full-width span held

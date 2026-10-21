@@ -6,6 +6,13 @@ spec:
     role toggles, search, CSV export. The wording and the layout are edited
     here; the participants themselves live in the Network Participants data
     file so one list can be reused on more than one page.
+
+    NEEDS css/ondc/np-directory.css in the page's `override:styles`, after
+    beckn.css. The ledger filters by setting `hidden` on rows, chips and
+    toggles it has already drawn, and three of those classes carry a
+    `display` rule that outranks the browser's `[hidden]` rule — without that
+    sheet, every chip in the taxonomy shows at once. See ADDING_PAGES.md,
+    rule 9.
   icon: table_rows
 
 blueprint:
