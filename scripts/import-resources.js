@@ -120,6 +120,10 @@ categories.forEach((cat) => {
  *                               "note" is labelled "Note for editors, never
  *                               shown on the live site" — the opposite of what
  *                               these two do
+ *   ref        -> doc_ref       the notification number. "ref" is far too
+ *                               generic a key to own globally
+ *   hideTypeChip -> hide_type_chip
+ *   labelChips   -> label_chips  camelCase everywhere else here is snake_case
  *
  * Renaming here rather than scoping the inputs keeps it working whether or not
  * CloudCannon honours `_inputs` nested inside a `_structures` value, which is
@@ -135,6 +139,13 @@ const areas = categories.map((cat) => {
     parent_area: cat.parent || '',
     hub: !!cat.hub,
     external: !!cat.external,
+    /* Two display switches upstream sets per area. An area whose documents are
+       all the same file type hides the type chip — a "PDF" badge on every row
+       of the page says nothing, and the room is better spent on the date. An
+       area whose rows carry two dates (issued on, numbered as) labels its chips,
+       because two bare dates side by side read as a puzzle. */
+    hide_type_chip: !!cat.hideTypeChip,
+    label_chips: !!cat.labelChips,
     doc_groups: (cat.sections || []).map((sec) => ({
       title: sec.title,
       group_note: sec.note || '',
@@ -146,6 +157,7 @@ const areas = categories.map((cat) => {
         lang: item.lang || '',
         doc_note: item.note || '',
         updated: item.updated || '',
+        doc_ref: item.ref || '',
       })),
     })),
   };

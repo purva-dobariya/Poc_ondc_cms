@@ -194,7 +194,20 @@
                       {%- when "page" -%}{%- assign chip = "" -%}{%- assign ico = "book-open" -%}{%- assign go = "arrow" -%}
                       {%- else -%}{%- assign chip = "Link" -%}{%- assign ico = "external" -%}{%- assign go = "external" -%}
                     {%- endcase -%}
-                    {%- capture meta -%}{% if item.lang %}<span class="res-chip is-lang">{{ item.lang }}</span>{% endif %}{% if chip != "" and internal == false %}<span class="res-chip">{{ chip }}</span>{% endif %}{% if item.updated %}<span class="res-chip">{{ item.updated }}</span>{% endif %}{% if item.doc_note %}<span class="res-row-note">{{ item.doc_note }}</span>{% endif %}{%- endcapture -%}
+                    {%- comment -%}
+                      Two switches the area carries in the data file:
+
+                      `hide_type_chip` — an area whose documents are all the
+                      same file type drops the type chip, because a "PDF" badge
+                      on every row of the page says nothing and the room is
+                      better spent on the date.
+
+                      `label_chips` — an area whose rows carry both an issue
+                      date and a notification number names each chip, because
+                      two bare dates side by side read as a puzzle. The words
+                      themselves are in "Wording around the documents".
+                    {%- endcomment -%}
+                    {%- capture meta -%}{% if item.lang %}<span class="res-chip is-lang">{{ item.lang }}</span>{% endif %}{% if chip != "" and internal == false %}{% unless cat.hide_type_chip %}<span class="res-chip">{{ chip }}</span>{% endunless %}{% endif %}{% if item.updated %}{% if cat.label_chips %}<span class="res-chip is-meta"><span class="res-chip-k">{{ labels.date_chip }}</span><b>{{ item.updated }}</b></span>{% else %}<span class="res-chip">{{ item.updated }}</span>{% endif %}{% endif %}{% if item.doc_ref %}<span class="res-chip is-meta"><span class="res-chip-k">{{ labels.ref_chip }}</span><b>{{ item.doc_ref }}</b></span>{% endif %}{% if item.doc_note %}<span class="res-row-note">{{ item.doc_note }}</span>{% endif %}{%- endcapture -%}
                     {%- capture body -%}<span class="res-row-ico">{%- case ico -%}
                         {%- when "file-text" -%}{%- assign d = '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/>' -%}
                         {%- when "archive" -%}{%- assign d = '<path d="M21 8v13H3V8"/><path d="M1 3h22v5H1z"/><path d="M10 12h4"/>' -%}

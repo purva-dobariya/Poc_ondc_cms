@@ -41,7 +41,7 @@
   {% for cat in resources.areas %}
     {% for sec in cat.doc_groups %}
       {% for item in sec.documents %}
-        {%- capture hay -%}{{ item.title }} {{ item.lang }} {{ item.doc_note }} {{ sec.title }} {{ cat.title }}{%- endcapture -%}
+        {%- capture hay -%}{{ item.title }} {{ item.lang }} {{ item.doc_note }} {{ item.doc_ref }} {{ sec.title }} {{ cat.title }}{%- endcapture -%}
         {%- assign internal = false -%}{%- if item.doc_type == "page" -%}{%- assign internal = true -%}{%- endif -%}
         {%- case item.doc_type -%}
           {%- when "pdf" -%}{%- assign chip = "PDF" -%}

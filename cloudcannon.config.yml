@@ -264,6 +264,7 @@ _structures:
           lang: ''
           doc_note: ''
           updated: ''
+          doc_ref: ''
   resource_groups:
     style: select
     values:
@@ -298,6 +299,8 @@ _structures:
           parent_area: ''
           hub: false
           external: false
+          hide_type_chip: false
+          label_chips: false
           doc_groups: []
 
   # One entry in the Network Participant directory. Its per-field labels come
@@ -1042,6 +1045,27 @@ _inputs:
     type: text
     label: Date tag
     comment: Shown as a tag on the row, for example "Jan 2026". Free text.
+  doc_ref:
+    type: text
+    label: Reference number
+    comment: >-
+      The notification number, shown as a second tag beside the date — for
+      example 2026/07/14/01. Leave empty on a document that has none.
+  hide_type_chip:
+    type: checkbox
+    label: Hide the file-type tag on every row
+    comment: >-
+      Tick on an area whose documents are all the same kind of file. A "PDF"
+      tag on every row of the page says nothing, and the room is better spent
+      on the date.
+  label_chips:
+    type: checkbox
+    label: Name each tag on a row
+    comment: >-
+      Tick on an area whose rows carry both a date and a reference number — the
+      tags then read "Date 14/07/2026" and "Notification No. 2026/07/14/01",
+      because two bare numbers side by side read as a puzzle. The words come
+      from the page's own "Wording around the documents".
   icon:
     type: select
     label: Icon

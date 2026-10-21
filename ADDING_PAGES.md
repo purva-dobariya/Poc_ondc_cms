@@ -583,7 +583,7 @@ hub cards, the global search — is built in the browser from
 `public/data/resources.json`.
 
 That shape ports almost unchanged. `src/_data/resources.json` carries 20 areas,
-105 groups and 485 documents, and **one file drives all nineteen pages**: the
+105 groups and 482 documents, and **one file drives all nineteen pages**: the
 hub cards and their counts, the search index, every sidebar, every breadcrumb
 trail and every document list. Delete a document in the CMS and it leaves all
 of them on the next publish.
@@ -593,7 +593,7 @@ Four new components, three new variants, no new page archetype:
 | | |
 | --- | --- |
 | `resource_index` | the hub's card grid, from the areas marked "Show on the hub" |
-| `resource_search` | the hub's search, with all 503 result rows pre-rendered |
+| `resource_search` | the hub's search, with all 500 result rows pre-rendered |
 | `resource_library` | a sub-page's whole body — breadcrumbs, sidebar, documents, sub-area cards, video grid |
 | `newsletter_rows` | the two download rows at the foot of the hub |
 | `page_hero` → **Compact** | the short banner each sub-page opens with |
@@ -698,7 +698,7 @@ translucent outline built for dark surfaces — so on a dark band the editor's
 
 #### What pre-rendering costs here
 
-The hub carries all 503 search rows — 485 documents plus one per area — at
+The hub carries all 500 search rows — 482 documents plus one per area — at
 358 KB. That is not a saving forgone: the index has to be in the page either
 way, and as HTML it is barely larger than the JSON blob the create-on-the-fly
 alternative would need, while keeping the no-new-nodes rule intact.
@@ -710,6 +710,33 @@ guard for that, and the `[hidden]` guard rule 9 demands for `.res-row`
 (`display: flex`, so `hidden` alone does nothing), live in
 `css/ondc/resources-search.css` rather than `resources.css`, because that file
 is a byte-copy of upstream's and a refresh would silently delete them.
+
+#### Two display switches the data file carries
+
+Most of what a row shows is the same on all nineteen pages. Two things are not,
+and ondc.org handles both with a flag on the area rather than a special case in
+the template:
+
+- **`hide_type_chip`** — an area whose documents are all PDFs drops the type
+  chip. A "PDF" badge on every row of the page says nothing, and the room is
+  better spent on the date.
+- **`label_chips`** — an area whose rows carry *two* numbers names each one, so
+  the row reads `Date 14/07/2026` · `Notification No. 2026/07/14/01` rather
+  than two bare dates side by side, which read as a puzzle.
+
+Only Notifications sets either, and that is the point: they are area data, not
+page markup, so turning them on for the next area is a checkbox in the CMS. The
+words themselves ("Date", "Notification No.") are in the page's **Wording around
+the documents**, with everything else an editor might reword.
+
+> **Our copy of an upstream stylesheet drifts, and the drift is invisible.**
+> `css/ondc/resources.css` is a byte-copy of ondc.org's. Between the import and
+> this change, upstream added `.res-chip.is-meta` — the style these labelled
+> chips need — and a collapsible-sections feature. Nothing warned us; the
+> markup simply had no rule to match. Refresh the file wholesale from upstream
+> before concluding a style is missing, and never patch it in place: the next
+> refresh deletes the patch. Page-specific additions go in a file of our own,
+> the way `resources-search.css` already does.
 
 #### nav_active
 

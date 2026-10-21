@@ -26,6 +26,8 @@ blueprint:
     videos: Videos
     filter_placeholder: Filter documents on this page
     empty: No matching documents on this page.
+    date_chip: Date
+    ref_chip: Notification No.
 
 # WHERE THE DOCUMENTS COME FROM
 # src/_data/resources.json, edited in the CMS under "Resources library". It is
@@ -153,3 +155,12 @@ _inputs:
   empty:
     type: text
     label: Message when the filter finds nothing
+  date_chip:
+    type: text
+    label: Word before the date on a row
+    comment: >-
+      Shown only on areas whose documents carry a reference number as well as a
+      date — Notifications. Elsewhere the date stands on its own.
+  ref_chip:
+    type: text
+    label: Word before the reference number on a row
