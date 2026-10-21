@@ -1012,18 +1012,33 @@ mechanism without touching the selector you were looking at.
 
 ### The role pages, and a counter that cannot go stale
 
-`buyer-network-participants.html` is the first of four role pages the footer
-links to (**seller, gateway and technology-service-provider are still 404**).
-It needed **no new component**: `role_hero` and `closing_cta`'s "role" variant
-were already built for it, and the only missing piece — the requirements grid —
-is a third layout on `numbered_lists` rather than a 36th component, because it
-is the same content model the other two use (a lead beside automatically
-numbered points) with one extra field per point: its own heading. The other two
-layouts ignore that field.
+`buyer-network-participants.html` and `seller-network-participants.html` are
+two of the four role pages the footer links to (**gateway and
+technology-service-provider are still 404**). Neither needed a new component:
+`role_hero` and `closing_cta`'s "role" variant were already built for them, and
+the only missing piece — the list in the middle — is a third layout on
+`numbered_lists` rather than a 36th component, because it is the same content
+model the other two use (a lead beside a list of points) with two optional
+fields per point: a heading, and a code. The other layouts ignore both.
+
+The two pages differ only in how that list is drawn, which is a field:
+
+| | buyer | seller |
+|---|---|---|
+| **How the points are shown** | numbered cards | node types |
+| markup | `.bk-requirements` / `.bk-requirement` | `.bk-node-ledger` / `.bk-node` |
+| the marker | `01`…`07`, counted | `MSN`, `ISN`, typed |
+| link under the intro | yes | none |
+| counter | `Buyer NP` → 213 | `Seller NP` → 173 |
+
+The marker is the tell. A requirement's number is its *position*, so it is
+counted and renumbers itself; a node's code is its *name*, so it is typed on
+the point. The legal pages make the same distinction between a clause number
+and a numbered point's marker, and for the same reason.
 
 **The counter is counted at build time, not fetched.** ondc.org asks the
 registry for it in the browser and ships `—` with a "Loading registry" note —
-which is what its page still shows, so the number never arrives. We already
+which is what both of its pages still show, so the number never arrives. We already
 hold that registry as `src/_data/network_participants.json`, the file the
 directory page lists and an editor edits, so the component counts it instead.
 Delete a participant in the CMS and this figure moves with the directory; there

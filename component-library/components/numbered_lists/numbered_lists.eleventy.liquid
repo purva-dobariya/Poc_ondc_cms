@@ -12,7 +12,20 @@
         {% endif %}
       </div>
     </div>
-    <div class="bk-requirements"{% if aria_label %} aria-label="{{ aria_label }}"{% endif %}>
+    {%- comment -%}
+      Two ways the same points are shown. "Requirements" counts them and gives
+      each a card in a flowing grid; "node types" is a two-up ledger where the
+      marker is the node's CODE — MSN, ISN — typed on the point rather than
+      counted, because it names the thing and is not a position.
+    {%- endcomment -%}
+    {% if list_style == "nodes" %}<div class="bk-node-ledger bk-rv"{% if aria_label %} aria-label="{{ aria_label }}"{% endif %}>
+      {% for group in groups %}{% for item in group.items %}        <article class="bk-node">
+          {% if item.code != blank %}<div class="bk-node-code" aria-hidden="true">{{ item.code }}</div>
+          {% endif %}{% if item.point_title != blank %}<h3>{{ item.point_title }}</h3>
+          {% endif %}<p>{{ item.text }}</p>
+        </article>
+      {% endfor %}{% endfor %}    </div>
+    {% else %}<div class="bk-requirements"{% if aria_label %} aria-label="{{ aria_label }}"{% endif %}>
       {% assign n = 0 %}
       {% for group in groups %}{% for item in group.items %}{% assign n = n | plus: 1 %}        <article class="bk-requirement bk-rv">
           <span class="bk-requirement-number">{% if n < 10 %}0{% endif %}{{ n }}</span>
@@ -20,6 +33,7 @@
           {% endif %}<p>{{ item.text }}</p>
         </article>
       {% endfor %}{% endfor %}    </div>
+    {% endif %}
   </section>
 {% elsif variant == "culture" %}<section class="bk-culture"{% if anchor_id %} id="{{ anchor_id }}"{% endif %} data-screen-label="{{ screen_label | default: "Our people" }}">
     <div class="bk-culture-lead">

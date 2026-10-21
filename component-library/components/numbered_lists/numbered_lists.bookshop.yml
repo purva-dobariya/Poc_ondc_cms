@@ -15,6 +15,7 @@ blueprint:
   heading: A heading for this section
   heading_accent: ''
   heading_id: ''
+  list_style: ''
   lead: ''
   aria_label: ''
   paragraphs: []
@@ -74,6 +75,20 @@ _inputs:
   heading_id:
     type: text
     hidden: true
+  list_style:
+    type: select
+    label: How the points are shown
+    comment: >-
+      Only used by the "Requirements" layout. "Numbered cards" counts the
+      points and flows them in a grid — the Buyer page. "Node types" is a
+      two-up ledger where each point shows its own code instead of a number —
+      the Seller page's MSN and ISN.
+    options:
+      values:
+        - value: ''
+          label: Numbered cards
+        - value: nodes
+          label: Node types
   lead:
     type: textarea
     label: Lead paragraph
@@ -171,8 +186,15 @@ _inputs:
                             - looks_one
                         value:
                           point_title: ''
+                          code: ''
                           text: ''
                         _inputs:
+                          code:
+                            type: text
+                            label: Code
+                            comment: >-
+                              Only shown by the "Node types" style — a short
+                              code such as MSN, standing where the number goes.
                           point_title:
                             type: text
                             label: Point heading
