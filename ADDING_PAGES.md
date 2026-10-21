@@ -1012,15 +1012,25 @@ mechanism without touching the selector you were looking at.
 
 ## The legal documents
 
-`privacy-policy.html` is the first of three pages the footer has always linked
-to and none of which existed: the cookie policy and the terms of use are still
-404, and **the privacy page's own "Read alongside" line points at both of
-them**. They are the same shape — `.bk-legal-head` over `.bk-legal-body` — and
-the `legal_document` component already has the switch for the one difference:
-untick **Show the index down the left** and the body becomes the narrower
-single-column `bk-legal-body-solo` that the cookie policy uses. Terms also
-carries a `bk-clause-toc` ledger and `bk-caps` statutory blocks, which that
-component does not render yet.
+`privacy-policy.html` and `cookie-policy.html` are two of the three pages the
+footer has always linked to and none of which existed. **`terms-and-conditions`
+is still 404**, and both of these pages link to it from their own "Read
+alongside" line. It is the same shape and the same component, but it carries
+two things nothing renders yet: a `bk-clause-toc` ledger standing in for the
+side index, and `bk-caps` statutory blocks.
+
+One component covers both pages because the differences between them are
+fields, not code:
+
+| | privacy | cookie |
+|---|---|---|
+| **Show the index down the left** | on — 12 clauses, sticky rail | off |
+| body | two columns | `bk-legal-body-solo`, centred |
+| **Width of the text column** | — | `.58fr` (upstream's default is `.62fr`) |
+| parts used | text, sub-heading, boxed aside | text, numbered points |
+
+That is the "a variant, not a new component" rule paying off again: the cookie
+policy needed one new part type and one width field, not a second template.
 
 Three decisions worth keeping:
 
@@ -1035,21 +1045,36 @@ narrow and upstream shortens "Collection of Personal Information and its use"
 to "Collection & Use of PII" in it. Left empty it falls back to the heading.
 
 **A clause body is a list of parts, not one rich-text field.** Upstream's
-sub-headings carry `class="bk-clause-sub"` and its asides are a
-`div.bk-clause-note`, and no rich-text editor will produce either — it would
-emit a bare `<h3>`, and the class would have to be faked with a duplicate CSS
-rule that drifts from `beckn.css`. So a part is Text (rich text: paragraphs and
-lists), Sub-heading, or Boxed aside, and the component writes the classes. The
-common case — a clause that is only paragraphs — is still a single Text part.
+sub-headings carry `class="bk-clause-sub"`, its asides are a
+`div.bk-clause-note` and its numbered points a `div.bk-barriers`, and no
+rich-text editor will produce any of them — it would emit a bare `<h3>` or
+`<ol>`, and the classes would have to be faked with duplicate CSS rules that
+drift from `beckn.css`. So a part is Text (rich text: paragraphs and lists),
+Sub-heading, Boxed aside or Numbered points, and the component writes the
+classes. The common case — a clause that is only paragraphs — is still a single
+Text part.
+
+A numbered point's marker is **typed, not counted**: the cookie policy runs
+`01, 02, 03, 04` in one list and `a, b, c, d` in the next. That is the opposite
+of the clause number, which is counted precisely because it must never disagree
+with the position.
 
 The content was imported once from the page on ondc.org and is CMS copy from
-here on. The rendered text is character-for-character identical to upstream; the
-only structural difference is deliberate, and it is this: the related-documents
-line is a `<div class="bk-note">` where upstream writes a `<p>`, because the
-field is rich text and a `<p>` inside a `<p>` is closed by the parser before
-the links are reached. `.bk-note` has no rule that depends on the tag; the
-margin guard is in `css/ondc/legal-doc.css`, not `beckn.css`, for the usual
-reason.
+here on. The rendered text is character-for-character identical to upstream on
+both pages; the only structural differences are deliberate, and they are the
+same one twice. The related-documents line is a `<div class="bk-note">` where
+upstream writes a `<p>`, and a numbered point's text is a
+`<div class="bk-barrier-t">` where upstream writes a `<span>`: both hold rich
+text, and an editor's `<p>` does not belong inside either tag. Neither class
+has a rule that depends on its tag, and `.bk-barrier` is a flex row where a
+div and a span are the same flex item. The margin guards are in
+`css/ondc/legal-doc.css`, not `beckn.css`, for the usual reason.
+
+> **A non-greedy `.*?</div>` cannot read a nested block.** The importer first
+> matched `<div class="bk-barriers">(.*?)</div>`, which stops at the tag
+> closing the FIRST row — four points silently became one, and the rest of the
+> clause was swallowed as stray text. Nothing errored. Blocks that nest are
+> lifted out by counting `<div>` depth before the rest is tokenised.
 
 The scroll spy that lights the clause you are reading is `js/ondc/doc-index.js`
 — a file rather than ondc.org's inline script, because **CloudCannon deletes an

@@ -32,7 +32,13 @@
   {% if read_alongside != blank %}<div class="bk-note">{{ read_alongside }}</div>{% endif %}
 </section>
 
-<section class="bk-legal-body{% unless show_index %} bk-legal-body-solo{% endunless %}" aria-label="{{ body_label }}">
+{%- comment -%}
+    Without the index the body is one centred column, and how wide that
+    column is depends on the document: `--bk-legal-measure` is a custom
+    property beckn.css already defaults to .62fr, so an empty field is
+    upstream's default and the cookie policy's .58fr is its own choice.
+  {%- endcomment -%}
+  <section class="bk-legal-body{% unless show_index %} bk-legal-body-solo{% endunless %}"{% if measure != blank %} style="--bk-legal-measure: {{ measure }}"{% endif %} aria-label="{{ body_label }}">
 
   {% if show_index %}
     <aside class="bk-doc-index" aria-label="{{ index_aria | default: "On this page" }}">
@@ -49,6 +55,14 @@
           {%- case part.part_kind -%}
             {%- when "subheading" -%}
               <h3 class="bk-clause-sub">{{ part.subheading }}</h3>
+            {%- when "barriers" -%}
+              {%- comment -%}
+                A <div> where upstream writes a <span>, for the same reason the
+                related-documents line is one: the row's text is rich text, and
+                an editor's <p> does not belong inside a <span>. `.bk-barrier`
+                is a flex row, so a div and a span are the same flex item.
+              {%- endcomment -%}
+              <div class="bk-barriers">{% for row in part.barriers %}<div class="bk-barrier"><span class="bk-barrier-n">{{ row.marker }}</span><div class="bk-barrier-t">{{ row.text_html }}</div></div>{% endfor %}</div>
             {%- when "note" -%}
               <div class="bk-clause-note">{% if part.note_title != blank %}<h3 class="bk-clause-sub">{{ part.note_title }}</h3>{% endif %}{{ part.note_html }}</div>
             {%- else -%}

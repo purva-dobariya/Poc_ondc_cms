@@ -17,6 +17,7 @@ blueprint:
   body_label: Policy document
   show_index: true
   index_aria: On this page
+  measure: ''
   clauses:
     - clause_anchor: section-one
       index_label: First clause
@@ -77,6 +78,15 @@ _inputs:
   index_aria:
     type: text
     label: Name of the index, for screen readers
+  measure:
+    type: text
+    label: Width of the text column
+    comment: >-
+      Only used when the index is off. A CSS grid width such as ".58fr" —
+      smaller is narrower. Leave empty for the standard width.
+    options:
+      pattern: '^(|[0-9.]+(fr|px|rem|ch)|minmax\(.+\))$'
+      pattern_message: A width such as .58fr, or empty for the standard one.
   clauses:
     type: array
     label: Clauses
@@ -155,6 +165,58 @@ _inputs:
                               removeformat: true
                               undo: true
                               redo: true
+                      - label: Numbered points
+                        icon: format_list_numbered
+                        preview:
+                          text:
+                            - 'Numbered points'
+                          icon: format_list_numbered
+                        value:
+                          part_kind: barriers
+                          barriers: []
+                        _inputs:
+                          part_kind:
+                            type: hidden
+                          barriers:
+                            type: array
+                            label: The points
+                            comment: >-
+                              A ruled list where each point carries its own
+                              marker — "01", "02" or "a", "b" — and a sentence
+                              that usually opens with the term in bold.
+                            options:
+                              structures:
+                                values:
+                                  - label: Point
+                                    icon: label
+                                    preview:
+                                      text:
+                                        - key: marker
+                                      subtext:
+                                        - key: text_html
+                                      icon: label
+                                    value:
+                                      marker: ''
+                                      text_html: ''
+                                    _inputs:
+                                      marker:
+                                        type: text
+                                        label: Marker
+                                        comment: >-
+                                          Shown in blue at the left — typed out
+                                          rather than counted, because some of
+                                          these lists run 01, 02 and others a,
+                                          b.
+                                      text_html:
+                                        type: html
+                                        label: The point
+                                        options:
+                                          bold: true
+                                          italic: true
+                                          link: true
+                                          removeformat: true
+                                          undo: true
+                                          redo: true
                       - label: Sub-heading
                         icon: title
                         preview:
