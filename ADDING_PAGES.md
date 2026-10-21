@@ -1012,9 +1012,9 @@ mechanism without touching the selector you were looking at.
 
 ### The role pages, and a counter that cannot go stale
 
-`buyer-network-participants.html` and `seller-network-participants.html` are
-two of the four role pages the footer links to (**gateway and
-technology-service-provider are still 404**). Neither needed a new component:
+`buyer-network-participants.html`, `seller-network-participants.html` and
+`gateway.html` are three of the four role pages the footer links to
+(**technology-service-provider is still 404**). None needed a new component:
 `role_hero` and `closing_cta`'s "role" variant were already built for them, and
 the only missing piece — the list in the middle — is a third layout on
 `numbered_lists` rather than a 36th component, because it is the same content
@@ -1036,6 +1036,26 @@ counted and renumbers itself; a node's code is its *name*, so it is typed on
 the point. The legal pages make the same distinction between a clause number
 and a numbered point's marker, and for the same reason.
 
+Gateway is the page that shows how far that one model stretches. It has no
+number to count, three more section shapes, and it still needed nothing new:
+
+| what it shows | where it lives |
+|---|---|
+| `DISCOVER` beside the heading | `role_hero`, a **wordmark** instead of the counter |
+| the mid-page context band | `tagline_strip`, "Network page" layout |
+| SEARCH → MULTICAST → DISCOVER | `numbered_lists`, **Relay** layout |
+| the three outcome rows | `numbered_lists`, **Outcome rows** layout |
+
+`numbered_lists` now carries five layouts, and that is the point rather than a
+smell: every one of them is a heading and an intro above a list of points, and
+what changes is the wrapper and whether a point draws a counted number, a typed
+code, or neither. A field a layout ignores is normal here.
+
+> **`data-bk-relay` is not decoration.** beckn.js writes
+> `--bk-relay-progress` onto that element as the page scrolls, which is what
+> draws the line through the three steps. Rename the attribute and the relay
+> goes static with nothing in the console.
+
 **The counter is counted at build time, not fetched.** ondc.org asks the
 registry for it in the browser and ships `—` with a "Loading registry" note —
 which is what both of its pages still show, so the number never arrives. We already
@@ -1047,6 +1067,12 @@ is no second place holding a hand-typed total that quietly goes stale.
 It counts **distinct names, not rows**: one organisation can hold several roles
 and can appear in both the key and the integrated list. 213 organisations, 345
 rows. Liquid has no set, hence `push` into an array and `uniq`.
+
+One divergence, consistently applied: upstream puts the reveal class on the
+closing section itself on Gateway (`section.bk-role-close.bk-rv`) but on an
+inner `<div>` on Buyer and Seller. `closing_cta` uses the inner div on all
+three — its own pages disagree, the two render the same, and one shape across
+our three role pages is worth more than matching a one-off.
 
 > **A shared component is a shared blast radius.** Adding `data-bk-intro` to
 > the tally — which the buyer page has — silently changed the RFPs/RFQs page,

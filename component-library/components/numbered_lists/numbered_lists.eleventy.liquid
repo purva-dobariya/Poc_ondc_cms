@@ -1,9 +1,38 @@
 {%- comment -%}
-  Three layouts over one content model: a lead beside automatically numbered
-  points. "Role" is the one on the Buyer/Seller/TSP pages, where each point is
-  a requirement with its own heading — the only field the other two ignore.
+  Five layouts over one content model: a heading and an intro, then a list of
+  points. What changes between them is the wrapper and how a point is drawn —
+  whether it carries a counted number, a typed code, or neither.
+
+    Panel / Our people  the original two, points are plain text
+    Requirements        role pages, each point is a card with its own heading
+    Relay               the Gateway's scroll-driven SEARCH / MULTICAST / DISCOVER
+    Outcomes            a plain stack of headed rows
+
+  A field one layout ignores is normal here and not a sign of the wrong
+  component: `code` is only drawn by Relay and by Requirements' node style.
 {%- endcomment -%}
-{% if variant == "role" %}<section class="bk-role-story"{% if anchor_id %} id="{{ anchor_id }}"{% endif %} data-screen-label="{{ screen_label | default: "What this role must do" }}"{% if heading_id %} aria-labelledby="{{ heading_id }}"{% endif %}>
+{% if variant == "relay" %}<section class="bk-relay"{% if anchor_id %} id="{{ anchor_id }}"{% endif %} data-bk-relay data-screen-label="{{ screen_label | default: "How it works" }}"{% if heading_id %} aria-labelledby="{{ heading_id }}"{% endif %}>
+    {%- comment -%}
+      `data-bk-relay` is not decoration: beckn.js writes --bk-relay-progress on
+      this element as it scrolls, which is what draws the line through the
+      steps. Rename it and the relay goes static.
+    {%- endcomment -%}
+    <div class="bk-relay-head bk-rv">
+      <h2{% if heading_id %} id="{{ heading_id }}"{% endif %} class="bk-h2">{{ heading }}{% if heading_accent %} <em>{{ heading_accent }}</em>{% endif %}{{ heading_suffix }}</h2>
+      {% for paragraph in paragraphs %}<p>{{ paragraph.text }}</p>
+      {% endfor %}
+    </div>
+    <div class="bk-relay-steps">
+      {% for group in groups %}{% for item in group.items %}        <article class="bk-relay-step bk-rv">{% if item.code != blank %}<strong>{{ item.code }}</strong>{% endif %}{% if item.point_title != blank %}<h3>{{ item.point_title }}</h3>{% endif %}<p>{{ item.text }}</p></article>
+      {% endfor %}{% endfor %}    </div>
+  </section>
+{% elsif variant == "outcomes" %}<section class="bk-role-outcomes"{% if anchor_id %} id="{{ anchor_id }}"{% endif %} data-screen-label="{{ screen_label | default: "What it gives you" }}"{% if heading_id %} aria-labelledby="{{ heading_id }}"{% endif %}>
+    <h2{% if heading_id %} id="{{ heading_id }}"{% endif %} class="bk-rv">{{ heading }}{% if heading_accent %} <em>{{ heading_accent }}</em>{% endif %}{{ heading_suffix }}</h2>
+    <div class="bk-outcome-rows">
+      {% for group in groups %}{% for item in group.items %}        <article class="bk-outcome-row bk-rv">{% if item.point_title != blank %}<h3>{{ item.point_title }}</h3>{% endif %}<p>{{ item.text }}</p></article>
+      {% endfor %}{% endfor %}    </div>
+  </section>
+{% elsif variant == "role" %}<section class="bk-role-story"{% if anchor_id %} id="{{ anchor_id }}"{% endif %} data-screen-label="{{ screen_label | default: "What this role must do" }}"{% if heading_id %} aria-labelledby="{{ heading_id }}"{% endif %}>
     <div class="bk-role-story-intro">
       <h2 class="bk-h2 bk-rv"{% if heading_id %} id="{{ heading_id }}"{% endif %}>{{ heading }}{% if heading_accent %} <em>{{ heading_accent }}</em>{% endif %}</h2>
       <div class="bk-role-story-copy bk-rv bk-rv-d1">

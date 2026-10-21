@@ -2,9 +2,10 @@ spec:
   structures: [sections]
   label: Numbered lists
   description: >-
-    A lead paragraph beside automatically numbered points. Three layouts: the
-    panel used on sector pages, the plainer "Our people" band used on Careers,
-    and the requirements list on the Buyer/Seller/TSP role pages.
+    A heading and an intro above a list of points. Five layouts: the panel
+    used on sector pages, the plainer "Our people" band on Careers, the
+    requirements list on the role pages, and the Gateway's relay and outcome
+    rows.
   icon: format_list_numbered
 
 blueprint:
@@ -14,6 +15,7 @@ blueprint:
   eyebrow: ''
   heading: A heading for this section
   heading_accent: ''
+  heading_suffix: ''
   heading_id: ''
   list_style: ''
   lead: ''
@@ -51,6 +53,10 @@ _inputs:
           label: Our people
         - value: role
           label: Requirements
+        - value: relay
+          label: Relay
+        - value: outcomes
+          label: Outcome rows
   screen_label:
     type: text
     label: Section name for screen readers
@@ -97,12 +103,18 @@ _inputs:
     type: text
     label: Name of the list, for screen readers
     comment: Only used by the "Requirements" layout.
+  heading_suffix:
+    type: text
+    label: Plain tail of the heading
+    comment: >-
+      Comes after the highlighted part — the full stop in "The discovery
+      *relay*." Include the leading space if one is needed.
   paragraphs:
     type: array
     label: Intro paragraphs
     comment: >-
-      Only used by the "Requirements" layout, which needs more than the one
-      lead paragraph the others take.
+      Used by the "Requirements" and "Relay" layouts, which need more than the
+      one lead paragraph the others take.
     options:
       structures:
         values:

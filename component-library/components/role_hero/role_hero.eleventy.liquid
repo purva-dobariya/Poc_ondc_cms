@@ -43,6 +43,15 @@
   {%- endfor -%}
   {%- assign tally_text = counted | uniq | size -%}
 {%- endif %}
+  {%- comment -%}
+    Two things can sit beside the heading, and a page has one or the other: a
+    counter, or a wordmark. The Gateway page has no number to show — what it
+    has is a word for what the role does, which is why `.bk-role-mark` is
+    aria-hidden: the sentence beside it already says the same thing.
+  {%- endcomment -%}
+  {% if mark.show %}
+    <div class="bk-role-mark" aria-hidden="true">{{ mark.word }}{% if mark.caption != blank %}<span>{{ mark.caption }}</span>{% endif %}</div>
+  {% endif %}
   {% if tally.show %}
     <div class="bk-role-tally"{% if tally.animate %} data-bk-intro{% endif %}{% if tally.aria_label %} aria-label="{{ tally.aria_label }}"{% endif %}>
       <strong class="bk-role-tally-value"{% if tally.value_id %} id="{{ tally.value_id }}"{% endif %}>{{ tally_text }}</strong>

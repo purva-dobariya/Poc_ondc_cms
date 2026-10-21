@@ -21,6 +21,10 @@ blueprint:
       style: ghost
       new_tab: false
       action: signup
+  mark:
+    show: false
+    word: ''
+    caption: ''
   tally:
     show: false
     value_id: ''
@@ -38,6 +42,24 @@ _inputs:
   heading_id:
     type: text
     hidden: true
+  mark:
+    type: object
+    label: Wordmark on the right
+    comment: >-
+      One word in blue beside the heading, with a short line next to it — the
+      Gateway page's "DISCOVER". A page shows this or the counter, not both.
+      It is hidden from screen readers, because the sentence beside it says
+      the same thing in words.
+    options:
+      preview:
+        text:
+          - key: word
+  word:
+    type: text
+    label: The word
+  caption:
+    type: text
+    label: Line beside the word
   tally:
     type: object
     label: Counter on the right
@@ -51,7 +73,7 @@ _inputs:
           - key: label
   show:
     type: checkbox
-    label: Show the counter
+    label: Show it
   animate:
     type: checkbox
     label: Fade the counter in with the heading
