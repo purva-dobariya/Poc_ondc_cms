@@ -1,0 +1,23 @@
+/* =====================================================================
+   Legal documents — the one rule beckn.css cannot carry.
+   =====================================================================
+   WHY THIS FILE EXISTS (the same reason as css/ondc/resources-search.css)
+
+   The related-documents line is rich text here, so whatever an editor
+   types arrives wrapped in its own <p>. ondc.org writes the sentence
+   straight into a <p class="bk-note"> and therefore has no rule for a
+   child paragraph — a browser-default `margin: 1em 0` would push the line
+   away from the title it belongs under. (`.bk-clause-note` needs nothing:
+   beckn.css already spaces the paragraphs inside it.)
+
+   This rule is NOT in beckn.css because that file is a byte-copy of the
+   one on ondc.org: refresh it from upstream and anything added to it is
+   silently lost, taking the fix with it.
+
+   Load AFTER beckn.css.
+   ===================================================================== */
+
+/* One grey line, not a stack of paragraphs. */
+.bk-note > p {
+  margin: 0;
+}

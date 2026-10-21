@@ -1010,6 +1010,52 @@ mechanism without touching the selector you were looking at.
 
 ---
 
+## The legal documents
+
+`privacy-policy.html` is the first of three pages the footer has always linked
+to and none of which existed: the cookie policy and the terms of use are still
+404, and **the privacy page's own "Read alongside" line points at both of
+them**. They are the same shape — `.bk-legal-head` over `.bk-legal-body` — and
+the `legal_document` component already has the switch for the one difference:
+untick **Show the index down the left** and the body becomes the narrower
+single-column `bk-legal-body-solo` that the cookie policy uses. Terms also
+carries a `bk-clause-toc` ledger and `bk-caps` statutory blocks, which that
+component does not render yet.
+
+Three decisions worth keeping:
+
+**The clause number is not stored.** It is `forloop.index`, zero-padded. Delete
+clause 3 and 4..12 renumber themselves — the one thing a hand-numbered legal
+document always gets wrong. The same goes for the index down the side: it is
+generated from the clause list, so a clause cannot exist without a link to it
+and a link cannot point at a clause that has been deleted.
+
+**`index_label` is a separate field from the heading**, because the rail is
+narrow and upstream shortens "Collection of Personal Information and its use"
+to "Collection & Use of PII" in it. Left empty it falls back to the heading.
+
+**A clause body is a list of parts, not one rich-text field.** Upstream's
+sub-headings carry `class="bk-clause-sub"` and its asides are a
+`div.bk-clause-note`, and no rich-text editor will produce either — it would
+emit a bare `<h3>`, and the class would have to be faked with a duplicate CSS
+rule that drifts from `beckn.css`. So a part is Text (rich text: paragraphs and
+lists), Sub-heading, or Boxed aside, and the component writes the classes. The
+common case — a clause that is only paragraphs — is still a single Text part.
+
+The content was imported once from the page on ondc.org and is CMS copy from
+here on. The rendered text is character-for-character identical to upstream; the
+only structural difference is deliberate, and it is this: the related-documents
+line is a `<div class="bk-note">` where upstream writes a `<p>`, because the
+field is rich text and a `<p>` inside a `<p>` is closed by the parser before
+the links are reached. `.bk-note` has no rule that depends on the tag; the
+margin guard is in `css/ondc/legal-doc.css`, not `beckn.css`, for the usual
+reason.
+
+The scroll spy that lights the clause you are reading is `js/ondc/doc-index.js`
+— a file rather than ondc.org's inline script, because **CloudCannon deletes an
+inline script the first time an editor saves the page** (see above). It only
+toggles a class on a link that is already there.
+
 ## Adding the next page
 
 1. **Read the original.** Note its `<section>` classes, stylesheets and scripts.

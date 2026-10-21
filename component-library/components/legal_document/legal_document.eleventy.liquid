@@ -1,0 +1,62 @@
+{%- comment -%}
+  A legal document — the privacy policy, and the shape the cookie policy and
+  terms of use take too.
+  ==========================================================================
+  A reading instrument, not a landing page: no hero image, no figures, no
+  marquee. The whole page is one section, because a clause is not a section
+  an editor should be able to drag out from under its own numbering.
+
+  The clause NUMBER is not stored. It is the position in the list, so
+  deleting clause 3 renumbers 4..12 without anyone touching them — the one
+  thing a hand-numbered legal document always gets wrong.
+
+  THE INDEX IS GENERATED from the same list, so a clause cannot exist
+  without a link to it, and a link cannot point at a clause that is gone.
+  `index_label` is separate from the heading on purpose: upstream shortens
+  "Collection of Personal Information and its use" to "Collection & Use of
+  PII" in the rail, and the rail is narrow.
+
+  js/ondc/doc-index.js only toggles a class on those links. It never creates
+  a node — Bookshop replaces this section's DOM while an editor types.
+{%- endcomment -%}
+<section class="bk-legal-head">
+  {% if eyebrow != blank %}<div class="bk-eyebrow">{{ eyebrow }}</div>{% endif %}
+  <h1 data-bk-intro>{{ heading }}{% if heading_accent != blank %} <em>{{ heading_accent }}</em>{% endif %}</h1>
+  {% if sub != blank %}<p class="bk-hero-sub" data-bk-scrub>{{ sub }}</p>{% endif %}
+  {%- comment -%}
+    A <div> where upstream writes a <p>: the field is rich text, so whatever
+    an editor types arrives wrapped in its own <p>, and a <p> inside a <p> is
+    closed by the parser before the links are reached. `.bk-note` has no
+    rule that depends on the tag. The margin guard is in legal-doc.css.
+  {%- endcomment -%}
+  {% if read_alongside != blank %}<div class="bk-note">{{ read_alongside }}</div>{% endif %}
+</section>
+
+<section class="bk-legal-body{% unless show_index %} bk-legal-body-solo{% endunless %}" aria-label="{{ body_label }}">
+
+  {% if show_index %}
+    <aside class="bk-doc-index" aria-label="{{ index_aria | default: "On this page" }}">
+      {% for clause in clauses %}<a class="bk-doc-index-link" href="#{{ clause.clause_anchor }}" data-bk-doc-link>{{ clause.index_label | default: clause.clause_title }}</a>{% endfor %}
+    </aside>
+  {% endif %}
+
+  <div class="bk-clauses">
+    {% for clause in clauses %}
+      <article class="bk-clause" id="{{ clause.clause_anchor }}" data-bk-clause>
+        <span class="bk-clause-num" aria-hidden="true">{% if forloop.index < 10 %}0{% endif %}{{ forloop.index }}</span>
+        <h2>{{ clause.clause_title }}</h2>
+        {%- for part in clause.parts -%}
+          {%- case part.part_kind -%}
+            {%- when "subheading" -%}
+              <h3 class="bk-clause-sub">{{ part.subheading }}</h3>
+            {%- when "note" -%}
+              <div class="bk-clause-note">{% if part.note_title != blank %}<h3 class="bk-clause-sub">{{ part.note_title }}</h3>{% endif %}{{ part.note_html }}</div>
+            {%- else -%}
+              {{ part.html }}
+          {%- endcase -%}
+        {%- endfor -%}
+      </article>
+    {% endfor %}
+  </div>
+
+</section>
