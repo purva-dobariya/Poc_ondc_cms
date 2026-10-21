@@ -148,10 +148,23 @@ it was `home.liquid` at `/home.html` and `https://<site>/` returned a 404.
 Two things are tied to that and would break quietly if the file were renamed
 back:
 
-- `collections_config.pages.url` is `/[slug].html`, which is how CloudCannon
-  works out that a source file maps to a live URL for its preview pane. The
-  slug comes from the FILE NAME, not from `permalink`, so the file has to be
-  `index.liquid` for the editor to open the right page.
+- **The home page is its own collection**, and that is not tidiness. CloudCannon
+  builds a page's address from `collections_config.<collection>.url`, and
+  `[slug]` is the file name without its extension — except that **for a file
+  named `index` the slug is an empty string**, which CloudCannon documents.
+  So `/[slug].html` renders as `/.html`: the Pages list showed that address and
+  the preview pane 404'd on it. One slug-based pattern cannot produce both
+  `/about-us.html` and `/`, so `index.liquid` sits in a `home` collection with
+  a literal `url: /`, and `pages` excludes it with `'!index.liquid'`.
+
+  Both collections point at `src/pages`, deliberately: `src/pages/pages.json`
+  is the Eleventy directory data file carrying the layout, the wrapper and the
+  default stylesheets, and it only applies to files in that folder. Moving the
+  home page to a folder of its own would mean keeping a second copy of that
+  file in step with the first.
+
+  None of this affects the build — Eleventy reads `permalink`, not the
+  CloudCannon config. It is purely what the editor opens.
 - The menu's "Home" and "Roles You Can Play" items are bare anchors
   (`#site-top`, `#find-your-place`). The header prefixes them with the home
   address on every other page and leaves them bare on the home page itself —

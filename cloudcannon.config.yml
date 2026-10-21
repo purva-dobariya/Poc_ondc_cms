@@ -69,11 +69,37 @@ markdown:
   options: {}
 
 collections_config:
+  # The home page is its own collection, and that is not tidiness — it is the
+  # only way CloudCannon can work out its address.
+  #
+  # `[slug]` is the filename without its extension, and CloudCannon documents
+  # that **for a file named `index` the slug is an empty string**. So the
+  # pattern below, `/[slug].html`, renders as `/.html` for `index.liquid`: the
+  # Pages list showed that address and the preview pane 404'd on it. One
+  # slug-based pattern cannot produce both `/about-us.html` and `/`, so the
+  # home page gets a literal `url` of its own.
+  #
+  # It stays in `src/pages` so that `src/pages/pages.json` — the Eleventy
+  # directory data file carrying the layout, wrapper and default assets — still
+  # applies to it. The `pages` collection below excludes it by glob.
+  home:
+    path: src/pages
+    url: /
+    glob:
+      - index.liquid
+    name: Home page
+    singular_name: Home page
+    icon: home
+    description: The front page, served at the site root.
+    disable_add: true
+    disable_add_folder: true
+
   pages:
     path: src/pages
     url: /[slug].html
     glob:
       - '*.liquid'
+      - '!index.liquid'
     name: Pages
     singular_name: Page
     icon: wysiwyg
