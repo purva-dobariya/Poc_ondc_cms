@@ -1,4 +1,27 @@
-{% if variant == "culture" %}<section class="bk-culture"{% if anchor_id %} id="{{ anchor_id }}"{% endif %} data-screen-label="{{ screen_label | default: "Our people" }}">
+{%- comment -%}
+  Three layouts over one content model: a lead beside automatically numbered
+  points. "Role" is the one on the Buyer/Seller/TSP pages, where each point is
+  a requirement with its own heading — the only field the other two ignore.
+{%- endcomment -%}
+{% if variant == "role" %}<section class="bk-role-story"{% if anchor_id %} id="{{ anchor_id }}"{% endif %} data-screen-label="{{ screen_label | default: "What this role must do" }}"{% if heading_id %} aria-labelledby="{{ heading_id }}"{% endif %}>
+    <div class="bk-role-story-intro">
+      <h2 class="bk-h2 bk-rv"{% if heading_id %} id="{{ heading_id }}"{% endif %}>{{ heading }}{% if heading_accent %} <em>{{ heading_accent }}</em>{% endif %}</h2>
+      <div class="bk-role-story-copy bk-rv bk-rv-d1">
+        {% for paragraph in paragraphs %}<p>{{ paragraph.text }}</p>
+        {% endfor %}{% if lead_link.label != blank %}<a class="bk-ul" href="{{ lead_link.url }}"{% if lead_link.new_tab %} target="_blank" rel="noopener"{% endif %}>{{ lead_link.label }}</a>
+        {% endif %}
+      </div>
+    </div>
+    <div class="bk-requirements"{% if aria_label %} aria-label="{{ aria_label }}"{% endif %}>
+      {% assign n = 0 %}
+      {% for group in groups %}{% for item in group.items %}{% assign n = n | plus: 1 %}        <article class="bk-requirement bk-rv">
+          <span class="bk-requirement-number">{% if n < 10 %}0{% endif %}{{ n }}</span>
+          {% if item.point_title != blank %}<h3>{{ item.point_title }}</h3>
+          {% endif %}<p>{{ item.text }}</p>
+        </article>
+      {% endfor %}{% endfor %}    </div>
+  </section>
+{% elsif variant == "culture" %}<section class="bk-culture"{% if anchor_id %} id="{{ anchor_id }}"{% endif %} data-screen-label="{{ screen_label | default: "Our people" }}">
     <div class="bk-culture-lead">
       {% if eyebrow %}
         <div class="bk-eyebrow bk-rv">{{ eyebrow }}</div>

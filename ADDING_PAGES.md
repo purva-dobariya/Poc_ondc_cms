@@ -1010,6 +1010,43 @@ mechanism without touching the selector you were looking at.
 
 ---
 
+### The role pages, and a counter that cannot go stale
+
+`buyer-network-participants.html` is the first of four role pages the footer
+links to (**seller, gateway and technology-service-provider are still 404**).
+It needed **no new component**: `role_hero` and `closing_cta`'s "role" variant
+were already built for it, and the only missing piece — the requirements grid —
+is a third layout on `numbered_lists` rather than a 36th component, because it
+is the same content model the other two use (a lead beside automatically
+numbered points) with one extra field per point: its own heading. The other two
+layouts ignore that field.
+
+**The counter is counted at build time, not fetched.** ondc.org asks the
+registry for it in the browser and ships `—` with a "Loading registry" note —
+which is what its page still shows, so the number never arrives. We already
+hold that registry as `src/_data/network_participants.json`, the file the
+directory page lists and an editor edits, so the component counts it instead.
+Delete a participant in the CMS and this figure moves with the directory; there
+is no second place holding a hand-typed total that quietly goes stale.
+
+It counts **distinct names, not rows**: one organisation can hold several roles
+and can appear in both the key and the integrated list. 213 organisations, 345
+rows. Liquid has no set, hence `push` into an array and `uniq`.
+
+> **A shared component is a shared blast radius.** Adding `data-bk-intro` to
+> the tally — which the buyer page has — silently changed the RFPs/RFQs page,
+> which upstream does *not* animate: its number arrives from the ledger after
+> the page has settled, and a second animation on top of that reads as a
+> glitch. It is a field now, off by default. Whenever a component that other
+> pages already use gains something, build every page before and after and diff
+> the output; this one was caught that way and the other 29 pages are
+> byte-identical.
+
+One difference worth knowing: our sector rail is **one shared list** in
+`site.json`, while upstream writes the pills out per page — its buyer page
+shows 13, its directory page 12, and they are not the same 13. Ours shows the
+same 12 everywhere, missing "About ONDC" against the buyer page.
+
 ## The legal documents
 
 `privacy-policy.html` and `cookie-policy.html` are two of the three pages the

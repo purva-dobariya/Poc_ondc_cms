@@ -25,6 +25,8 @@ blueprint:
     show: false
     value_id: ''
     aria_label: ''
+    animate: false
+    count_role: ''
     placeholder: '—'
     label: What this number counts.
     source_note: ''
@@ -40,8 +42,9 @@ _inputs:
     type: object
     label: Counter on the right
     comment: >-
-      The large number beside the heading. Its value is filled in by the page
-      itself from live data — the text around it is edited here.
+      The large number beside the heading. Pick which role it counts and the
+      number is worked out from the Network Participants data — the text
+      around it is edited here.
     options:
       preview:
         text:
@@ -49,6 +52,27 @@ _inputs:
   show:
     type: checkbox
     label: Show the counter
+  animate:
+    type: checkbox
+    label: Fade the counter in with the heading
+    comment: >-
+      On. Off on RFPs/RFQs, where the number arrives from the ledger after the
+      page has settled and a second animation on top of it reads as a glitch.
+  count_role:
+    type: select
+    label: What the number counts
+    comment: >-
+      Counts the distinct organisations in Network Participants holding this
+      role. An organisation listed twice, or holding two roles, is counted
+      once. Leave empty to show the placeholder instead of a number.
+    options:
+      values:
+        - value: ''
+          label: Nothing — show the placeholder
+        - value: Buyer NP
+          label: Buyer network participants
+        - value: Seller NP
+          label: Seller network participants
   placeholder:
     type: text
     label: Shown until the number loads

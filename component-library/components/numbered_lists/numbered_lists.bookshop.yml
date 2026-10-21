@@ -2,9 +2,9 @@ spec:
   structures: [sections]
   label: Numbered lists
   description: >-
-    A lead paragraph beside automatically numbered points. Two layouts: the
-    panel used on sector pages, and the plainer "Our people" band used on
-    Careers.
+    A lead paragraph beside automatically numbered points. Three layouts: the
+    panel used on sector pages, the plainer "Our people" band used on Careers,
+    and the requirements list on the Buyer/Seller/TSP role pages.
   icon: format_list_numbered
 
 blueprint:
@@ -14,7 +14,14 @@ blueprint:
   eyebrow: ''
   heading: A heading for this section
   heading_accent: ''
+  heading_id: ''
   lead: ''
+  aria_label: ''
+  paragraphs: []
+  lead_link:
+    label: ''
+    url: ''
+    new_tab: false
   groups:
     - heading: First group
       intro: ''
@@ -32,13 +39,17 @@ _inputs:
       "Panel" is the boxed two-column layout on the sector pages, where each
       group gets its own sub-heading. "Our people" is the plainer full-width
       band used on Careers: the group sub-headings are not shown and the points
-      are numbered straight through.
+      are numbered straight through. "Requirements" is the role-page layout —
+      the intro sits above a grid of cards, and each point shows its own
+      heading.
     options:
       values:
         - value: ''
           label: Panel
         - value: culture
           label: Our people
+        - value: role
+          label: Requirements
   screen_label:
     type: text
     label: Section name for screen readers
@@ -60,9 +71,48 @@ _inputs:
     type: text
     label: Highlighted tail of the heading
     comment: Shown in the accent style at the end of the heading. Leave empty for a plain heading.
+  heading_id:
+    type: text
+    hidden: true
   lead:
     type: textarea
     label: Lead paragraph
+    comment: Not used by the "Requirements" layout, which uses the paragraphs below.
+  aria_label:
+    type: text
+    label: Name of the list, for screen readers
+    comment: Only used by the "Requirements" layout.
+  paragraphs:
+    type: array
+    label: Intro paragraphs
+    comment: >-
+      Only used by the "Requirements" layout, which needs more than the one
+      lead paragraph the others take.
+    options:
+      structures:
+        values:
+          - label: Paragraph
+            icon: notes
+            preview:
+              text:
+                - key: text
+              icon: notes
+            value:
+              text: ''
+            _inputs:
+              text:
+                type: textarea
+                label: Paragraph
+  lead_link:
+    type: object
+    label: Link under the intro
+    comment: >-
+      Only used by the "Requirements" layout — the underlined link below the
+      intro paragraphs. Leave the text empty for no link.
+    options:
+      preview:
+        text:
+          - key: label
   groups:
     type: array
     label: Groups
@@ -112,13 +162,23 @@ _inputs:
                           icon: looks_one
                         preview:
                           text:
+                            - key: point_title
                             - key: text
                             - 'Empty point'
+                          subtext:
+                            - key: text
                           icon:
                             - looks_one
                         value:
+                          point_title: ''
                           text: ''
                         _inputs:
+                          point_title:
+                            type: text
+                            label: Point heading
+                            comment: >-
+                              Only shown by the "Requirements" layout. Leave
+                              empty on the other two.
                           text:
                             type: textarea
                             label: Point
