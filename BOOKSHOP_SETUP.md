@@ -15,7 +15,7 @@ Liquid-only version you already have running is the fallback.
 
 ```bash
 npm install
-npm start          # http://localhost:8080/home.html
+npm start          # http://localhost:8080/
 ```
 
 The page should look exactly as it does now. Bookshop changes how components are

@@ -1,7 +1,7 @@
 {
   "logo": "/images/ondc-logo.svg",
   "logo_alt": "ONDC — Open Network for Digital Commerce",
-  "home_url": "/home.html",
+  "home_url": "/",
   "nav": [
     {
       "label": "Home",

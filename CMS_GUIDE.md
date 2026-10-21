@@ -25,7 +25,8 @@ build settings have to change once. In CloudCannon: **Site Settings → Build**
 Then push this repo and let the build run. Until the build settings are changed the
 site will not publish.
 
-Pages are served flat: `/home.html`, `/about-us.html`, `/rfp.html`. Each new page
+Pages are served flat: `/about-us.html`, `/rfp.html`. The home page is the one
+exception — it is `src/pages/index.liquid` and is served at `/`. Each new page
 keeps that shape.
 
 The postbuild hook `.cloudcannon/postbuild` must stay **executable in Git** — it is

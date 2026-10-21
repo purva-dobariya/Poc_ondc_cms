@@ -1,4 +1,17 @@
-{%- assign home_url = site.home_url | default: "/home.html" -%}
+{%- assign home_url = site.home_url | default: "/" -%}
+{%- comment -%}
+  The home page is reachable at BOTH "/" and "/index.html" — the file is
+  index.html, and the host serves it for the bare path too. The menu's "Home"
+  and "Roles You Can Play" items are bare anchors (#site-top), which have to be
+  prefixed with the home address from every OTHER page and left bare on the
+  home page itself, or clicking them reloads instead of scrolling. So the test
+  is "is this the home page", not a string compare against one of its two
+  addresses: `page.url` is whichever one Eleventy wrote.
+{%- endcomment -%}
+{%- assign on_home = false -%}
+{%- if page.url == "/" or page.url == "/index.html" or page.url == home_url -%}
+  {%- assign on_home = true -%}
+{%- endif -%}
 {%- comment -%}
   Which menu item is lit. A page is normally its own menu item, but a section
   with sub-pages — Resources has eighteen — wants the parent item lit on every
@@ -24,7 +37,7 @@
                   stroke-linejoin="round"
                   stroke-width="1.4"
                   viewbox="0 0 8 5"
-                  width="8"><path d="M1 1l3 3 3-3"></path></svg></summary><div class="nav-drop-menu">{% for child in item.children %}<a href="{{ child.url }}"{% if child.url == active_url %} class="active"{% endif %}>{{ child.label }}</a>{% endfor %}</div></details>{% else %}{% assign first_char = item.url | slice: 0 %}{% if first_char == "#" and page.url != home_url %}{% assign href = home_url | append: item.url %}{% else %}{% assign href = item.url %}{% endif %}<a
+                  width="8"><path d="M1 1l3 3 3-3"></path></svg></summary><div class="nav-drop-menu">{% for child in item.children %}<a href="{{ child.url }}"{% if child.url == active_url %} class="active"{% endif %}>{{ child.label }}</a>{% endfor %}</div></details>{% else %}{% assign first_char = item.url | slice: 0 %}{% if first_char == "#" and on_home == false %}{% assign href = home_url | append: item.url %}{% else %}{% assign href = item.url %}{% endif %}<a
               class="nav-link{% if item.url == active_url %} active{% endif %}"
               href="{{ href }}"{% if item.new_tab %} rel="noopener"
               target="_blank"{% endif %}>{{ item.label }}</a>{% endif %}{% endfor %}

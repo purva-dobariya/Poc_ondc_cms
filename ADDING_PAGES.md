@@ -140,6 +140,31 @@ class, no sector rail. Contact adds two classes the CSS keys off —
 
 ## URLs
 
+**The home page is `index.html`, and that is the only page whose file name
+matters.** `src/pages/index.liquid` carries `permalink: /index.html`, so the
+host serves it for the bare domain as well as for `/index.html`; before this
+it was `home.liquid` at `/home.html` and `https://<site>/` returned a 404.
+
+Two things are tied to that and would break quietly if the file were renamed
+back:
+
+- `collections_config.pages.url` is `/[slug].html`, which is how CloudCannon
+  works out that a source file maps to a live URL for its preview pane. The
+  slug comes from the FILE NAME, not from `permalink`, so the file has to be
+  `index.liquid` for the editor to open the right page.
+- The menu's "Home" and "Roles You Can Play" items are bare anchors
+  (`#site-top`, `#find-your-place`). The header prefixes them with the home
+  address on every other page and leaves them bare on the home page itself —
+  otherwise clicking them reloads instead of scrolling. Because the home page
+  answers to both `/` and `/index.html`, that test asks *is this the home
+  page*, rather than comparing against whichever address `site.home_url`
+  happens to hold.
+
+`site.home_url` (in the CMS under Header & Footer) is `/`. It is the string
+pasted in front of those anchors and into the logo link, so it is the one place
+to change if the home address ever moves again.
+
+
 Every page is served flat at `/<slug>.html`, which is what
 `collections_config.pages.url: /[slug].html` expects. The two must agree — when
 they disagree CloudCannon shows "No preview available" even though the build
@@ -1301,7 +1326,7 @@ the same class CloudCannon's frame triggers — and the real boxes measured:
 
 | Page | Mode | Navbar | First section | Overlap |
 | --- | --- | --- | --- | --- |
-| `home.html` | editor | static, `0 → 88` | starts at `88` | none |
+| `index.html` | editor | static, `0 → 88` | starts at `88` | none |
 | `about-us.html` | editor | static, `0 → 88` | starts at `88` | none |
 | `rfp.html` | live | sticky, `0 → 88` | starts at `88` | none |
 | `rfp.html` | editor | static, `0 → 88` | starts at `88` | none |
