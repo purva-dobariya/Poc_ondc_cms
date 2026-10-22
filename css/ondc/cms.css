@@ -169,6 +169,79 @@ html.is-editing .bk-ba-card[hidden] { display: block !important; }
 html.is-editing .bk-ba-card > .bk-ba-detail { display: block !important; }
 html.is-editing .bk-ba-pagination { display: none !important; }
 
+/* ── Network Participants ────────────────────────────────────────────── */
+/* The list switcher is a <details>, closed until it is clicked, and the names
+   inside it are this section's own copy (the "Lists in this directory" field).
+   Closed, they could never be clicked to edit. Open the menu in place while
+   editing — the same trade as the RFP tabs: the switcher stops switching
+   anything, and everything on the page is reachable. */
+html.is-editing .bk-np-listdrop > summary { display: none; }
+html.is-editing .bk-np-listdrop-menu {
+  position: static;
+  display: block;
+  min-width: 0;
+  box-shadow: none;
+  border: 1px dashed var(--bk-line, #e3e5e8);
+}
+html.is-editing .bk-np-listdrop-menu .np-tab { cursor: text; }
+
+/* The directory's rows are not editable content — they come from the Network
+   Participants data file, and are edited there — so paging is left working
+   rather than unhidden the way the Buyer App cards are. 494 rows unhidden in
+   an editor frame would cost more than it gives, and every piece of this
+   section that IS editable copy (the heading, the tab names, the search hint,
+   the column headings, the note under the table) is visible without paging.
+
+   What does need help is the first paint: the template ships rows past page
+   one with `hidden`, and the script only un-hides them once it has run. In
+   the editor Bookshop re-renders the section constantly, so there is a window
+   where the table is 20 rows with no controls bound. That is correct, not
+   broken — leave it be. */
+
+/* The category tree ships collapsed and the script hides whichever branches
+   the visible list has no rows for. Both are data, not copy, so neither is
+   forced open here; the panel stays the height it is on the page. */
+
+/* ── Resources ───────────────────────────────────────────────────────── */
+/* legal.css holds `.reveal` at opacity 0 until js/ondc/reveal.js adds `in` on
+   scroll. The editor frame never scrolls, so without this the intro, the
+   document list, the hub cards and the closing band all render INVISIBLE —
+   the same trap `.bk-rv` sets, and the same fix. (Two reveal systems is not
+   an accident: `.bk-rv`/beckn.js stages the ONDC-page sections, `.reveal`
+   stages the legal and resources pages, and the two stylesheets position
+   their elements differently.) */
+html.is-editing .reveal {
+  opacity: 1 !important;
+  transform: none !important;
+  transition: none !important;
+}
+
+/* The sidebar is a <details> that this build closes below 1000px, because a
+   tree that tall would push the documents a screen and a half down on a
+   phone. An editor frame is often narrower than that, and a closed sidebar
+   hides the area's own name — the one thing that says which page you are on.
+   Keep it open while editing. */
+html.is-editing .res-nav-details { display: block; }
+html.is-editing .res-nav-details > div { display: block !important; }
+
+/* Disclosures folds its five groups into <details> bars that open one at a
+   time. Closed, the editor shows five grey bars and nothing else, which reads
+   as a page that failed to load. Everything inside them comes from the
+   Resources library data file and is not click-to-edit anyway, so unfold them
+   all. The second rule is for Chrome's ::details-content, which the first one
+   alone no longer beats; browsers that do not know the selector drop that
+   rule and keep the first. */
+html.is-editing .res-sec.is-collapsible > .res-sec-body { display: block !important; }
+html.is-editing .res-sec.is-collapsible::details-content {
+  content-visibility: visible !important;
+  block-size: auto !important;
+}
+
+/* The search results box is empty until somebody types, and every row in it
+   is a copy of a document edited under "Resources library" — nothing here is
+   click-to-edit, and 500 rows unhidden would bury the page. Left alone
+   deliberately. */
+
 /* ── Shared chrome in the editor ─────────────────────────────────────── */
 /* The navbar is position:sticky at z-index 300/100 on the live site. Inside the
    editor frame it then floats over the FIRST section and swallows that

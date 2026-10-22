@@ -7,6 +7,7 @@ spec:
   icon: title
 
 blueprint:
+  variant: ''
   screen_label: Page title
   heading_id: page-title
   heading: A heading for this page
@@ -15,19 +16,32 @@ blueprint:
   intro: ''
 
 # NOTE ON THE CSS CLASS
-# This renders `.bk-contact-head`, which is the class ondc.org uses for the
-# Contact page's title band. The same band appears on other ondc.org pages
-# under sibling class names (.bk-library-head, .bk-relay-head,
-# .bk-service-plane-head, .bk-library-index-head) which beckn.css styles
-# identically. When the first of those pages is ported, add a `variant` select
-# here and switch the class on it in the .liquid file — the same way
-# `numbered_lists` grew its "Our people" layout. Until then a dropdown with one
-# choice in it would only be noise for editors.
+# This renders `.bk-contact-head`, the class ondc.org uses for the Contact
+# page's title band. The same band appears on other ondc.org pages under
+# sibling class names (.bk-library-head, .bk-relay-head, .bk-service-plane-head,
+# .bk-library-index-head) which beckn.css styles identically.
+#
+# The Resources hub was the first of those to be ported, so the `variant` select
+# this note predicted now exists. Adding the next one is a value here plus a
+# branch in the .liquid — it is not a new component.
 
 # Configured HERE, in the component file. `_inputs` at the top of
 # cloudcannon.config.yml does not reach a Bookshop component's fields — see
 # ADDING_PAGES.md, rule 5.
 _inputs:
+  variant:
+    type: select
+    label: Layout
+    comment: >-
+      "Standard" is the band at the top of the Contact page. "Knowledge base" is
+      the wider masthead on the Resources hub.
+    options:
+      values:
+        - value: ''
+          label: Standard
+        - value: library
+          label: Knowledge base
+
   screen_label:
     type: text
     label: Section name for screen readers

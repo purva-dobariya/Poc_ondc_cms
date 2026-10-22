@@ -140,6 +140,44 @@ class, no sector rail. Contact adds two classes the CSS keys off —
 
 ## URLs
 
+**The home page is `index.html`, and that is the only page whose file name
+matters.** `src/pages/index.liquid` carries `permalink: /index.html`, so the
+host serves it for the bare domain as well as for `/index.html`; before this
+it was `home.liquid` at `/home.html` and `https://<site>/` returned a 404.
+
+Two things are tied to that and would break quietly if the file were renamed
+back:
+
+- **The home page is its own collection**, and that is not tidiness. CloudCannon
+  builds a page's address from `collections_config.<collection>.url`, and
+  `[slug]` is the file name without its extension — except that **for a file
+  named `index` the slug is an empty string**, which CloudCannon documents.
+  So `/[slug].html` renders as `/.html`: the Pages list showed that address and
+  the preview pane 404'd on it. One slug-based pattern cannot produce both
+  `/about-us.html` and `/`, so `index.liquid` sits in a `home` collection with
+  a literal `url: /`, and `pages` excludes it with `'!index.liquid'`.
+
+  Both collections point at `src/pages`, deliberately: `src/pages/pages.json`
+  is the Eleventy directory data file carrying the layout, the wrapper and the
+  default stylesheets, and it only applies to files in that folder. Moving the
+  home page to a folder of its own would mean keeping a second copy of that
+  file in step with the first.
+
+  None of this affects the build — Eleventy reads `permalink`, not the
+  CloudCannon config. It is purely what the editor opens.
+- The menu's "Home" and "Roles You Can Play" items are bare anchors
+  (`#site-top`, `#find-your-place`). The header prefixes them with the home
+  address on every other page and leaves them bare on the home page itself —
+  otherwise clicking them reloads instead of scrolling. Because the home page
+  answers to both `/` and `/index.html`, that test asks *is this the home
+  page*, rather than comparing against whichever address `site.home_url`
+  happens to hold.
+
+`site.home_url` (in the CMS under Header & Footer) is `/`. It is the string
+pasted in front of those anchors and into the logo link, so it is the one place
+to change if the home address ever moves again.
+
+
 Every page is served flat at `/<slug>.html`, which is what
 `collections_config.pages.url: /[slug].html` expects. The two must agree — when
 they disagree CloudCannon shows "No preview available" even though the build
@@ -442,6 +480,355 @@ when the sheet changes, instead of it happening by itself. The seed values came
 from the live sheet (`13-10-2026`: 1254 + 1584 + 236 = 3074, which reconciles),
 and `as_of_note` is the field that carries the "Last updated on…" line.
 
+### The Network Participants page: four decisions
+
+**The CSVs became a database; they are not fetched any more.** ondc.org builds
+this table in the browser: `participant-csv.js` fetches two CSVs and a logo map
+(~95 KB), parses them, and writes the rows in with `innerHTML`. None of that
+can work here, for two reasons that are the whole point of this build —
+requirement 1 asks for the entries to be editable by a non-developer, and a
+CSV fetched at runtime is not something the CMS can see; and a section whose
+rows arrive from `fetch()` renders **empty** in the visual editor, because
+Bookshop re-renders components in the browser with only the data
+`data_config` carries.
+
+So the CSVs were converted once, by `scripts/import-network-participants.js`,
+into `src/_data/network_participants.json`. Everything the browser used to do
+at runtime happens there instead: canonicalising category labels, splitting the
+three-line Contact blob into `spoc` / `email` / `phone`, giving a bare domain
+like `nammayatri.in` a scheme, and working out the two-letter monogram for a
+participant with no logo. What lands in the JSON is already the shape the page
+renders and the CMS edits. Re-run the script when the participants team hands
+over a fresh CSV drop; it takes the path to an ondc.org checkout and rewrites
+the three data files, copying any new brand logos into `images/np-logos/`.
+
+**Deleting an entry in the CMS deletes it from the site.** That was a stated
+requirement, and it falls out of rendering at build time: every row on the page
+comes from the data file, so a build after a deletion simply does not draw it.
+Verified rather than assumed — removing `Paytm` and rebuilding left no trace of
+it in the HTML. Adding works the same way in reverse: the component sorts by
+name at build time, so an entry appended to the **end** of the file lands in its
+alphabetical place (`Mango Commerce Pvt Ltd` appended last came out at position
+166 of 344, between `Mahawanti…` and `Mango Fox`).
+
+Alphabetical is the default for both lists, per the requirement. The order is a
+per-list field, so the Key list can be put back to its volume ranking with one
+click — see the note in the CMS guide.
+
+**The taxonomy is read back off the DOM, not duplicated in the script.** The
+left-hand tree is drawn from `src/_data/np_categories.json`, which is a flat
+list of `{ name, parent }`. `network-participants.js` rebuilds the parent/child
+map by reading the `data-parent` attributes the template just wrote. That is
+what lets an editor add a category in the CMS without a code change — and what
+stops the taxonomy existing in two places that can drift, which is exactly what
+`participant-csv.js` does today with a 60-line `TAXONOMY` constant.
+
+A category a participant carries that the taxonomy has no row for still shows
+and still filters; it is grouped under **Other**.
+
+**Three field names are longer than they look like they should be.** `_inputs`
+at the top of `cloudcannon.config.yml` is keyed by field *name* across every
+data file and page at once. A role written as `{ value, short, pill, full }`
+picks up the labels the home page's figures and hero pills already claim for
+`value` ("Number") and `pill` ("Tab name"), in a sidebar where the editor has
+no way to tell why. Hence `role_value` / `role_key` / `role_label` /
+`role_full`. The same rule bit once more inside the component itself: `_inputs`
+there is one flat map, so `labels.directory_tabs` could not sit under the
+`directory_tabs` array, and is `labels.tabs_aria`.
+
+This is rule 5's cousin and worth stating on its own: **a global `_inputs` key
+is global.** Before naming a field on a data file, grep
+`cloudcannon.config.yml` for it.
+
+#### Rendering 494 rows
+
+Both lists are rendered in full, into two `<tbody>` elements of one table:
+859 KB of HTML, 72 KB over the wire. That is the cost of the no-new-nodes rule
+and it was taken deliberately — the alternative is the runtime fetch above.
+Two things keep it from being felt:
+
+- rows past the first page ship with `hidden` on them. Without that the browser
+  paints 494 rows and the script collapses them to 20 a moment later, which is
+  a layout shift the length of the page;
+- a `<noscript>` block hands every row back and hides the controls that would
+  then be lying — search, the role toggles, the category panel and the pager.
+  With no script the page is still the whole directory, just not a filterable
+  one.
+
+The filter chips and the page numbers are drawn by the template too, all of
+them, hidden. A chip the script had to create is a chip that disappears on the
+next keystroke in the editor.
+
+### Ecosystem Participants: the component paying for itself
+
+This page cost no new component, no new JavaScript and no new CSS. It is the
+same `participant_directory` section with different fields, which is the whole
+reason that section was built generic rather than as `network_participants`.
+
+ondc.org's two pages are near-identical files — the diff between their inline
+scripts is four constants and the tab switcher. What actually differs:
+
+| | Network Participants | Ecosystem Participants |
+| --- | --- | --- |
+| Lists | two, with a switcher | one |
+| Category column | `Live Categories` | `Category` |
+| Sub-line under the name | `Technology Service Provider`, "Enabled by" | `Live NP supported`, "Live NPs supported" |
+| Roles present | Buyer NP, Seller NP | the four TSP roles |
+
+Only the first of those needed any code. The other three are handled without a
+branch anywhere:
+
+- **the two differently-named columns land in the same two fields.** The
+  importer takes the column names as an argument, so `Live Categories` and
+  `Category` both become `categories`, and `Technology Service Provider` and
+  `Live NP supported` both become `enabled_by`. One row shape, three sheets.
+- **the wording that differs is a label on the section**, not a second code
+  path: `labels.enabled_by` is "Enabled by" on one page and "Live NPs
+  supported" on the other, set in the CMS.
+- **the roles narrow themselves.** The script hides any role toggle or category
+  branch the visible list has no rows for, so the ecosystem page offers the
+  four TSP roles and the network page offers Buyer/Seller NP, from one shared
+  `np_roles.json`. Nothing declares which page gets which.
+
+The one real change was the list switcher. It already rendered only when
+`lists.size > 1`; the page just needed the empty tab-note paragraph dropped
+too, or a one-list directory holds a margin open for a line of text that will
+never arrive.
+
+**A fourth directory is now two lines of Liquid plus one dropdown option.** The
+`{% case list.source %}` in the component maps each option to its data file.
+Liquid cannot resolve a global by a name held in a variable, so this stays
+written out — which is also what makes it obvious where to add the next one.
+
+**Its data is a file of its own**, `src/_data/ecosystem_participants.json`, not
+a third list inside `network_participants.json`. The two directories are
+maintained by different people, so deleting an ecosystem participant should
+never rewrite the network file: smaller diffs, and no merge conflict when both
+are edited the same afternoon.
+
+**This page closed the last dead link on the site that was ours.** The tab
+above the network directory, and the entries in the navbar and footer, all
+pointed at `/ecosystem-participants.html` and 404'd. Everything still dead is a
+page nobody has migrated yet.
+
+### Resources: nineteen pages, one data file
+
+The Resources section is the hub plus eighteen sub-pages. On ondc.org those
+eighteen files are the same ~203-line template; the diff between any two of
+them is the hero copy, the intro paragraph and one `data-category` attribute.
+Everything else — the sidebar tree, the breadcrumbs, the document lists, the
+hub cards, the global search — is built in the browser from
+`public/data/resources.json`.
+
+That shape ports almost unchanged. `src/_data/resources.json` carries 20 areas,
+105 groups and 482 documents, and **one file drives all nineteen pages**: the
+hub cards and their counts, the search index, every sidebar, every breadcrumb
+trail and every document list. Delete a document in the CMS and it leaves all
+of them on the next publish.
+
+Four new components, three new variants, no new page archetype:
+
+| | |
+| --- | --- |
+| `resource_index` | the hub's card grid, from the areas marked "Show on the hub" |
+| `resource_search` | the hub's search, with all 500 result rows pre-rendered |
+| `resource_library` | a sub-page's whole body — breadcrumbs, sidebar, documents, sub-area cards, video grid |
+| `newsletter_rows` | the two download rows at the foot of the hub |
+| `page_hero` → **Compact** | the short banner each sub-page opens with |
+| `closing_cta` → **Band** | the wide call to action each sub-page closes with |
+| `page_title_band` → **Knowledge base** | the hub masthead |
+
+The three variants are the convention this repo already states — *a new visual
+treatment of an existing content model is a variant field, not a new
+component*. `page_title_band.bookshop.yml` had even left a note predicting the
+third one; the Resources hub was the page that triggered it.
+
+**A second reveal system now exists, deliberately.** `.bk-rv` (beckn.js) stages
+the ONDC-page sections; `.reveal` (legal.css) stages the legal and resources
+pages, and the two stylesheets position their elements differently. ondc.org
+ships the `.reveal` observer inline at the bottom of every one of those pages;
+here it is `js/ondc/reveal.js`, listed once per page. Without it `.reveal`
+holds every element at `opacity: 0` and the pages render blank — so it needs
+its editor rule in `cms.css` exactly the way `.bk-rv` does (rule 2).
+
+#### Three traps worth naming
+
+**1. A global `_inputs` key is global — and this data file collided six ways.**
+Upstream's field names are `categories`, `sections`, `items`, `parent`, `note`
+and `source`. Every one of those already means something else on this site:
+`sections` is the list of blocks on a page, `categories` is the participant
+multiselect, `note` is labelled "Note for editors, never shown on the live
+site" — the exact opposite of what a group note does. So the importer renames
+them on the way in to `areas`, `doc_groups`, `documents`, `parent_area`,
+`group_note`/`doc_note` and `provenance`, and `type` becomes `doc_type`
+because a bare `type` as a global input name is a trap for whoever comes next.
+
+This is rule 9's companion and the second time it has cost real time. **Before
+naming a field on a data file, grep `cloudcannon.config.yml` for it.**
+
+**2. Liquid's `where` returns EVERYTHING when its value is undefined.** Not
+nothing — everything. So
+
+```liquid
+{% assign parent = areas | where: "id", cat.parent_area | first %}
+```
+
+on a top-level area does not yield nil; it yields the whole list, and `first`
+hands back whichever area happens to sit first in the file. A typo in that one
+line (`parent_area_area`) silently put "Governance and Policy" into the
+breadcrumb of **every page on the site** and raised no error at all. Ask
+whether there is a parent before looking one up:
+
+```liquid
+{% if cat.parent_area != blank %}{% assign up1 = … %}{% endif %}
+```
+
+**3. Two things Eleventy gives you are not there in the editor.** Bookshop
+re-renders a component in the BROWSER with plain LiquidJS: Eleventy's custom
+filters and `slugify` do not exist, and neither does `{% render %}`. So the
+section anchors are `sec-1`, `sec-2` … by position rather than slugified from
+the heading, and the icon set is a `case` block inlined at each of its three
+call sites rather than a shared partial. Both are uglier than the obvious
+version and both work in the editor, which the obvious version does not.
+
+#### A wrapper class is an API, and loading a stylesheet is a choice
+
+The Resources sub-pages first shipped with `wrapper_class: bk bk-resources-page`
+and the same stylesheet list as the hub. Both were wrong, and together they
+broke every document row on all eighteen pages: the icon, the text and the
+arrow stacked instead of sitting on one line.
+
+`beckn.css` carries
+
+```css
+.bk-resources-page .res-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; }
+```
+
+at specificity `0,2,0`, which beats `resources.css`'s `.res-row { display: flex }`
+at `0,1,0` **whatever order they load in**. That rule is written for the HUB,
+where a search result has two children (body, arrow) and two columns are
+exactly right. A sub-page's document row has three (icon, body, arrow), so the
+arrow fell to a second grid row.
+
+On ondc.org `bk-resources-page` appears on the hub and nowhere else, and the
+sub-pages do not load `beckn.css` at all — they load `legal.css`,
+`resources.css`, `fx.css`, `scale.css`, `mobile.css`. Checking every class the
+sub-pages render against every stylesheet showed none of them needs `beckn` or
+`type-boost`, so both are gone from those pages: the bug cannot come back, and
+each sub-page fetches 135 KB less CSS.
+
+Two general lessons, both cheap to apply and expensive to miss:
+
+- **A class on the page wrapper is an API other stylesheets hang rules off.**
+  Before copying one onto a new page, grep for `.that-class ` with a
+  descendant after it.
+- **Copy the original page's stylesheet list, not the neighbouring page's.**
+  Two pages in the same section can legitimately load different sets, and this
+  section is exactly that case — the hub is a `.bk-*` page, the sub-pages are
+  `.legal`-family pages that happen to share a data file.
+
+The button on those pages was wrong for a related reason. `.btn-primary` is a
+blue gradient and the closing band is a blue gradient, so the call to action
+all but vanished; ondc.org uses `.btn-light` (white) there. The `band` variant
+now maps "Solid" to `.btn-light` and the secondary to `.btn-ghost`, the
+translucent outline built for dark surfaces — so on a dark band the editor's
+"main button" is still the one that reads as the main button.
+
+#### What pre-rendering costs here
+
+The hub carries all 500 search rows — 482 documents plus one per area — at
+358 KB. That is not a saving forgone: the index has to be in the page either
+way, and as HTML it is barely larger than the JSON blob the create-on-the-fly
+alternative would need, while keeping the no-new-nodes rule intact.
+
+Relevance ordering survives without moving a node. The results box is a flex
+column and the script sets `order` — 1 for a title match, 2 for one found only
+in the blurb — which is what ondc.org achieves by rebuilding the list. The
+guard for that, and the `[hidden]` guard rule 9 demands for `.res-row`
+(`display: flex`, so `hidden` alone does nothing), live in
+`css/ondc/resources-search.css` rather than `resources.css`, because that file
+is a byte-copy of upstream's and a refresh would silently delete them.
+
+#### Two display switches the data file carries
+
+Most of what a row shows is the same on all nineteen pages. Two things are not,
+and ondc.org handles both with a flag on the area rather than a special case in
+the template:
+
+- **`hide_type_chip`** — an area whose documents are all PDFs drops the type
+  chip. A "PDF" badge on every row of the page says nothing, and the room is
+  better spent on the date.
+- **`label_chips`** — an area whose rows carry *two* numbers names each one, so
+  the row reads `Date 14/07/2026` · `Notification No. 2026/07/14/01` rather
+  than two bare dates side by side, which read as a puzzle.
+
+Only Notifications sets either, and that is the point: they are area data, not
+page markup, so turning them on for the next area is a checkbox in the CMS. The
+words themselves ("Date", "Notification No.") are in the page's **Wording around
+the documents**, with everything else an editor might reword.
+
+> **Our copy of an upstream stylesheet drifts, and the drift is invisible.**
+> `css/ondc/resources.css` is a byte-copy of ondc.org's. Between the import and
+> this change, upstream added `.res-chip.is-meta` — the style these labelled
+> chips need — and a collapsible-sections feature. Nothing warned us; the
+> markup simply had no rule to match. Refresh the file wholesale from upstream
+> before concluding a style is missing, and never patch it in place: the next
+> refresh deletes the patch. Page-specific additions go in a file of our own,
+> the way `resources-search.css` already does.
+
+#### The notice box
+
+Two areas carry a standing caution above the filter, where it is read before
+anything is downloaded: Marketing ("ONDC's communication collaterals and brand
+assets must not be modified") and Investor Corner ("some of these are
+password-protected"). It is the **Notice above the documents** field, empty on
+the other sixteen.
+
+It is rich text, so CloudCannon wraps whatever an editor types in a `<p>`.
+Upstream writes the sentence straight into the div and therefore has no rule
+for a child paragraph — a browser-default `margin: 1em 0` would push the text
+out of the box's own padding. The guard for that is in
+`css/ondc/resources-search.css`, not `resources.css`, for the usual reason.
+
+#### Disclosures folds its groups, and nothing else does
+
+A hundred and two documents under five headings is a page you scroll past, not
+one you read, so ondc.org marks that one list `data-collapsible` and renders
+each group as a `<details>` bar carrying its own count. Every other sub-page
+keeps the plain headings.
+
+Here it is a checkbox on the section — **Fold each group of documents** — and
+both shapes hold the *same* documents: the rows are captured once into
+`group_body` and emitted into whichever wrapper the flag chooses, so the two
+shapes cannot drift apart. A folded list also carries the area eyebrow once,
+above the stack, instead of repeating it on every bar.
+
+The accordion is still inside the no-new-nodes rule. It sets `open` on an
+element that is already in the page and animates the height of a `<div>` that
+is already in the page; it creates nothing. Three details are worth knowing
+before touching it:
+
+- **`<details>` cannot transition its own height.** The body is animated by
+  hand, and `open` is not cleared until a collapse has *finished* — so
+  mid-flight the element still reports `open: true`. What a click reverses is
+  therefore where the section is *heading* (`headingOpen`), not where it is.
+- **A closed `<details>` still reports its content's full height.** The
+  collapsed end of the travel is a literal `0`, never a measurement.
+- **The filter has to reach inside a folded group.** While a query is active
+  every group with a hit is opened without animating, and the state the reader
+  left behind is restored when the box is cleared.
+
+In the editor all five unfold, via `cms.css`. Closed, the page is five grey
+bars and reads as content that failed to load — and nothing inside them is
+click-to-edit anyway, since it all comes from the Resources library data file.
+
+#### nav_active
+
+Eighteen sub-pages need the "Resources" menu item lit, and none of them *is*
+`/resources.html`. A page can now set `nav_active` in its front matter to the
+menu address it belongs under; the header falls back to the page's own URL,
+which is what every other page wants.
+
 ### CloudCannon rewrites page front matter when an editor saves
 
 Comparing the Careers page before and after it had been opened and saved in
@@ -472,7 +859,7 @@ The same applies to the note in `contact-us.liquid` explaining why `legal.css`
 is in its stylesheet list — expect it to disappear on first save. That reasoning
 is recorded under **Stylesheets** above, which is why it is safe to lose there.
 
-### Eight rules that are not optional
+### Nine rules that are not optional
 
 **1. A component reads the data it needs itself.** It must not receive data
 through a helper or the layout — Bookshop re-renders components in the browser,
@@ -601,6 +988,44 @@ the photo column"). It was found while building Contact and fixed in all seven
 components that had it: `closing_cta`, `contact_form`, `cta_banner`,
 `life_blocks`, `page_hero`, `rich_text` and `role_hero`.
 
+**9. `hidden` loses to any author `display` rule, so guard it.** The `hidden`
+attribute is nothing but a UA-stylesheet `display: none`. An author rule
+setting `display` on the same element outranks it, and the element stays on
+screen with `hidden` set and no visible effect — `el.hidden = true` returns
+`true` when you read it back, and DevTools shows the attribute, so this reads
+as a JavaScript bug for as long as you look at the JavaScript.
+
+It bit the participant directory in three places at once. `.bk-np-chip`,
+`.bk-np-role` and `.bk-np-chk` all carry `display: inline-flex` or `flex`, so
+ticking one role filter revealed **every chip in the taxonomy** and left the
+four zero-count TSP toggles sitting there reading `0`.
+
+`beckn.css` already guards the two elements ondc.org itself hides:
+
+```css
+.bk-np-chips[hidden]    { display: none; }
+.bk-np-cat-kids[hidden] { display: none; }
+```
+
+It has no guard for the singular chip, toggle or checkbox row because the
+original **creates** those with `innerHTML` instead of hiding them — which is
+the one thing this build cannot do (see rule 1 and the no-new-nodes rule).
+Pre-rendering and hiding is the right architecture here; it just moves the
+weight onto `hidden`, so every element a script hides needs checking.
+
+The guards live in `css/ondc/np-directory.css`, **not** in `beckn.css`, and
+that placement is deliberate: `beckn.css` is byte-identical with the copy on
+ondc.org, so refreshing it from upstream would silently delete anything added
+to it and bring the bug back.
+
+Before shipping a section that hides pre-rendered nodes, check every class it
+hides:
+
+```bash
+# does this element carry its own display?
+awk '/^\.bk-np-chip \{/{f=1} f{print; if(/^}/)exit}' css/ondc/beckn.css
+```
+
 **8. Check which property the CSS actually animates before writing the JS.**
 `category-chrome.css` paints the scroll-progress bar as a full-width span held
 at `transform: scaleX(0)`, with a comment saying it scales rather than
@@ -622,6 +1047,266 @@ the rule first. A second stylesheet later in the cascade can redefine the
 mechanism without touching the selector you were looking at.
 
 ---
+
+### The holding page, and a wave made of markup
+
+`payment-assurance-program.html` is a page that is not live yet: an eyebrow, a
+headline, a status line, one paragraph. No sector rail, no buttons. It is a
+third layout on `page_hero` — the content model is the hero's own — and the
+only thing in it worth explaining is the headline.
+
+**The blue wave through "Coming soon" is CSS running off `:nth-child`.**
+`beckn.css` writes out ten delays, one per letterform, deliberately rather than
+computing them, so the markup carries no inline style and no script. That puts
+a requirement on the template: the headline must arrive as **one `<span>` per
+letter**, and the gap between the words must stay a **text node**. A span
+there would shift every delay by one and the stagger would come apart — which
+is why there is a test asserting the space is not a span.
+
+```liquid
+{%- assign soon_words = heading | split: " " -%}
+{%- for soon_word in soon_words -%}
+  {%- unless forloop.first %} {% endunless -%}
+  {%- assign soon_letters = soon_word | split: "" -%}
+  {%- for soon_letter in soon_letters -%}<span aria-hidden="true">{{ soon_letter }}</span>{%- endfor -%}
+{%- endfor -%}
+```
+
+Splitting a string on `""` gives its characters in LiquidJS, so an editor types
+"Coming soon" into an ordinary text field and the wave follows. Every span is
+`aria-hidden` and the whole word sits on the heading's `aria-label`, so a
+screen reader reads the phrase rather than ten letters. The wave stands itself
+down under `prefers-reduced-motion`, in `beckn.css`, not here.
+
+`coming-soon.html` is the same family and still 404: status line **above** the
+heading rather than under it, no letter wave, plus a `bk-hold-return` row and a
+closing coda. A fourth layout, not a new component.
+
+### The role pages, and a counter that cannot go stale
+
+`buyer-network-participants.html`, `seller-network-participants.html`,
+`gateway.html` and `technology-service-provider.html` are **all four** role
+pages the footer links to. None needed a new component:
+`role_hero` and `closing_cta`'s "role" variant were already built for them, and
+the only missing piece — the list in the middle — is a third layout on
+`numbered_lists` rather than a 36th component, because it is the same content
+model the other two use (a lead beside a list of points) with two optional
+fields per point: a heading, and a code. The other layouts ignore both.
+
+The two pages differ only in how that list is drawn, which is a field:
+
+| | buyer | seller |
+|---|---|---|
+| **How the points are shown** | numbered cards | node types |
+| markup | `.bk-requirements` / `.bk-requirement` | `.bk-node-ledger` / `.bk-node` |
+| the marker | `01`…`07`, counted | `MSN`, `ISN`, typed |
+| link under the intro | yes | none |
+| counter | `Buyer NP` → 213 | `Seller NP` → 173 |
+
+The marker is the tell. A requirement's number is its *position*, so it is
+counted and renumbers itself; a node's code is its *name*, so it is typed on
+the point. The legal pages make the same distinction between a clause number
+and a numbered point's marker, and for the same reason.
+
+Gateway is the page that shows how far that one model stretches. It has no
+number to count, three more section shapes, and it still needed nothing new:
+
+| what it shows | where it lives |
+|---|---|
+| `DISCOVER` / `ENABLE` beside the heading | `role_hero`, a **wordmark** instead of the counter |
+| the mid-page context band | `tagline_strip`, "Network page" layout |
+| SEARCH → MULTICAST → DISCOVER | `numbered_lists`, **Relay** layout |
+| the TSP service continuum | `numbered_lists`, **Service lanes** layout |
+| the three outcome rows | `numbered_lists`, **Outcome rows** layout |
+
+TSP is Gateway's shape with one band swapped: `.bk-service-plane` instead of
+`.bk-relay`. Identical structure — a head block of h2 + paragraph, then a list
+of marked items — with two differences that are exactly the ones this codebase
+keeps meeting. The marker is a **counted number in a `<span>`** rather than a
+**typed code in a `<strong>`**, and there is no `data-bk-relay`, because only
+the Gateway's line draws itself on scroll. The two are written out as separate
+branches rather than folded together behind a pile of `assign`s: the markup is
+what a reader opens this file for.
+
+`numbered_lists` now carries six layouts, and that is the point rather than a
+smell: every one of them is a heading and an intro above a list of points, and
+what changes is the wrapper and whether a point draws a counted number, a typed
+code, or neither. A field a layout ignores is normal here.
+
+Across the four pages the marker rule has held every time, and it is worth
+stating plainly: **a marker that is a position is counted; a marker that is a
+name is typed.** `01…07` on buyer requirements and `01…03` on TSP lanes
+renumber themselves when a point is dragged. `MSN`, `ISN`, `SEARCH`,
+`MULTICAST`, `DISCOVER` do not, because they are not positions. The legal
+pages draw the same line between a clause number and a numbered point's
+marker.
+
+> **`data-bk-relay` is not decoration.** beckn.js writes
+> `--bk-relay-progress` onto that element as the page scrolls, which is what
+> draws the line through the three steps. Rename the attribute and the relay
+> goes static with nothing in the console.
+
+**The counter shows no number, and that was a decision, not an oversight.**
+ondc.org asks the registry for it in the browser and ships `—` with a "Loading
+registry" note; the request never completes, so its pages show the dash. This
+build *can* fill it: we already hold that registry as
+`src/_data/network_participants.json`, and "What the number counts" in the CMS
+counts distinct names from it — 213 buyer-side organisations across 345 rows,
+since one organisation can hold several roles and appear in both lists.
+
+Both pages shipped that way and were then **turned off, deliberately: the site
+is not to carry figures the original does not.** The field stays, off by
+default, so the choice is a dropdown rather than a code change. The cost of
+leaving it is that the counting branch is no longer exercised by any page, and
+so is no longer covered by a test — read it again before trusting it if it is
+ever wanted back.
+
+One divergence, consistently applied: upstream puts the reveal class on the
+closing section itself on Gateway and TSP (`section.bk-role-close.bk-rv`) but
+on an inner `<div>` on Buyer and Seller. `closing_cta` uses the inner div on
+all four — upstream's own pages disagree two against two, the two shapes
+render the same, and one shape across our four role pages is worth more than
+reproducing the split.
+
+> **A shared component is a shared blast radius.** Adding `data-bk-intro` to
+> the tally — which the buyer page has — silently changed the RFPs/RFQs page,
+> which upstream does *not* animate: its number arrives from the ledger after
+> the page has settled, and a second animation on top of that reads as a
+> glitch. It is a field now, off by default. Whenever a component that other
+> pages already use gains something, build every page before and after and diff
+> the output; this one was caught that way and the other 29 pages are
+> byte-identical.
+
+One difference worth knowing: our sector rail is **one shared list** in
+`site.json`, while upstream writes the pills out per page — its buyer page
+shows 13, its directory page 12, and they are not the same 13. Ours shows the
+same 12 everywhere, missing "About ONDC" against the buyer page.
+
+### Every button's address is in the CMS, including the sign-up ones
+
+A button is a label, an address, a style and a new-tab tick. That is the whole
+model, and there is no second kind.
+
+There used to be one: a **What this button does** select, where choosing "Open
+the ONDC sign-up portal" made the component render a `<button
+onclick="ONDCSignup.open()">` instead of a link, with the real address sitting
+in `js/ondc/signup.js`. It was tidy — the portal URL was written once, so a
+change to it was a one-line edit — but it failed the test that matters here:
+**an editor looking at that button in CloudCannon saw an empty Link address
+field and no way to find out where it went.** Worse, typing an address into
+that field did nothing at all, silently.
+
+So the select is gone, `signup.js` is deleted, and all 33 of those buttons now
+carry `https://portal.ondc.org/` in the field, with **Open in a new tab**
+ticked. If the portal moves, an editor changes 33 fields instead of a developer
+changing one line — that is the trade, and it was made deliberately in favour
+of the person without a code editor.
+
+The rule this leaves behind: **if a component renders something an editor can
+click, the destination belongs in a field, not in a script.** The only
+`<button>` elements left in a page body are real controls — a lightbox close,
+pagination, Clear search, Submit, Export CSV. Those have no destination to
+show, so they have no field.
+
+One thing stayed as it was: the **Sign Up** button in the navbar is still a
+`<button onclick>`, but its address is `site.cta_url`, edited under *Header &
+Footer*. It is already on screen and already changeable, so it did not have the
+problem. Making it an anchor as well would need a CSS rule — `.nav-cta` sets a
+height with no `display`, which an inline `<a>` ignores — and that file is a
+byte-copy of ondc.org's.
+
+## The legal documents
+
+`privacy-policy.html`, `cookie-policy.html` and `terms-and-conditions.html`
+are **all three** of the legal pages the footer has always linked to and none
+of which existed. One component renders them all.
+
+One component covers both pages because the differences between them are
+fields, not code:
+
+| | privacy | cookie | terms |
+|---|---|---|---|
+| **Show the index down the left** | on — 12 clauses, sticky rail | off | off |
+| body | two columns | solo | solo |
+| **Width of the text column** | — | `.58fr` | — (`.62fr` default) |
+| parts used | text, sub-heading, boxed aside | text, numbered points | text, statutory blocks, ledger |
+| clause numbers | 01–12 | 01–07 | preamble unnumbered, then 01–11 |
+
+That is the "a variant, not a new component" rule paying off again: the cookie
+policy needed one new part type and one width field, not a second template.
+
+Three decisions worth keeping:
+
+**The clause number is not stored.** It is a running count, zero-padded. Delete
+clause 3 and 4..12 renumber themselves — the one thing a hand-numbered legal
+document always gets wrong. The same goes for the index down the side and for
+the ledger Terms of Use prints inside its own preamble: both are generated from
+the clause list, so a clause cannot exist without a link to it and a link
+cannot point at a clause that has been deleted.
+
+It counts **numbered clauses**, not loop positions. Terms of Use opens with an
+unnumbered preamble and then runs 01–11, so a clause that opts out of a number
+must not consume one either — otherwise its ledger of the other eleven would
+point one clause out of step with their own headings.
+
+**`index_label` is a separate field from the heading**, because the rail is
+narrow and upstream shortens "Collection of Personal Information and its use"
+to "Collection & Use of PII" in it. Left empty it falls back to the heading.
+
+**A clause body is a list of parts, not one rich-text field.** Upstream's
+sub-headings carry `class="bk-clause-sub"`, its asides are a
+`div.bk-clause-note` and its numbered points a `div.bk-barriers`, and no
+rich-text editor will produce any of them — it would emit a bare `<h3>` or
+`<ol>`, and the classes would have to be faked with duplicate CSS rules that
+drift from `beckn.css`. So a part is Text (rich text: paragraphs and lists),
+Sub-heading, Boxed aside or Numbered points, and the component writes the
+classes. The common case — a clause that is only paragraphs — is still a single
+Text part.
+
+A numbered point's marker is **typed, not counted**: the cookie policy runs
+`01, 02, 03, 04` in one list and `a, b, c, d` in the next. That is the opposite
+of the clause number, which is counted precisely because it must never disagree
+with the position.
+
+Terms of Use adds the statutory blocks — the all-caps disclaimer and indemnity.
+`.bk-caps` has to sit on the `<p>` or the `<ul>` **itself**: `.bk-clause p`
+sets an explicit font-size, so a wrapper would not win by inheritance, and no
+rich-text editor will put a class there. Hence two more part kinds rather than
+a tick-box on Text.
+
+> **A non-greedy `<li>(.*?)</li>` cannot read a nested list.** One statutory
+> point is a sentence, then a sub-list, then a closing sentence. Split that way
+> it stopped at the first `</li>`: the sub-list's opening tag landed inside its
+> parent's text, its items were promoted to siblings, and the closing sentence
+> was dropped. **The rendered page still looked right** — the HTML parser
+> re-nests it — so neither the word count nor the structure diff caught it.
+> Only the stored data was wrong, which is what an editor would have opened.
+> Top-level `<li>`s are found by counting depth now, and each is kept as HTML
+> rather than split into text-plus-children, because no structured shape holds
+> "sentence, list, sentence" in fields an editor could be told the meaning of.
+> The test that catches it counts `:scope > li`, not `li`.
+
+The content was imported once from the page on ondc.org and is CMS copy from
+here on. The rendered text is character-for-character identical to upstream on
+both pages; the only structural differences are deliberate, and they are the
+same one twice. The related-documents line is a `<div class="bk-note">` where
+upstream writes a `<p>`, and a numbered point's text is a
+`<div class="bk-barrier-t">` where upstream writes a `<span>`: both hold rich
+text, and an editor's `<p>` does not belong inside either tag. Neither class
+has a rule that depends on its tag, and `.bk-barrier` is a flex row where a
+div and a span are the same flex item. The margin guards are in
+`css/ondc/legal-doc.css`, not `beckn.css`, for the usual reason.
+
+> **A non-greedy `.*?</div>` cannot read a nested block.** The importer first
+> matched `<div class="bk-barriers">(.*?)</div>`, which stops at the tag
+> closing the FIRST row — four points silently became one, and the rest of the
+> clause was swallowed as stray text. Nothing errored. Blocks that nest are
+> lifted out by counting `<div>` depth before the rest is tokenised.
+
+The scroll spy that lights the clause you are reading is `js/ondc/doc-index.js`
+— a file rather than ondc.org's inline script, because **CloudCannon deletes an
+inline script the first time an editor saves the page** (see above). It only
+toggles a class on a link that is already there.
 
 ## Adding the next page
 
@@ -687,7 +1372,7 @@ the same class CloudCannon's frame triggers — and the real boxes measured:
 
 | Page | Mode | Navbar | First section | Overlap |
 | --- | --- | --- | --- | --- |
-| `home.html` | editor | static, `0 → 88` | starts at `88` | none |
+| `index.html` | editor | static, `0 → 88` | starts at `88` | none |
 | `about-us.html` | editor | static, `0 → 88` | starts at `88` | none |
 | `rfp.html` | live | sticky, `0 → 88` | starts at `88` | none |
 | `rfp.html` | editor | static, `0 → 88` | starts at `88` | none |

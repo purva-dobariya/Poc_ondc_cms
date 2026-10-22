@@ -25,7 +25,8 @@ build settings have to change once. In CloudCannon: **Site Settings → Build**
 Then push this repo and let the build run. Until the build settings are changed the
 site will not publish.
 
-Pages are served flat: `/home.html`, `/about-us.html`, `/rfp.html`. Each new page
+Pages are served flat: `/about-us.html`, `/rfp.html`. The home page is the one
+exception — it is `src/pages/index.liquid` and is served at `/`. Each new page
 keeps that shape.
 
 The postbuild hook `.cloudcannon/postbuild` must stay **executable in Git** — it is
@@ -140,6 +141,11 @@ is published.
 | Numbered journey (spine) | Numbered steps down a line that fills as you scroll, with optional expandable detail. One per page. |
 | Escalation panel | A dark call-out: conditions, buttons, and key facts down the side. |
 | Buyer App directory | The searchable, paged list of Buyer Apps and their contacts. |
+| Participant directory | The filterable, paged participant ledger — category tree, role toggles, search and CSV export. |
+| Knowledge base index | The grid of cards on the Resources hub, one per area of the library. |
+| Resources search | The search box that searches every document in the knowledge base at once. |
+| Knowledge base area | The body of a Resources sub-page — sidebar, breadcrumbs and that area's documents. |
+| Newsletter rows | A heading and a stack of wide rows, each linking to a newsletter to download. |
 | FAQ | Questions that open one at a time. |
 | Key numbers | Big figures that count up, in labelled rows, with an optional legend. |
 
@@ -387,6 +393,224 @@ expandable section and FAQ answer is open so you can click into the text, and
 all 143 directory cards are shown with their contacts visible. On the live page
 only the first answer in each group is open, and the directory shows one page at
 a time.
+
+---
+
+## 3d. Editing the Network Participants page
+
+Three sections: the hero, the **Participant directory**, and the closing
+**Participant Portal** panel. The hero and the closing panel are ordinary
+sections — heading, paragraph, buttons.
+
+### What is edited on the section, and what is not
+
+Open **Participant directory** and you can change everything *around* the
+table: the tabs across the top, the names and descriptions of the two lists,
+the search hint, how many rows a page starts with, whether the **Export CSV**
+button shows, and the disclaimer underneath. Column headings and the small
+wording inside the table ("Email", "Call", "Website", "Enabled by", the
+"nothing matches" message) are grouped under **Wording inside the directory**
+— open that only when you need to reword something specific.
+
+**The participants themselves are not edited here.** They are in their own
+place in the sidebar.
+
+### Adding, changing and deleting a participant
+
+In the CloudCannon sidebar, open **Network Participants**. You will find two
+lists — **Key Network Participants** and **Integrated Network Participants** —
+matching the two tabs on the page.
+
+- **Add one** with the **+** button. Fill in the name, upload or pick a logo,
+  tick its roles and its live categories, and fill in the contact details.
+- **Change one** by clicking it open.
+- **Delete one** with the item menu (**⋮**) → Delete. It is gone from the
+  website on the next publish. The same goes for duplicating: **⋮** →
+  Duplicate gives you a copy to edit.
+
+Two things you do not have to think about:
+
+- **Order.** The page sorts by name every time it builds, so it does not matter
+  where in the list a new entry ends up — it will appear in its alphabetical
+  place on the site.
+- **A missing logo.** Leave the logo empty and the row shows a grey circle with
+  the participant's initials rather than a broken image. The same happens if a
+  logo file goes missing later. You can set the two letters yourself in
+  **Initials**, or leave that empty and the first two letters of the name are
+  used.
+
+Only **Name** really matters. Every other field can be empty, and the row
+simply does not draw that part.
+
+### Adding a new category or role
+
+Open **Participant categories & roles** in the sidebar.
+
+**Categories** is the list behind the filter panel on the left of the directory
+*and* behind the category picker on each participant. Add the category here
+first, then tag participants with it. **Sits under** decides where it appears
+in the panel: leave it empty for a top-level category, or pick a top-level one
+to nest it underneath.
+
+A category only shows in the filter panel when the list you are looking at
+actually has participants in it — an option nobody can tick is left out rather
+than greyed, and the two tabs genuinely carry different sets. The number beside
+each one is how many participants are in it.
+
+**Roles** carries the short key the table prints (BNP, SNP) and the full
+wording behind it. **Role** must match exactly what is written on the
+participants; changing it here does not change it on them.
+
+### Changing the order of a list
+
+Each list has an **Order** setting:
+
+- **Alphabetical by name** — the default for both lists, and what keeps a newly
+  added participant in the right place by itself.
+- **As listed in the data file** — keeps the order of the entries exactly as
+  they sit in **Network Participants**.
+
+The Key list is a volume ranking on ondc.org. It is set to alphabetical here;
+switch it to **As listed in the data file** to restore the ranking, and reword
+the list's **Line under the switcher** to match.
+
+### The tabs across the top
+
+**Tabs above the directory** is the row of links for moving between this
+directory and the other participant directories. Tick **This is the current
+page** on exactly one — that is the one drawn as selected.
+
+### While you are editing
+
+The list switcher is shown open, so both list names can be clicked and
+reworded. The table itself pages the same way it does on the live site, twenty
+rows at a time — the rows are not editable here anyway, and everything on the
+section that *is* editable is visible without paging.
+
+---
+
+## 3e. Editing the Ecosystem Participants page
+
+The same three sections as Network Participants — hero, **Participant
+directory**, closing **Participant Portal** panel — and the directory is the
+same section type, so §3d applies to it word for word. Two differences:
+
+- **One list, so no switcher.** The directory shows a single list and the
+  "Participant list" dropdown is not drawn. Add a second list under **Lists in
+  this directory** and the switcher appears by itself.
+- **The sub-line under a participant's name says "Live NPs supported"** rather
+  than "Enabled by". That is **Wording inside the directory → Label before the
+  technology service provider**. Nothing on the page uses it today — the sheet
+  carries no values — but fill the field on a participant and the line appears.
+
+### Adding, changing and deleting an ecosystem participant
+
+Sidebar → **Ecosystem Participants** (hub icon). It works exactly like
+**Network Participants**: **+** to add, **⋮ → Delete** to remove, **⋮ →
+Duplicate** to copy, click a row to edit. Deleting removes it from the site on
+the next publish, and the page sorts by name, so a new entry lands in its
+alphabetical place by itself.
+
+It is a **separate file** from Network Participants on purpose — editing one
+directory never touches the other, so two people can work on them at the same
+time without colliding.
+
+### Moving a participant between the two directories
+
+There is no "move" button. Open the entry, copy its fields into a new entry in
+the other list, then delete the original. An organisation that genuinely
+belongs in both — a TSP that is also a Buyer NP — should be listed in both.
+
+### The tabs at the top
+
+Both pages carry the same two tabs, and each page ticks **This is the current
+page** on its own one. If you rename a tab, rename it on *both* pages or the
+pair will disagree.
+
+---
+
+## 3f. Editing the Resources section
+
+Resources is **nineteen pages** — the hub at `/resources.html` and eighteen
+sub-pages, one per area of the knowledge base. All nineteen are drawn from a
+single place in the sidebar: **Resources library**.
+
+### The one rule that explains everything here
+
+Add a document to an area and it appears **in four places at once**: on that
+area's page, in the hub's search, in the count on the hub card, and in the
+count on any parent area's sub-area card. Delete it and it leaves all four.
+You never update a number by hand.
+
+### Adding, changing and deleting a document
+
+Sidebar → **Resources library** → open the file → you get the list of
+**Areas**. Each area opens to **Groups of documents**, and each group opens to
+its **Documents**.
+
+- **Add** with **+** at whichever level you need — a document, a whole group,
+  or a new area.
+- **Delete** with the item menu (**⋮**) → Delete.
+- **Reorder** by dragging. Order matters here and is exactly what the page
+  shows: the order of areas is the order of the hub cards and the sidebar, and
+  the order of groups is the order they appear down the page.
+
+A document has a **Title**, a **Kind of document** (PDF, Video, Link, Page on
+this site…) which picks its icon and tag, a **Link address**, and three
+optional tags: **Language**, **Date tag** and a short **Note beside the
+title**. Leave the link empty for something announced but not published yet —
+the row shows without a link, which is how "coming soon" is done.
+
+### Adding a whole new area (a new page)
+
+Two steps, in this order:
+
+1. **In Resources library**, add the area. Give it an **id** (lower-case, no
+   spaces — for example `payments`), a title, a short description, an icon,
+   and a **Page address** such as `/resources-payments.html`. Tick **Show a
+   card on the Resources hub** if it should appear on the hub. To nest it
+   under an existing area, put that area's id in **Sits under** — that one
+   field drives the sidebar tree, the breadcrumbs and the parent's sub-area
+   cards together.
+2. **In Pages**, duplicate any existing `resources-…` page and change three
+   things: the **Page address** to match what you just typed, the hero wording,
+   and — on the **Knowledge base area** section — **Which part of the library**
+   to the new id.
+
+Until step 2 is done the hub card points at a page that does not exist.
+
+### What is edited on the page, and what is not
+
+Open a Resources sub-page and you can edit the hero, the intro paragraph, the
+closing call to action, and the wording around the documents (the sidebar
+heading, the breadcrumb, the filter hint, the "nothing matched" message, under
+**Wording around the documents**). **The documents themselves are not edited
+there** — they are in Resources library.
+
+On the hub the same split applies: the masthead, the search wording, the index
+heading and the newsletter rows are page content; the cards are the areas.
+
+### The newsletters
+
+The only list on these pages that *is* edited on the page. Open **Newsletter
+rows** on the hub: each row has a small label, a title, a description, the link
+text (put the file size in it — "Download PDF · 17 MB") and the address.
+
+### Two settings not to change by accident
+
+- **Which part of the library** on a sub-page is the area's id. Change it and
+  the page shows a different area's documents — or nothing, if no area has
+  that id.
+- **Menu item to highlight** in Page settings is `/resources.html` on every
+  sub-page. That is what keeps "Resources" lit in the top menu while a reader
+  is on one of them.
+
+### While you are editing
+
+Everything that normally fades in as you scroll is shown already faded in, and
+the sidebar is held open so you can see which area the page is. The search
+results box stays empty — it fills only when somebody types, and nothing in it
+is editable anyway.
 
 ---
 
