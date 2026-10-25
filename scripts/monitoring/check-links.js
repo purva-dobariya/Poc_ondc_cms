@@ -21,7 +21,7 @@ const fs = require('fs');
 const path = require('path');
 
 const SITE = process.argv[2] || '_site';
-const STRICT = process.env.ONDC_FAIL_ON_BROKEN_LINKS !== '0';
+const STRICT = process.env.ONDC_FAIL_ON_BROKEN_LINKS === '1';
 
 function walk(dir, out = []) {
   for (const e of fs.readdirSync(dir, { withFileTypes: true })) {

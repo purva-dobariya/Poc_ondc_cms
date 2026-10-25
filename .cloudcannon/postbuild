@@ -51,21 +51,25 @@ npm i
 npx @bookshop/generate --editable-regions
 
 # --- 2. Build metrics and page-weight budgets ------------------------
+# NOTE the `|| EXIT=$?` form. CloudCannon's build shell runs with
+# errexit enabled, and this file is SOURCED into it, so a bare command
+# that exits non-zero kills the whole build on the spot — before the
+# gate logic further down ever runs. Putting the call on the left of
+# `||` makes it a tested command, which errexit ignores. Do not
+# "simplify" these back to a bare call followed by `EXIT=$?`.
+METRICS_EXIT=0
 if [ -f "$SCRIPTS/build-metrics.js" ]; then
-  node $SCRIPTS/build-metrics.js "$SITE_DIR"
-  METRICS_EXIT=$?
+  node "$SCRIPTS/build-metrics.js" "$SITE_DIR" || METRICS_EXIT=$?
 else
   echo "[postbuild] $SCRIPTS/build-metrics.js missing, skipping metrics"
-  METRICS_EXIT=0
 fi
 
 # --- 3. Internal link and asset integrity ----------------------------
+LINKS_EXIT=0
 if [ -f "$SCRIPTS/check-links.js" ]; then
-  node $SCRIPTS/check-links.js "$SITE_DIR"
-  LINKS_EXIT=$?
+  node "$SCRIPTS/check-links.js" "$SITE_DIR" || LINKS_EXIT=$?
 else
   echo "[postbuild] $SCRIPTS/check-links.js missing, skipping link check"
-  LINKS_EXIT=0
 fi
 
 # --- 4. Slack summary, if configured ---------------------------------
