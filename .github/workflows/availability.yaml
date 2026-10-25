@@ -13,7 +13,7 @@ name: Availability check
 
 on:
   schedule:
-    - cron: '*/30 * * * *'      # every 30 minutes (best effort)
+    - cron: '0 */2 * * *'      # every 30 minutes (best effort)
   workflow_dispatch:             # and on demand, from the Actions tab
 
 permissions:
