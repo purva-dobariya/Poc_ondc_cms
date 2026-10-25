@@ -81,18 +81,31 @@ if [ -z "$PROBE_IPS" ]; then
   fail "no IPs to probe"
 else
   for ip in $PROBE_IPS; do
-    CODE=$(curl -s -o /dev/null -w '%{http_code}' -m "$TIMEOUT" \
+    # Body goes to a FILE, not a shell variable. Command substitution
+    # strips NUL bytes and mangles any non-text response, and piping a
+    # large body into `grep -q` raises "write error: Broken pipe" the
+    # moment grep short-circuits. A temp file avoids both.
+    # --compressed matters too: CDNs may return gzip/brotli, which as
+    # raw bytes would never match a plaintext keyword.
+    TMP_BODY=$(mktemp)
+    CODE=$(curl -s -o "$TMP_BODY" -w '%{http_code}' -m "$TIMEOUT" --compressed \
              --resolve "$DOMAIN:443:$ip" "https://$DOMAIN/" 2>/dev/null)
     if [ "$CODE" = "200" ]; then
-      BODY=$(curl -s -m "$TIMEOUT" --resolve "$DOMAIN:443:$ip" "https://$DOMAIN/" 2>/dev/null)
-      if printf '%s' "$BODY" | grep -qF "$KEYWORD"; then
+      if grep -qF "$KEYWORD" "$TMP_BODY" 2>/dev/null; then
         pass "$ip -> HTTP 200, keyword \"$KEYWORD\" present"
       else
-        fail "$ip -> HTTP 200 but keyword \"$KEYWORD\" MISSING (wrong content served)"
+        # Say what WAS served, so the next run diagnoses itself instead
+        # of just repeating "missing".
+        BYTES=$(wc -c < "$TMP_BODY" | tr -d ' ')
+        TITLE=$(tr '\n' ' ' < "$TMP_BODY" \
+                | sed -n 's/.*<title[^>]*>\([^<]*\)<\/title>.*/\1/ip' \
+                | cut -c1-80)
+        fail "$ip -> HTTP 200 but keyword \"$KEYWORD\" MISSING (${BYTES} bytes, title: ${TITLE:-none})"
       fi
     else
       fail "$ip -> HTTP $CODE (expected 200)"
     fi
+    rm -f "$TMP_BODY"
   done
 fi
 
