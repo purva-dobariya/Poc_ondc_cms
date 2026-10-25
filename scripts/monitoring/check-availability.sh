@@ -138,12 +138,26 @@ done
 
 # ── 4. ACME validation records ───────────────────────────────────────
 head2 "4. Certificate renewal prerequisites"
-TXT_COUNT=$(doh "_acme-challenge.$DOMAIN" TXT | grep -c . || true)
-if [ "${TXT_COUNT:-0}" -ge 1 ]; then
-  pass "_acme-challenge.$DOMAIN has $TXT_COUNT TXT record(s) — renewal can validate"
-else
-  fail "_acme-challenge.$DOMAIN has NO TXT records — certificate renewal WILL fail silently"
-fi
+# On a CloudCannon-owned preview host (*.cloudvent.net) the certificate
+# is issued against CloudCannon's own zone, so there is no
+# _acme-challenge record in any zone we control and nothing to assert.
+# Auto-skip rather than fail: a check that is permanently red trains
+# people to ignore the alert, which costs more than it catches. This
+# starts asserting for real the moment ONDC_DOMAIN becomes ondc.org.
+case "$DOMAIN" in
+  *.cloudvent.net)
+    warn "skipped on CloudCannon preview host — ACME records live in CloudCannon's zone, not yours"
+    warn "this check starts enforcing once ONDC_DOMAIN is your own domain"
+    ;;
+  *)
+    TXT_COUNT=$(doh "_acme-challenge.$DOMAIN" TXT | grep -c . || true)
+    if [ "${TXT_COUNT:-0}" -ge 1 ]; then
+      pass "_acme-challenge.$DOMAIN has $TXT_COUNT TXT record(s) — renewal can validate"
+    else
+      fail "_acme-challenge.$DOMAIN has NO TXT records — certificate renewal WILL fail silently"
+    fi
+    ;;
+esac
 
 # ── 5. HTTP to HTTPS redirect ────────────────────────────────────────
 head2 "5. HTTP -> HTTPS redirect"
