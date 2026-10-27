@@ -36,10 +36,18 @@ MAX_BUILD_AGE_HOURS="${ONDC_MAX_BUILD_AGE_HOURS:-168}"   # 7 days
 TIMEOUT=20
 
 FAILURES=0
-pass() { printf '  \033[32mPASS\033[0m  %s\n' "$1"; }
-fail() { printf '  \033[31mFAIL\033[0m  %s\n' "$1"; FAILURES=$((FAILURES+1)); }
-warn() { printf '  \033[33mWARN\033[0m  %s\n' "$1"; }
-head2() { printf '\n\033[1m%s\033[0m\n' "$1"; }
+
+# Every pass/fail/warn is recorded as a tab-separated row as well as
+# printed, so the dashboard at the end can be built without threading a
+# return value through every check. SECTION is set by head2.
+SUMFILE=$(mktemp)
+SECTION="General"
+trap 'rm -f "$SUMFILE"' EXIT
+
+pass() { printf '  \033[32mPASS\033[0m  %s\n' "$1"; printf '%s\t✅\t%s\n' "$SECTION" "$1" >> "$SUMFILE"; }
+fail() { printf '  \033[31mFAIL\033[0m  %s\n' "$1"; FAILURES=$((FAILURES+1)); printf '%s\t❌\t%s\n' "$SECTION" "$1" >> "$SUMFILE"; }
+warn() { printf '  \033[33mWARN\033[0m  %s\n' "$1"; printf '%s\t⚠️\t%s\n' "$SECTION" "$1" >> "$SUMFILE"; }
+head2() { SECTION="${1#*. }"; printf '\n\033[1m%s\033[0m\n' "$1"; }
 
 doh() { # doh <name> <type> -> one value per line
   curl -fsS -m "$TIMEOUT" -H 'accept: application/dns-json' \
@@ -193,7 +201,74 @@ else
   fi
 fi
 
-# ── summary ──────────────────────────────────────────────────────────
+# ── dashboard ────────────────────────────────────────────────────────
+# Renders everything — live availability AND the content metrics from
+# the last build — as one Markdown view. GitHub shows this at the top of
+# the workflow run page, which is the single place to look.
+#
+# Writes nowhere unless GITHUB_STEP_SUMMARY is set, so local runs are
+# unaffected. Set ONDC_SUMMARY_FILE to render it locally for testing.
+SUMMARY_OUT="${GITHUB_STEP_SUMMARY:-${ONDC_SUMMARY_FILE:-}}"
+if [ -n "$SUMMARY_OUT" ]; then
+  if [ "$FAILURES" -eq 0 ]; then BANNER="## 🟢 All checks passed"; else BANNER="## 🔴 $FAILURES check(s) failed"; fi
+
+  {
+    printf '# %s — site status\n\n' "$DOMAIN"
+    printf '%s\n\n' "$BANNER"
+    printf '_Checked %s UTC_\n\n' "$(date -u '+%Y-%m-%d %H:%M')"
+
+    printf '## Live checks\n\n'
+    printf '| Area | | Detail |\n|---|---|---|\n'
+    # Collapse repeated section names so the table reads as groups.
+    awk -F'\t' '{ s=($1==prev)?"":$1; prev=$1; gsub(/\|/,"\\|",$3); printf "| %s | %s | %s |\n", s, $2, $3 }' "$SUMFILE"
+    printf '\n'
+
+    # Content metrics come from the files the build hook publishes.
+    BI=$(curl -fsS -m "$TIMEOUT" "https://$DOMAIN/build-info.json" 2>/dev/null)
+    LR=$(curl -fsS -m "$TIMEOUT" "https://$DOMAIN/link-report.json" 2>/dev/null)
+    if [ -n "$BI" ]; then
+      printf '## Content, as of the last build\n\n'
+      printf '| Metric | Value |\n|---|---|\n'
+      printf '%s' "$BI" | jq -r '
+        "| Built | \(.built_at_ist // .built_at) |",
+        "| Pages | \(.pages) |",
+        "| Files | \(.files) |",
+        "| Output size | \(.total_mb) MB |",
+        "| Heaviest page | \(.heaviest_pages[0].kb) KB — `\(.heaviest_pages[0].url)` |",
+        "| Image tags | \(.references.img_tags) |",
+        "| PDF links | \(.references.pdf_links) |",
+        "| External links | \(.references.external_links) |",
+        "| Inline scripts | \(.references.inline_scripts) |",
+        "| Budget breaches | \((.budget_breaches // []) | length) |"
+      ' 2>/dev/null
+      [ -n "$LR" ] && printf '%s' "$LR" | jq -r '
+        "| Internal links checked | \(.checked) |",
+        "| **Broken internal links** | **\(.broken | length)** |"
+      ' 2>/dev/null
+      printf '\n'
+
+      # Only worth listing when there is something to act on.
+      if [ -n "$LR" ]; then
+        NBROKEN=$(printf '%s' "$LR" | jq -r '.broken | length' 2>/dev/null || echo 0)
+        if [ "${NBROKEN:-0}" -gt 0 ]; then
+          printf '<details><summary>Broken links (%s) — most referenced first</summary>\n\n' "$NBROKEN"
+          printf '| Target | Pages affected |\n|---|---|\n'
+          printf '%s' "$LR" | jq -r '
+            .broken | group_by(.target) | map({t: .[0].target, n: length})
+            | sort_by(-.n) | .[:25] | .[] | "| `\(.t)` | \(.n) |"
+          ' 2>/dev/null
+          printf '\n</details>\n\n'
+        fi
+      fi
+    else
+      printf '## Content\n\n_build-info.json not reachable — is the postbuild hook deployed?_\n\n'
+    fi
+
+    printf -- '---\n_Availability from this workflow; content metrics from the last CloudCannon build._\n'
+  } >> "$SUMMARY_OUT"
+fi
+
+# ── result ───────────────────────────────────────────────────────────
 echo ""
 echo "════════════════════════════════════════════"
 if [ "$FAILURES" -eq 0 ]; then
