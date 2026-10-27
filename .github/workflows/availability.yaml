@@ -1,19 +1,29 @@
 name: Availability check
 
-# Runs the checks a hostname-only uptime service cannot do:
-# per-IP reachability, TLS expiry per IP, DNS drift, ACME TXT presence
+# The ONLY monitoring layer for this site. Checks per-IP reachability,
+# TLS expiry per IP, DNS drift, ACME TXT presence, HTTP->HTTPS redirect
 # and build freshness. On failure it opens (or comments on) a GitHub
-# Issue, which emails everyone watching the repo — free alerting with
-# no extra service.
+# Issue, which emails everyone watching the repo.
+#
+# ALERTING DEPENDS ON A GITHUB SETTING, NOT ON THIS FILE. The issue is
+# created by github-actions[bot] and does not @mention anyone, so the
+# repo's Watch setting must be "All Activity" — "Participating and
+# @mentions" will NOT email you. Verify before relying on this.
 #
 # NOTE ON TIMING: GitHub delays scheduled runs under load, sometimes by
-# 10-30 minutes, and disables schedules after 60 days of repo inactivity.
-# So this is the thorough-but-slow layer. Fast outage detection stays
-# with UptimeRobot at 5-minute intervals.
+# 10-30 minutes, and skips slots entirely; it also disables schedules
+# after 60 days of repository inactivity. Treat "every 2 hours" as
+# "several times a day, best effort". Since this is now the only layer,
+# an outage may go unnoticed for a few hours.
+#
+# BUILD FAILURES are caught by check 6 (build freshness), which reads
+# build-info.json from the live site. Set the ONDC_MAX_BUILD_AGE_HOURS
+# repo variable to a little more than your longest expected gap between
+# publishes — the 168h default is too loose to catch a broken pipeline.
 
 on:
   schedule:
-    - cron: '0 */2 * * *'      # every 30 minutes (best effort)
+    - cron: '0 */2 * * *'      # every 2 hrs (best effort)
   workflow_dispatch:             # and on demand, from the Actions tab
 
 permissions:
